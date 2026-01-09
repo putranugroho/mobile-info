@@ -1,0 +1,12 @@
+{
+    "status": "active",
+    "icon_url": "https://cdn.mobilepulsa.net/img/logo/pulsa/small/listrik.png",
+    "pulsa_code": "hpln100000",
+    "pulsa_op": "PLN",
+    "pulsa_nominal": "100000",
+    "pulsa_details": "-",
+    "pulsa_price": 100500,
+    "pulsa_type": "pln",
+    "masaaktif": "0",
+    "pulsa_category": "pln"
+}

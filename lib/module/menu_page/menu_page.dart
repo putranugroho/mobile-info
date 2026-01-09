@@ -1,0 +1,211 @@
+import 'package:flutter/material.dart';
+import 'package:ibpr/module/home/home_page.dart';
+import 'package:ibpr/module/menu_page/menu_notifier.dart';
+import 'package:ibpr/module/profile/profile_page.dart';
+import 'package:ibpr/module/riwayat/riwayat_page.dart';
+import 'package:ibpr/module/produk/produk_page.dart'; // ✅ TAMBAHAN
+import 'package:ibpr/utils/colors.dart';
+import 'package:ibpr/utils/images_path.dart';
+import 'package:provider/provider.dart';
+
+class MenuPage extends StatelessWidget {
+  const MenuPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return ChangeNotifierProvider(
+      create: (_) => MenuNotifier(context: context),
+      child: Consumer<MenuNotifier>(
+        builder: (context, value, child) => SafeArea(
+          child: Scaffold(
+            backgroundColor: Colors.grey[200],
+            body: Center(
+              child: Container(
+                width: MediaQuery.of(context).size.width > 600 ? 400 : MediaQuery.of(context).size.width,
+                decoration: const BoxDecoration(color: Colors.white),
+                child: WillPopScope(
+                  onWillPop: value.back,
+                  child: Stack(
+                    children: [
+                      Positioned(
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        bottom: 60,
+                        child: value.page == 0
+                            ? HomePage()
+                            : value.page == 1
+                            ? RiwayatPage()
+                            : value.page == 2
+                            ? ProdukPage() // ✅ PRODUK PAGE
+                            : ProfilePage(),
+                      ),
+                      Positioned(
+                        bottom: 0,
+                        left: 0,
+                        right: 0,
+                        child: Container(
+                          height: 60,
+                          decoration: BoxDecoration(
+                            border: Border(top: BorderSide(width: 1, color: Colors.grey[300] ?? Colors.transparent)),
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              InkWell(
+                                onTap: () => value.gantiPage(0),
+                                child: SizedBox(
+                                  height: 60,
+                                  width: 60,
+                                  child: Stack(
+                                    children: [
+                                      Positioned(
+                                        top: 5,
+                                        right: 0,
+                                        child: value.page == 0
+                                            ? Container(
+                                                width: 32,
+                                                height: 32,
+                                                decoration: BoxDecoration(color: colorPrimary, shape: BoxShape.circle),
+                                              )
+                                            : const SizedBox(),
+                                      ),
+                                      Positioned.fill(
+                                        child: Column(
+                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          children: [
+                                            Image.asset(
+                                              value.page == 0 ? ImageAssets.homeSelect : ImageAssets.homeUnselect,
+                                              height: 26,
+                                              color: value.page == 0 ? colorSecondary : Colors.grey,
+                                            ),
+                                            const SizedBox(height: 4),
+                                            Text("Home", style: TextStyle(color: value.page == 0 ? colorPrimary : Colors.grey, fontSize: 12)),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              InkWell(
+                                onTap: () => value.gantiPage(1),
+                                child: SizedBox(
+                                  height: 60,
+                                  width: 60,
+                                  child: Stack(
+                                    children: [
+                                      Positioned(
+                                        top: 5,
+                                        right: 0,
+                                        child: value.page == 1
+                                            ? Container(
+                                                width: 32,
+                                                height: 32,
+                                                decoration: BoxDecoration(color: colorPrimary, shape: BoxShape.circle),
+                                              )
+                                            : const SizedBox(),
+                                      ),
+                                      Positioned.fill(
+                                        child: Column(
+                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          children: [
+                                            Image.asset(
+                                              value.page == 1 ? ImageAssets.reportSelect : ImageAssets.reportUnselect,
+                                              height: 26,
+                                              color: value.page == 1 ? colorSecondary : Colors.grey,
+                                            ),
+                                            const SizedBox(height: 4),
+                                            Text("Riwayat", style: TextStyle(color: value.page == 1 ? colorPrimary : Colors.grey, fontSize: 12)),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              InkWell(
+                                onTap: () => value.gantiPage(2),
+                                child: SizedBox(
+                                  height: 60,
+                                  width: 60,
+                                  child: Stack(
+                                    children: [
+                                      Positioned(
+                                        top: 5,
+                                        right: 0,
+                                        child: value.page == 2
+                                            ? Container(
+                                                width: 32,
+                                                height: 32,
+                                                decoration: BoxDecoration(color: colorPrimary, shape: BoxShape.circle),
+                                              )
+                                            : const SizedBox(),
+                                      ),
+                                      Positioned.fill(
+                                        child: Column(
+                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          children: [
+                                            Icon(Icons.grid_view_rounded, size: 26, color: value.page == 2 ? colorSecondary : Colors.grey),
+                                            const SizedBox(height: 4),
+                                            Text("Produk", style: TextStyle(color: value.page == 2 ? colorPrimary : Colors.grey, fontSize: 12)),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+
+                              /// PROFIL
+                              InkWell(
+                                onTap: () => value.gantiPage(3),
+                                child: SizedBox(
+                                  height: 60,
+                                  width: 60,
+                                  child: Stack(
+                                    children: [
+                                      Positioned(
+                                        top: 5,
+                                        right: 0,
+                                        child: value.page == 3
+                                            ? Container(
+                                                width: 32,
+                                                height: 32,
+                                                decoration: BoxDecoration(color: colorPrimary, shape: BoxShape.circle),
+                                              )
+                                            : const SizedBox(),
+                                      ),
+                                      Positioned.fill(
+                                        child: Column(
+                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          children: [
+                                            Image.asset(
+                                              value.page == 3 ? ImageAssets.userSelect : ImageAssets.userUnselect,
+                                              height: 26,
+                                              color: value.page == 3 ? colorSecondary : Colors.grey,
+                                            ),
+                                            const SizedBox(height: 4),
+                                            Text("Profil", style: TextStyle(color: value.page == 3 ? colorPrimary : Colors.grey, fontSize: 12)),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}

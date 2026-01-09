@@ -1,0 +1,292 @@
+import 'dart:async';
+
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/material.dart';
+import 'package:ibpr/models/deposito_model.dart';
+import 'package:ibpr/models/index.dart';
+import 'package:ibpr/models/tabungan_model.dart';
+import 'package:ibpr/module/auth/lock_screen_page.dart';
+import 'package:ibpr/module/repository/home_repository.dart';
+import 'package:ibpr/module/repository/rekening_repository.dart';
+import 'package:ibpr/module/transfer/transfer_in_page.dart';
+import 'package:ibpr/module/transfer/transfer_page.dart';
+import 'package:ibpr/module/transfer/transfer_sesama_page.dart';
+import 'package:ibpr/pref/pref.dart';
+import 'package:ibpr/utils/colors.dart';
+import 'package:ibpr/utils/images_path.dart';
+
+import '../../network/network.dart';
+import '../../utils/pro_shimmer.dart';
+
+class HomeNotifier extends ChangeNotifier {
+  final BuildContext context;
+
+  HomeNotifier({required this.context}) {
+    getProfile();
+  }
+
+  UsersModel? users;
+  getProfile() async {
+    Pref().getUsers().then((value) {
+      users = value;
+      print(users!.bprLogo);
+      getHome();
+      loadTabungan();
+      loadDeposito();
+      initializeTimer();
+      notifyListeners();
+    });
+  }
+
+  Timer? _rootTimer;
+
+  void initializeTimer() {
+    if (_rootTimer != null) _rootTimer!.cancel();
+    const time = const Duration(minutes: 5);
+    print(time);
+    _rootTimer = Timer(time, () {
+      logOutUser();
+    });
+  }
+
+  void logOutUser() async {
+    // Log out the user if they're logged in, then cancel the timer.
+    Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => LockScreenPage()), (route) => false);
+    _rootTimer?.cancel();
+  }
+
+  void handleUserInteraction([_]) {
+    if (_rootTimer != null && !_rootTimer!.isActive) {
+      // This means the user has been logged out
+      return;
+    }
+    _rootTimer?.cancel();
+
+    initializeTimer();
+  }
+
+  int page = 0;
+
+  void toggleSaldo() {
+    hideSaldo = !hideSaldo;
+    notifyListeners();
+  }
+
+  List<TabunganModel> listTabungan = [];
+  bool loadingTabungan = false;
+
+  Future loadTabungan() async {
+    loadingTabungan = true;
+    notifyListeners();
+
+    try {
+      listTabungan = await RekeningRepository.getTabungan();
+    } catch (e) {
+      debugPrint("ERROR TABUNGAN: $e");
+    }
+
+    loadingTabungan = false;
+    notifyListeners();
+  }
+
+  List<DepositoModel> listDeposito = [];
+  bool loadingDeposito = false;
+
+  Future loadDeposito() async {
+    loadingDeposito = true;
+    notifyListeners();
+
+    try {
+      listDeposito = await RekeningRepository.getDeposito();
+    } catch (e) {
+      debugPrint("ERROR DEPOSITO: $e");
+    }
+
+    loadingDeposito = false;
+    notifyListeners();
+  }
+
+  gantiPage(int value) {
+    page = value;
+    notifyListeners();
+  }
+
+  var isLoading = true;
+  List<BannersModel> list = [];
+  List<BannersModel> listBanner = [];
+  List<BannersModel> listDialog = [];
+  List<ProdukModel> listProduk = [];
+  Future getHome() async {
+    isLoading = true;
+    list.clear();
+    listProduk.clear();
+    notifyListeners();
+    HomeRepository.homeData(token, NetworkURL.homeData(), users!.id, users!.bprId).then((value) {
+      if (value['value'] == 1) {
+        for (Map<String, dynamic> i in value['banner']) {
+          list.add(BannersModel.fromJson(i));
+        }
+        for (Map<String, dynamic> i in value['produk']) {
+          listProduk.add(ProdukModel.fromJson(i));
+        }
+        listDialog = list.where((element) => element.tipe == "DIALOG").toList();
+        listBanner = list.where((element) => element.tipe != "DIALOG").toList();
+        if (listDialog.isNotEmpty) {
+          showDialog(
+            context: context,
+            builder: (context) {
+              return Dialog(
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                child: CachedNetworkImage(
+                  placeholder: (context, url) => ProShimmer(height: 300, width: 400, radius: 8),
+                  fit: BoxFit.cover,
+                  imageBuilder: (context, imageProvider) => Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(8),
+                      image: DecorationImage(image: imageProvider, fit: BoxFit.cover),
+                    ),
+                  ),
+                  height: 300,
+                  width: 400,
+                  imageUrl: "https://ibprservices.medtrans.id/webServices/image-proxy.php?url=$upload/${listDialog[0].banners}",
+                  errorWidget: (context, url, error) => const Icon(Icons.error),
+                ),
+              );
+            },
+          );
+        }
+        isLoading = false;
+        notifyListeners();
+      } else {
+        isLoading = false;
+        notifyListeners();
+      }
+    });
+  }
+
+  var isLoadingSaldo = false;
+  var hideSaldo = true;
+  int saldo = 0;
+  cekSaldo() async {
+    if (hideSaldo) {
+      isLoadingSaldo = true;
+      notifyListeners();
+      HomeRepository.cekBalance(token, NetworkURL.cekBalance(), users!.noRekening, users!.nomorPonsel, users!.bprId).then((value) {
+        if (value['value'] == 1) {
+          saldo = value['saldo'];
+          isLoadingSaldo = false;
+          hideSaldo = false;
+          notifyListeners();
+        } else {
+          isLoadingSaldo = false;
+          notifyListeners();
+        }
+      });
+    } else {
+      hideSaldo = !hideSaldo;
+      notifyListeners();
+    }
+  }
+
+  transferModul() {
+    showModalBottomSheet(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.only(topLeft: Radius.circular(16), topRight: Radius.circular(16)),
+      ),
+      context: context,
+      builder: (context) {
+        return Container(
+          padding: EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Row(
+                children: [
+                  Expanded(
+                    child: Text("Pilih Metode Transfer", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                  ),
+                  InkWell(
+                    onTap: () => Navigator.pop(context),
+                    child: Container(
+                      width: 40,
+                      height: 40,
+                      decoration: BoxDecoration(shape: BoxShape.circle, color: Colors.grey[300]),
+                      child: Icon(Icons.close),
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(height: 16),
+              InkWell(
+                onTap: () {
+                  Navigator.pop(context);
+                  Navigator.push(context, MaterialPageRoute(builder: (context) => TransferInPage()));
+                },
+                child: Row(
+                  children: [
+                    Container(
+                      width: 40,
+                      height: 40,
+                      padding: EdgeInsets.all(12),
+                      decoration: BoxDecoration(shape: BoxShape.circle, color: colorPrimary),
+                      child: Image.asset(ImageAssets.download, height: 40, color: Colors.white),
+                    ),
+                    SizedBox(width: 8),
+                    Expanded(child: Text("Transfer Ke Rekening Sendiri")),
+                  ],
+                ),
+              ),
+              Container(
+                padding: EdgeInsets.symmetric(vertical: 4),
+                child: Divider(color: Colors.grey),
+              ),
+              InkWell(
+                onTap: () {
+                  Navigator.pop(context);
+                  Navigator.push(context, MaterialPageRoute(builder: (context) => TransferSesamaPage()));
+                },
+                child: Row(
+                  children: [
+                    Container(
+                      width: 40,
+                      height: 40,
+                      padding: EdgeInsets.all(12),
+                      decoration: BoxDecoration(shape: BoxShape.circle, color: colorPrimary),
+                      child: Image.asset(ImageAssets.trasnferIcon, height: 40, color: Colors.white),
+                    ),
+                    SizedBox(width: 8),
+                    Expanded(child: Text("Pindah Buku")),
+                  ],
+                ),
+              ),
+              Container(
+                padding: EdgeInsets.symmetric(vertical: 4),
+                child: Divider(color: Colors.grey),
+              ),
+              InkWell(
+                onTap: () {
+                  Navigator.pop(context);
+                  Navigator.push(context, MaterialPageRoute(builder: (context) => const TransferPage()));
+                },
+                child: Row(
+                  children: [
+                    Container(
+                      width: 40,
+                      height: 40,
+                      padding: EdgeInsets.all(12),
+                      decoration: BoxDecoration(shape: BoxShape.circle, color: colorPrimary),
+                      child: Image.asset(ImageAssets.upload, height: 40, color: Colors.white),
+                    ),
+                    SizedBox(width: 8),
+                    Expanded(child: Text("Transfer Ke Bank Lain")),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+}

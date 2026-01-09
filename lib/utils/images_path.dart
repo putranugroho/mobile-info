@@ -1,0 +1,85 @@
+const String root = "assets/";
+
+class ImageAssets {
+  static const String hris = "${root}hris.png";
+  static const String bjbSyariah = "${root}bjb-syariah.png";
+  static const String logo = "${root}ibpr_logo_fix-01.png";
+  static const String logoIbpr = "${root}ibpr1-01.png";
+  static const String homeSelect = "${root}home_select.png";
+  static const String homeUnselect = "${root}home_unselect.png";
+  static const String reportUnselect = "${root}report_unselect.png";
+  static const String reportSelect = "${root}report_select.png";
+  static const String userSelect = "${root}user_select.png";
+  static const String userUnselect = "${root}user_unselect.png";
+  static const String customerservice = "${root}customer-service.png";
+  static const String user = "${root}user.png";
+
+  static const String pln = "${root}pln.png";
+  static const String smartphone = "${root}smartphone.png";
+  static const String wifi = "${root}wifi.png";
+  static const String wallet = "${root}wallet.png";
+  static const String store = "${root}store.png";
+  static const String voucher = "${root}voucher.png";
+  static const String stamp = "${root}stamp.png";
+  static const String streaming = "${root}streaming.png";
+  static const String qris = "${root}qris.png";
+  static const String transfer = "${root}transfer.png";
+  static const String bpjs = "${root}logo-bpjs.png";
+  static const String withdraw = "${root}withdraw.png";
+  static const String download = "${root}download.png";
+  static const String upload = "${root}upload.png";
+  static const String pbb = "${root}world.png";
+  static const String tv = "${root}tv.png";
+  static const String call = "${root}call.png";
+  static const String emoney = "${root}emoney.png";
+  static const String trasnferIcon = "${root}transfer_icon.png";
+  static const String pdam = "${root}pdam.png";
+  static const String idCard = "${root}idCard.png";
+  static const String signal = "${root}signal.png";
+  static const String calendar = "${root}calendar.png";
+  static const String education = "${root}mortarboard.png";
+
+  static const String loading = "${root}loading-buffering.gif";
+
+  static const String email = "${root}email.png";
+  static const String phone = "${root}phone-call.png";
+  static const String map = "${root}map.png";
+  static const String buildings = "${root}buildings.png";
+  static const String filter = "${root}filter.png";
+  static const String pengalaman = "${root}portfolio.png";
+  static const String pendidikan = "${root}graduation-cap.png";
+  static const String family = "${root}family.png";
+  static const String abnout = "${root}information-button.png";
+  static const String hierarchy = "${root}hierarchy.png";
+  static const String breaks = "${root}coffee-time.png";
+  static const String training = "${root}training.png";
+  static const String kendaraanNotAvailable = "${root}car-wash.png";
+  static const String kendaraanAvailable = "${root}parked-car.png";
+  static const String dashboard = "${root}dashboard.png";
+  static const String groups = "${root}userss.png";
+  static const String employee = "${root}employees.png";
+  static const String kartanu = "${root}id-card.png";
+  static const String youtube = "${root}youtube.png";
+  static const String infaq_ = "${root}infaq_.png";
+  static const String islam = "${root}islam.png";
+  static const String box_ = "${root}box_.png";
+  static const String menu_ = "${root}menu_.png";
+  static const String exit = "${root}exit.png";
+  static const String report = "${root}report.png";
+  static const String setoran = "${root}setoran.png";
+  static const String pengajuan = "${root}pengajuan.png";
+  static const String nasabah = "${root}nasabah.png";
+  static const String penarikan = "${root}penarikan.png";
+  static const String pinjaman = "${root}pinjaman.png";
+  static const String tabungan = "${root}tabungan.png";
+  static const String product_ = "${root}product_.png";
+  static const String employees_ = "${root}employees_.png";
+  static const String branch = "${root}branch.png";
+  static const String tiket = "${root}tiket.png";
+  static const String access = "${root}access.png";
+  static const String usersManagement = "${root}users_management.png";
+  static const String bank_ = "${root}bank_.png";
+
+  static const String dashboard_ = "${root}dashboard_.png";
+  static const String masterData = "${root}master-data.png";
+}

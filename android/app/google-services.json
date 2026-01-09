@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "473823120596",
+    "project_id": "ibpr-8a792",
+    "storage_bucket": "ibpr-8a792.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:473823120596:android:a8720750ef73975fc7ff41",
+        "android_client_info": {
+          "package_name": "id.ibpr.android"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA_kkAfS1rlFS6OJE5BUO6v2py-6PJgHjw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

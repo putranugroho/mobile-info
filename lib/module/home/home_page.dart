@@ -1,7 +1,9 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:ibpr/module/home/home_notifier.dart';
+import 'package:ibpr/module/loan/loan_detail_page.dart';
 import 'package:ibpr/module/mutasi/mutasi_tabungan_page.dart';
+import 'package:ibpr/module/deposito/deposito_detail_page.dart';
 import 'package:ibpr/utils/colors.dart';
 import 'package:ibpr/utils/format_currency.dart';
 import 'package:ibpr/utils/images_path.dart';
@@ -113,6 +115,7 @@ class HomePage extends StatelessWidget {
                                                               overflow: TextOverflow.ellipsis,
                                                               style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
                                                             ),
+                                                            Text("No CIF: 10000043917", style: TextStyle(fontSize: 12, color: Colors.white)),
                                                           ],
                                                         ),
                                                       ),
@@ -248,11 +251,13 @@ class HomePage extends StatelessWidget {
                                         value.page == 0
                                             ? _produkTabungan(value, context)
                                             : value.page == 1
-                                            ? _produkDeposito(value)
-                                            : _produkPinjaman(),
+                                            ? _produkDeposito(value, context)
+                                            : _produkPinjaman(value, context),
                                       ],
                                     ),
                                   ),
+                                  SizedBox(height: 24),
+                                  _sukuBungaSection(),
                                   SizedBox(height: 24),
                                   Container(
                                     padding: EdgeInsets.symmetric(horizontal: 20),
@@ -366,7 +371,7 @@ Widget _produkTabungan(HomeNotifier value, BuildContext context) {
   );
 }
 
-Widget _produkDeposito(HomeNotifier value) {
+Widget _produkDeposito(HomeNotifier value, BuildContext context) {
   if (value.loadingDeposito) {
     return const Padding(padding: EdgeInsets.all(16), child: CircularProgressIndicator());
   }
@@ -379,7 +384,7 @@ Widget _produkDeposito(HomeNotifier value) {
     children: value.listDeposito.map((deposito) {
       return accountProductCard(
         onTap: () {
-          // NEXT: halaman detail deposito
+          Navigator.push(context, MaterialPageRoute(builder: (_) => DepositoDetailPage(noRekening: deposito.noAcc)));
         },
         leading: Container(
           width: 44,
@@ -402,13 +407,39 @@ Widget _produkDeposito(HomeNotifier value) {
   );
 }
 
-Widget _produkPinjaman() {
+Widget _produkPinjaman(HomeNotifier value, BuildContext context) {
+  if (value.loadingKredit) {
+    return const Padding(padding: EdgeInsets.all(16), child: CircularProgressIndicator());
+  }
+
+  if (value.listKredit.isEmpty) {
+    return const Padding(padding: EdgeInsets.all(16), child: Text("Belum ada pinjaman"));
+  }
+
   return Column(
-    crossAxisAlignment: CrossAxisAlignment.stretch,
-    children: [
-      _produkCard(title: "KAD", subtitle: "Kredit Agunan Deposito", icon: Icons.handshake),
-      _produkCard(title: "KPR", subtitle: "Bunga kompetitif", icon: Icons.house),
-    ],
+    children: value.listKredit.map((kredit) {
+      return accountProductCard(
+        onTap: () {
+          Navigator.push(context, MaterialPageRoute(builder: (_) => LoanDetailPage(noRek: kredit.noAcc)));
+        },
+        leading: Container(
+          width: 44,
+          height: 44,
+          decoration: BoxDecoration(color: const Color.fromARGB(255, 0, 95, 0).withOpacity(0.12), borderRadius: BorderRadius.circular(12)),
+          child: const Icon(Icons.handshake, color: Color.fromARGB(255, 0, 95, 0)),
+        ),
+        content: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(kredit.namaProduk, style: const TextStyle(fontWeight: FontWeight.bold)),
+            const SizedBox(height: 4),
+            Text(kredit.noAcc, style: const TextStyle(fontSize: 12, color: Colors.grey)),
+            const SizedBox(height: 6),
+            Text("Tagihan: Rp ${FormatCurrency.oCcy.format(kredit.tagihan)}", style: const TextStyle(fontWeight: FontWeight.bold)),
+          ],
+        ),
+      );
+    }).toList(),
   );
 }
 
@@ -447,66 +478,45 @@ Widget accountProductCard({
   );
 }
 
-Widget _produkCard({required String title, required String subtitle, required IconData icon, VoidCallback? onTap}) {
-  return accountProductCard(
-    onTap: onTap ?? () {},
-    leading: Container(
-      width: 44,
-      height: 44,
-      decoration: BoxDecoration(color: const Color.fromARGB(255, 0, 95, 0).withOpacity(0.12), borderRadius: BorderRadius.circular(12)),
-      child: Icon(icon, color: const Color.fromARGB(255, 0, 95, 0)),
+Widget _sukuBungaSection() {
+  return Container(
+    margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+    padding: const EdgeInsets.all(16),
+    decoration: BoxDecoration(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(12),
+      boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 8, offset: const Offset(0, 4))],
     ),
-    content: Column(
+    child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
-        const SizedBox(height: 4),
-        Text(subtitle, style: const TextStyle(fontSize: 12, color: Colors.grey)),
+        const Text(
+          "Suku Bunga",
+          style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.black87),
+        ),
+        const SizedBox(height: 12),
+
+        _rateItem("Tabungan", "2,5%"),
+        _rateItem("Deposito 1 Bulan", "5%"),
+        _rateItem("Deposito 6 Bulan", "5,5%"),
+        _rateItem("Deposito 12 Bulan", "6%"),
       ],
     ),
   );
 }
 
-// Widget _cardTabunganPayroll(HomeNotifier value, BuildContext context) {
-//   return accountProductCard(
-//     onTap: () {
-//       Navigator.push(context, MaterialPageRoute(builder: (_) => const MutasiTabunganPage()));
-//     },
-
-//     /// ICON
-//     leading: Container(
-//       width: 44,
-//       height: 44,
-//       decoration: BoxDecoration(color: const Color.fromARGB(255, 0, 95, 0).withOpacity(0.12), borderRadius: BorderRadius.circular(12)),
-//       child: const Icon(Icons.credit_card, color: Color.fromARGB(255, 0, 95, 0)),
-//     ),
-
-//     /// CONTENT
-//     content: Column(
-//       crossAxisAlignment: CrossAxisAlignment.start,
-//       children: [
-//         const Text("Tabungan Payroll", style: TextStyle(fontWeight: FontWeight.bold)),
-//         const SizedBox(height: 4),
-//         Text(value.users!.noRekening, style: const TextStyle(fontSize: 12, color: Colors.grey)),
-//         const SizedBox(height: 6),
-
-//         /// TAP SALDO ONLY
-//         GestureDetector(
-//           behavior: HitTestBehavior.opaque,
-//           onTap: value.cekSaldo,
-//           child: Row(
-//             mainAxisSize: MainAxisSize.min,
-//             children: [
-//               Text(
-//                 value.hideSaldo ? "Rp *****" : "Rp ${FormatCurrency.oCcy.format(value.saldo)}",
-//                 style: const TextStyle(fontWeight: FontWeight.bold),
-//               ),
-//               const SizedBox(width: 6),
-//               Icon(value.hideSaldo ? Icons.visibility_off : Icons.visibility, size: 16, color: Colors.grey),
-//             ],
-//           ),
-//         ),
-//       ],
-//     ),
-//   );
-// }
+Widget _rateItem(String label, String value) {
+  return Padding(
+    padding: const EdgeInsets.symmetric(vertical: 6),
+    child: Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(label, style: TextStyle(fontSize: 13, color: Colors.grey.shade700)),
+        Text(
+          value,
+          style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Colors.green),
+        ),
+      ],
+    ),
+  );
+}

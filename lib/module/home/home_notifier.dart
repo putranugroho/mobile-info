@@ -2,9 +2,10 @@ import 'dart:async';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:ibpr/models/deposito_model.dart';
 import 'package:ibpr/models/index.dart';
+import 'package:ibpr/models/deposito_model.dart';
 import 'package:ibpr/models/tabungan_model.dart';
+import 'package:ibpr/models/kredit_model.dart';
 import 'package:ibpr/module/auth/lock_screen_page.dart';
 import 'package:ibpr/module/repository/home_repository.dart';
 import 'package:ibpr/module/repository/rekening_repository.dart';
@@ -33,6 +34,7 @@ class HomeNotifier extends ChangeNotifier {
       getHome();
       loadTabungan();
       loadDeposito();
+      loadKredit();
       initializeTimer();
       notifyListeners();
     });
@@ -103,6 +105,23 @@ class HomeNotifier extends ChangeNotifier {
     }
 
     loadingDeposito = false;
+    notifyListeners();
+  }
+
+  List<KreditModel> listKredit = [];
+  bool loadingKredit = false;
+
+  Future loadKredit() async {
+    loadingKredit = true;
+    notifyListeners();
+
+    try {
+      listKredit = await RekeningRepository.getKredit();
+    } catch (e) {
+      debugPrint("ERROR KREDIT: $e");
+    }
+
+    loadingKredit = false;
     notifyListeners();
   }
 

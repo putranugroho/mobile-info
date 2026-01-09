@@ -110,13 +110,9 @@ class MenuPage extends StatelessWidget {
                                         child: Column(
                                           mainAxisAlignment: MainAxisAlignment.center,
                                           children: [
-                                            Image.asset(
-                                              value.page == 1 ? ImageAssets.reportSelect : ImageAssets.reportUnselect,
-                                              height: 26,
-                                              color: value.page == 1 ? colorSecondary : Colors.grey,
-                                            ),
+                                            Icon(Icons.support_agent, size: 26, color: value.page == 1 ? colorSecondary : Colors.grey),
                                             const SizedBox(height: 4),
-                                            Text("Riwayat", style: TextStyle(color: value.page == 1 ? colorPrimary : Colors.grey, fontSize: 12)),
+                                            Text("Video Call", style: TextStyle(color: value.page == 1 ? colorPrimary : Colors.grey, fontSize: 12)),
                                           ],
                                         ),
                                       ),
@@ -146,9 +142,9 @@ class MenuPage extends StatelessWidget {
                                         child: Column(
                                           mainAxisAlignment: MainAxisAlignment.center,
                                           children: [
-                                            Icon(Icons.grid_view_rounded, size: 26, color: value.page == 2 ? colorSecondary : Colors.grey),
+                                            Icon(Icons.chat, size: 26, color: value.page == 2 ? colorSecondary : Colors.grey),
                                             const SizedBox(height: 4),
-                                            Text("Produk", style: TextStyle(color: value.page == 2 ? colorPrimary : Colors.grey, fontSize: 12)),
+                                            Text("Chat", style: TextStyle(color: value.page == 2 ? colorPrimary : Colors.grey, fontSize: 12)),
                                           ],
                                         ),
                                       ),

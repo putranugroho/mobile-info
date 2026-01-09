@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../../models/tabungan_model.dart';
 import '../../models/deposito_model.dart';
+import '../../models/kredit_model.dart';
 
 class RekeningRepository {
   static Future<Map<String, dynamic>> _fetchMasterData() async {
@@ -34,5 +35,12 @@ class RekeningRepository {
     final data = await _fetchMasterData();
     final List list = data['deposito'] ?? [];
     return list.map((e) => DepositoModel.fromJson(e)).toList();
+  }
+
+  /// ✅ PINJAMAN
+  static Future<List<KreditModel>> getKredit() async {
+    final data = await _fetchMasterData();
+    final List list = data['kredit'] ?? [];
+    return list.map((e) => KreditModel.fromJson(e)).toList();
   }
 }

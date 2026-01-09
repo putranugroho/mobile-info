@@ -67,24 +67,28 @@ class _MutasiBodyState extends State<_MutasiBody> with SingleTickerProviderState
           _header(),
           Expanded(
             child: Container(
+              margin: const EdgeInsets.only(top: 8),
               decoration: const BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
               ),
-              child: Column(
-                children: [
-                  TabBar(
-                    controller: _tabController,
-                    labelColor: colorPrimary,
-                    unselectedLabelColor: Colors.grey,
-                    indicatorColor: colorPrimary,
-                    tabs: const [
-                      Tab(text: "November"),
-                      Tab(text: "Desember"),
-                    ],
-                  ),
-                  Expanded(child: _listMutasi()),
-                ],
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16), // ⬅️ SAMA DENGAN HOME
+                child: Column(
+                  children: [
+                    TabBar(
+                      controller: _tabController,
+                      labelColor: const Color.fromARGB(255, 0, 95, 0),
+                      unselectedLabelColor: Colors.grey,
+                      indicatorColor: const Color.fromARGB(255, 0, 95, 0),
+                      tabs: const [
+                        Tab(text: "November"),
+                        Tab(text: "Desember"),
+                      ],
+                    ),
+                    Expanded(child: _listMutasi()),
+                  ],
+                ),
               ),
             ),
           ),
@@ -97,7 +101,9 @@ class _MutasiBodyState extends State<_MutasiBody> with SingleTickerProviderState
   Widget _header() {
     return Container(
       padding: const EdgeInsets.fromLTRB(16, 48, 16, 24),
-      decoration: BoxDecoration(gradient: LinearGradient(colors: [colorPrimary, colorPrimary.withOpacity(0.7)])),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(colors: [const Color.fromARGB(255, 0, 95, 0), const Color.fromARGB(255, 0, 95, 0).withOpacity(0.7)]),
+      ),
       child: Column(
         children: [
           Row(
@@ -137,7 +143,7 @@ class _MutasiBodyState extends State<_MutasiBody> with SingleTickerProviderState
         }
 
         return ListView.builder(
-          padding: const EdgeInsets.all(16),
+          padding: EdgeInsets.zero, // ⬅️ BIAR IKUT WRAPPER
           itemCount: value.data.length,
           itemBuilder: (_, i) {
             return _MutasiItem(item: value.data[i]);

@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:mobile_info/utils/colors.dart';
 import 'package:mobile_info/utils/format_currency.dart';
 import 'package:mobile_info/module/video_call/video_call_screen.dart';
-// import 'package:mobile_info/module/chat/chat_page.dart';
+import 'package:mobile_info/module/chat/chat_page.dart';
 import '../../models/mutasi_tabungan_model.dart';
 import 'mutasi_tabungan_notifier.dart';
 
@@ -61,37 +61,45 @@ class _MutasiBodyState extends State<_MutasiBody> with SingleTickerProviderState
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey[100],
-      body: Column(
-        children: [
-          _header(),
-          Expanded(
-            child: Container(
-              margin: const EdgeInsets.only(top: 8),
-              decoration: const BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: Column(
-                  children: [
-                    TabBar(
-                      controller: _tabController,
-                      labelColor: const Color.fromARGB(255, 0, 95, 0),
-                      unselectedLabelColor: Colors.grey,
-                      indicatorColor: const Color.fromARGB(255, 0, 95, 0),
-                      tabs: const [
-                        Tab(text: "November"),
-                        Tab(text: "Desember"),
-                      ],
-                    ),
-                    Expanded(child: _listMutasi()),
-                  ],
+      body: Center(
+        child: Container(
+          width: MediaQuery.of(context).size.width > 600 ? 400 : MediaQuery.of(context).size.width,
+          color: Colors.white,
+          child: Stack(
+            children: [
+              _header(),
+
+              /// ===== CONTENT =====
+              Positioned(
+                top: 170, // ⬅️ tinggi header (PENTING)
+                left: 0,
+                right: 0,
+                bottom: 0,
+                child: Container(
+                  decoration: const BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+                  ),
+                  child: Column(
+                    children: [
+                      TabBar(
+                        controller: _tabController,
+                        labelColor: const Color.fromARGB(255, 0, 95, 0),
+                        unselectedLabelColor: Colors.grey,
+                        indicatorColor: const Color.fromARGB(255, 0, 95, 0),
+                        tabs: const [
+                          Tab(text: "November"),
+                          Tab(text: "Desember"),
+                        ],
+                      ),
+                      Expanded(child: _listMutasi()),
+                    ],
+                  ),
                 ),
               ),
-            ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
@@ -99,7 +107,7 @@ class _MutasiBodyState extends State<_MutasiBody> with SingleTickerProviderState
   /// ================= HEADER =================
   Widget _header() {
     return Container(
-      padding: const EdgeInsets.fromLTRB(16, 48, 16, 24),
+      padding: const EdgeInsets.fromLTRB(16, 48, 16, 12),
       decoration: BoxDecoration(
         gradient: LinearGradient(colors: [const Color.fromARGB(255, 0, 95, 0), const Color.fromARGB(255, 0, 95, 0).withOpacity(0.7)]),
       ),
@@ -138,13 +146,6 @@ class _MutasiBodyState extends State<_MutasiBody> with SingleTickerProviderState
           const SizedBox(height: 16),
 
           /// ==== CONTENT ====
-          Container(
-            width: 72,
-            height: 48,
-            decoration: BoxDecoration(borderRadius: BorderRadius.circular(12), color: Colors.white.withOpacity(0.2)),
-            child: const Icon(Icons.credit_card, color: Colors.white, size: 32),
-          ),
-          const SizedBox(height: 12),
           Text(widget.namaProduk, style: const TextStyle(color: Colors.white, fontSize: 18)),
           const SizedBox(height: 4),
           Text(widget.noRekening, style: const TextStyle(color: Colors.white70)),
@@ -156,61 +157,82 @@ class _MutasiBodyState extends State<_MutasiBody> with SingleTickerProviderState
   void _showBantuanCS() {
     showModalBottomSheet(
       context: context,
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
-      builder: (_) {
-        return Padding(
-          padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
+      useRootNavigator: false,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) {
+        final screenWidth = MediaQuery.of(ctx).size.width;
+        final contentWidth = screenWidth > 600 ? 400.0 : screenWidth;
+
+        return GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onTap: () => Navigator.pop(ctx), // ✅ tap luar = close
+          child: Stack(
             children: [
-              Container(
-                width: 40,
-                height: 4,
-                margin: const EdgeInsets.only(bottom: 16),
-                decoration: BoxDecoration(color: Colors.grey[300], borderRadius: BorderRadius.circular(2)),
-              ),
-
-              const Text("Bantuan Customer Service", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-
-              const SizedBox(height: 16),
-
-              /// ===== VIDEO CALL =====
-              ListTile(
-                leading: CircleAvatar(
-                  backgroundColor: colorPrimary.withOpacity(0.15),
-                  child: const Icon(Icons.support_agent, color: colorPrimary),
-                ),
-                title: const Text("Video Call"),
-                subtitle: const Text("Hubungi CS melalui video"),
-                onTap: () {
-                  Navigator.pop(context);
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => VideoPage(channelName: widget.noRekening, invoice: ""),
+              Align(
+                alignment: Alignment.bottomCenter,
+                child: GestureDetector(
+                  onTap: () {}, // ❗ cegah tap tembus
+                  child: Container(
+                    width: contentWidth,
+                    decoration: const BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
                     ),
-                  );
-                },
-              ),
+                    padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
+                    child: SafeArea(
+                      top: false,
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Container(
+                            width: 40,
+                            height: 4,
+                            margin: const EdgeInsets.only(bottom: 16),
+                            decoration: BoxDecoration(color: Colors.grey[300], borderRadius: BorderRadius.circular(2)),
+                          ),
 
-              /// ===== CHAT =====
-              ListTile(
-                leading: CircleAvatar(
-                  backgroundColor: Colors.green.withOpacity(0.15),
-                  child: const Icon(Icons.chat, color: Colors.green),
-                ),
-                title: const Text("Chat"),
-                subtitle: const Text("Chat dengan Customer Service"),
-                onTap: () {
-                  Navigator.pop(context);
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      // builder: (_) => const ChatPage(),
-                      builder: (_) => VideoPage(channelName: widget.noRekening, invoice: ""),
+                          const Text("Bantuan Customer Service", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+
+                          const SizedBox(height: 16),
+
+                          /// ===== VIDEO CALL =====
+                          ListTile(
+                            leading: CircleAvatar(
+                              backgroundColor: colorPrimary.withOpacity(0.15),
+                              child: const Icon(Icons.support_agent, color: colorPrimary),
+                            ),
+                            title: const Text("Video Call"),
+                            subtitle: const Text("Hubungi CS melalui video"),
+                            onTap: () {
+                              Navigator.pop(context);
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => VideoPage(channelName: widget.noRekening, invoice: ""),
+                                ),
+                              );
+                            },
+                          ),
+
+                          /// ===== CHAT =====
+                          ListTile(
+                            leading: CircleAvatar(
+                              backgroundColor: Colors.green.withOpacity(0.15),
+                              child: const Icon(Icons.chat, color: Colors.green),
+                            ),
+                            title: const Text("Chat"),
+                            subtitle: const Text("Chat dengan Customer Service"),
+                            onTap: () {
+                              Navigator.pop(context);
+                              Navigator.push(context, MaterialPageRoute(builder: (_) => const ChatPage()));
+                            },
+                          ),
+                        ],
+                      ),
                     ),
-                  );
-                },
+                  ),
+                ),
               ),
             ],
           ),

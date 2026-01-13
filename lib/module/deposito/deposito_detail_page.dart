@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'deposito_detail_notifier.dart';
 import '../../utils/format_currency.dart';
 import 'package:mobile_info/module/video_call/video_call_screen.dart';
+import 'package:mobile_info/module/chat/chat_page.dart';
 import 'package:mobile_info/utils/colors.dart';
 
 class DepositoDetailPage extends StatelessWidget {
@@ -16,61 +17,73 @@ class DepositoDetailPage extends StatelessWidget {
       create: (_) => DepositoDetailNotifier(noRekening: noRekening),
       child: Consumer<DepositoDetailNotifier>(
         builder: (context, value, child) {
+          final screenWidth = MediaQuery.of(context).size.width;
+          final contentWidth = screenWidth > 600 ? 400.0 : screenWidth;
+
           return Scaffold(
-            appBar: AppBar(
-              title: const Text("Detail Deposito"),
-              backgroundColor: const Color.fromARGB(255, 0, 95, 0),
-              foregroundColor: Colors.white,
-              actions: [
-                Padding(
-                  padding: const EdgeInsets.only(right: 12),
-                  child: InkWell(
-                    borderRadius: BorderRadius.circular(20),
-                    onTap: () => _showBantuanCS(context),
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(20)),
-                      child: const Text(
-                        "Bantuan CS",
-                        style: TextStyle(color: Colors.black, fontWeight: FontWeight.w600, fontSize: 12),
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            body: value.isLoading
-                ? const Center(child: CircularProgressIndicator())
-                : value.deposito == null
-                ? const Center(child: Text("Data tidak tersedia"))
-                : SafeArea(
-                    child: ListView(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-                      children: [
-                        _item("No Rekening", value.deposito!.noRek),
-                        _item("Nama Nasabah", value.deposito!.nama),
-                        _item("No Bilyet", value.deposito!.noBilyet),
-                        _item("Nominal", "Rp ${FormatCurrency.oCcy.format(value.deposito!.nominal)}", bold: true),
-                        _item("Suku Bunga", "${value.deposito!.rate.toStringAsFixed(2)} %", bold: true),
-                        _item(
-                          "Jangka Waktu",
-                          "${value.deposito!.jkwaktu} ${value.deposito!.jnsjkwaktu == "B"
-                              ? "Bulan"
-                              : value.deposito!.jnsjkwaktu == "B"
-                              ? "Bulan"
-                              : value.deposito!.jnsjkwaktu == "H"
-                              ? "Hari"
-                              : value.deposito!.jnsjkwaktu == "T"
-                              ? "Tahun"
-                              : ""}",
+            backgroundColor: Colors.grey.shade200, // background luar (tablet/web)
+            body: Center(
+              child: Container(
+                width: contentWidth,
+                color: Colors.white,
+                child: Scaffold(
+                  backgroundColor: Colors.white,
+                  appBar: AppBar(
+                    title: const Text("Detail Deposito"),
+                    backgroundColor: const Color.fromARGB(255, 0, 95, 0),
+                    foregroundColor: Colors.white,
+                    actions: [
+                      Padding(
+                        padding: const EdgeInsets.only(right: 12),
+                        child: InkWell(
+                          borderRadius: BorderRadius.circular(20),
+                          onTap: () => _showBantuanCS(context),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(20)),
+                            child: const Text(
+                              "Bantuan CS",
+                              style: TextStyle(color: Colors.black, fontWeight: FontWeight.w600, fontSize: 12),
+                            ),
+                          ),
                         ),
-                        _item("Tanggal Buka", formatTanggal(value.deposito!.tglEff)),
-                        _item("Jatuh Tempo", formatTanggal(value.deposito!.tglJatuhTempo)),
-                        _item("ARO", value.deposito!.aro ? "YA" : "TIDAK"),
-                        _item("Tambah Nominal", value.deposito!.tambahNominal ? "YA" : "TIDAK"),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
+                  body: value.isLoading
+                      ? const Center(child: CircularProgressIndicator())
+                      : value.deposito == null
+                      ? const Center(child: Text("Data tidak tersedia"))
+                      : SafeArea(
+                          child: ListView(
+                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                            children: [
+                              _item("No Rekening", value.deposito!.noRek),
+                              _item("Nama Nasabah", value.deposito!.nama),
+                              _item("No Bilyet", value.deposito!.noBilyet),
+                              _item("Nominal", "Rp ${FormatCurrency.oCcy.format(value.deposito!.nominal)}", bold: true),
+                              _item("Suku Bunga", "${value.deposito!.rate.toStringAsFixed(2)} %", bold: true),
+                              _item(
+                                "Jangka Waktu",
+                                "${value.deposito!.jkwaktu} "
+                                    "${value.deposito!.jnsjkwaktu == "B"
+                                        ? "Bulan"
+                                        : value.deposito!.jnsjkwaktu == "H"
+                                        ? "Hari"
+                                        : value.deposito!.jnsjkwaktu == "T"
+                                        ? "Tahun"
+                                        : ""}",
+                              ),
+                              _item("Tanggal Buka", formatTanggal(value.deposito!.tglEff)),
+                              _item("Jatuh Tempo", formatTanggal(value.deposito!.tglJatuhTempo)),
+                              _item("ARO", value.deposito!.aro ? "YA" : "TIDAK"),
+                              _item("Tambah Nominal", value.deposito!.tambahNominal ? "YA" : "TIDAK"),
+                            ],
+                          ),
+                        ),
+                ),
+              ),
+            ),
           );
         },
       ),
@@ -101,63 +114,82 @@ class DepositoDetailPage extends StatelessWidget {
 void _showBantuanCS(BuildContext context) {
   showModalBottomSheet(
     context: context,
-    shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
-    builder: (_) {
-      return Padding(
-        padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
+    useRootNavigator: false,
+    isScrollControlled: true,
+    backgroundColor: Colors.transparent,
+    builder: (ctx) {
+      final screenWidth = MediaQuery.of(ctx).size.width;
+      final contentWidth = screenWidth > 600 ? 400.0 : screenWidth;
+
+      return GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: () => Navigator.pop(ctx), // ✅ klik area luar = close
+        child: Stack(
           children: [
-            Container(
-              width: 40,
-              height: 4,
-              margin: const EdgeInsets.only(bottom: 16),
-              decoration: BoxDecoration(color: Colors.grey[300], borderRadius: BorderRadius.circular(2)),
-            ),
+            Align(
+              alignment: Alignment.bottomCenter,
+              child: GestureDetector(
+                onTap: () {}, // ❗ cegah tap tembus
+                child: Container(
+                  width: contentWidth,
+                  decoration: const BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+                  ),
+                  padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
+                  child: SafeArea(
+                    top: false,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Container(
+                          width: 40,
+                          height: 4,
+                          margin: const EdgeInsets.only(bottom: 16),
+                          decoration: BoxDecoration(color: Colors.grey[300], borderRadius: BorderRadius.circular(2)),
+                        ),
 
-            const Text("Bantuan Customer Service", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                        const Text("Bantuan Customer Service", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
 
-            const SizedBox(height: 16),
+                        const SizedBox(height: 16),
 
-            /// ===== VIDEO CALL =====
-            ListTile(
-              leading: CircleAvatar(
-                backgroundColor: colorPrimary.withOpacity(0.15),
-                child: const Icon(Icons.support_agent, color: colorPrimary),
-              ),
-              title: const Text("Video Call"),
-              subtitle: const Text("Hubungi CS melalui video"),
-              onTap: () {
-                Navigator.pop(context);
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => VideoPage(
-                      channelName: "", // atau noRekening jika mau
-                      invoice: "",
+                        /// ===== VIDEO CALL =====
+                        ListTile(
+                          leading: CircleAvatar(
+                            backgroundColor: colorPrimary.withOpacity(0.15),
+                            child: const Icon(Icons.support_agent, color: colorPrimary),
+                          ),
+                          title: const Text("Video Call"),
+                          subtitle: const Text("Hubungi CS melalui video"),
+                          onTap: () {
+                            Navigator.pop(context);
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => VideoPage(channelName: "", invoice: ""),
+                              ),
+                            );
+                          },
+                        ),
+
+                        /// ===== CHAT =====
+                        ListTile(
+                          leading: CircleAvatar(
+                            backgroundColor: Colors.green.withOpacity(0.15),
+                            child: const Icon(Icons.chat, color: Colors.green),
+                          ),
+                          title: const Text("Chat"),
+                          subtitle: const Text("Chat dengan Customer Service"),
+                          onTap: () {
+                            Navigator.pop(context);
+                            Navigator.push(context, MaterialPageRoute(builder: (_) => const ChatPage()));
+                          },
+                        ),
+                      ],
                     ),
                   ),
-                );
-              },
-            ),
-
-            /// ===== CHAT =====
-            ListTile(
-              leading: CircleAvatar(
-                backgroundColor: Colors.green.withOpacity(0.15),
-                child: const Icon(Icons.chat, color: Colors.green),
+                ),
               ),
-              title: const Text("Chat"),
-              subtitle: const Text("Chat dengan Customer Service"),
-              onTap: () {
-                Navigator.pop(context);
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => VideoPage(channelName: "", invoice: ""),
-                  ),
-                );
-              },
             ),
           ],
         ),

@@ -14,6 +14,17 @@ class Pref {
   static String noKtp = "no_ktp";
   static String photo = "photo";
   static String createdDate = "createdDate";
+  static String token = "token";
+
+  saveToken(String token) async {
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    pref.setString(Pref.token, token);
+  }
+
+  Future<String> getToken() async {
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    return pref.getString(Pref.token) ?? "";
+  }
 
   simpanPhoto(String photo) async {
     SharedPreferences pref = await SharedPreferences.getInstance();

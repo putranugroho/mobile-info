@@ -2,19 +2,20 @@ import 'dart:async';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:ibpr/models/index.dart';
-import 'package:ibpr/models/deposito_model.dart';
-import 'package:ibpr/models/tabungan_model.dart';
-import 'package:ibpr/models/kredit_model.dart';
-import 'package:ibpr/module/auth/lock_screen_page.dart';
-import 'package:ibpr/module/repository/home_repository.dart';
-import 'package:ibpr/module/repository/rekening_repository.dart';
-import 'package:ibpr/module/transfer/transfer_in_page.dart';
-import 'package:ibpr/module/transfer/transfer_page.dart';
-import 'package:ibpr/module/transfer/transfer_sesama_page.dart';
-import 'package:ibpr/pref/pref.dart';
-import 'package:ibpr/utils/colors.dart';
-import 'package:ibpr/utils/images_path.dart';
+import 'package:mobile_info/models/index.dart';
+import 'package:mobile_info/models/deposito_model.dart';
+import 'package:mobile_info/models/tabungan_model.dart';
+import 'package:mobile_info/models/kredit_model.dart';
+import 'package:mobile_info/module/auth/lock_screen_page.dart';
+import 'package:mobile_info/module/repository/home_repository.dart';
+import 'package:mobile_info/module/repository/rekening_repository.dart';
+import 'package:mobile_info/module/repository/rekening_inquiry_repository.dart';
+import 'package:mobile_info/module/transfer/transfer_in_page.dart';
+import 'package:mobile_info/module/transfer/transfer_page.dart';
+import 'package:mobile_info/module/transfer/transfer_sesama_page.dart';
+import 'package:mobile_info/pref/pref.dart';
+import 'package:mobile_info/utils/colors.dart';
+import 'package:mobile_info/utils/images_path.dart';
 
 import '../../network/network.dart';
 import '../../utils/pro_shimmer.dart';
@@ -28,16 +29,31 @@ class HomeNotifier extends ChangeNotifier {
 
   UsersModel? users;
   getProfile() async {
-    Pref().getUsers().then((value) {
-      users = value;
-      print(users!.bprLogo);
-      getHome();
-      loadTabungan();
-      loadDeposito();
-      loadKredit();
-      initializeTimer();
-      notifyListeners();
-    });
+    users = await Pref().getUsers();
+
+    /// 1. cek nocif
+    if (users!.nocif.isEmpty && users!.noRekening.isNotEmpty) {
+      final nocif = await RekeningInquiryRepository.inquiryNocif(
+        token: token,
+        userlogin: users!.usersId,
+        bprId: users!.bprId,
+        noRek: users!.noRekening,
+      );
+
+      await Pref().simpanNocif(nocif);
+
+      /// reload user
+      users = await Pref().getUsers();
+    }
+
+    /// 2. sekarang BARU aman
+    getHome();
+    loadTabungan();
+    loadDeposito();
+    loadKredit();
+    initializeTimer();
+
+    notifyListeners();
   }
 
   Timer? _rootTimer;
@@ -82,7 +98,14 @@ class HomeNotifier extends ChangeNotifier {
     notifyListeners();
 
     try {
-      listTabungan = await RekeningRepository.getTabungan();
+      listTabungan = await RekeningRepository.getTabungan(
+        token: token,
+        endpoint: NetworkURL.inquiryMasterData(),
+        userlogin: "admin",
+        // bprId: users!.bprId,
+        bprId: "600931",
+        nocif: users!.nocif,
+      );
     } catch (e) {
       debugPrint("ERROR TABUNGAN: $e");
     }
@@ -99,7 +122,14 @@ class HomeNotifier extends ChangeNotifier {
     notifyListeners();
 
     try {
-      listDeposito = await RekeningRepository.getDeposito();
+      listDeposito = await RekeningRepository.getDeposito(
+        token: token,
+        endpoint: NetworkURL.inquiryMasterData(),
+        userlogin: "admin",
+        // bprId: users!.bprId,
+        bprId: "600931",
+        nocif: users!.nocif,
+      );
     } catch (e) {
       debugPrint("ERROR DEPOSITO: $e");
     }
@@ -116,7 +146,14 @@ class HomeNotifier extends ChangeNotifier {
     notifyListeners();
 
     try {
-      listKredit = await RekeningRepository.getKredit();
+      listKredit = await RekeningRepository.getKredit(
+        token: token,
+        endpoint: NetworkURL.inquiryMasterData(),
+        userlogin: "admin",
+        // bprId: users!.bprId,
+        bprId: "600931",
+        nocif: users!.nocif,
+      );
     } catch (e) {
       debugPrint("ERROR KREDIT: $e");
     }
@@ -167,7 +204,7 @@ class HomeNotifier extends ChangeNotifier {
                   ),
                   height: 300,
                   width: 400,
-                  imageUrl: "https://ibprservices.medtrans.id/webServices/image-proxy.php?url=$upload/${listDialog[0].banners}",
+                  imageUrl: "https://infoservices.medtrans.id/webServices/image-proxy.php?url=$upload/${listDialog[0].banners}",
                   errorWidget: (context, url, error) => const Icon(Icons.error),
                 ),
               );

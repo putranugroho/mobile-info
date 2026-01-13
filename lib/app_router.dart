@@ -1,8 +1,8 @@
 import 'package:go_router/go_router.dart';
-import 'package:ibpr/module/auth/login_page.dart';
-import 'package:ibpr/module/dashboard/dashboard_page.dart';
-import 'package:ibpr/module/menu_page/menu_page.dart';
-import 'package:ibpr/module/splash_screen_page.dart';
+import 'package:mobile_info/module/auth/login_page.dart';
+import 'package:mobile_info/module/dashboard/dashboard_page.dart';
+import 'package:mobile_info/module/menu_page/menu_page.dart';
+import 'package:mobile_info/module/splash_screen_page.dart';
 import 'services/auth_service.dart';
 
 final GoRouter appRouter = GoRouter(

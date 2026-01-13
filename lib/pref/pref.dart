@@ -1,4 +1,4 @@
-import 'package:ibpr/models/index.dart';
+import 'package:mobile_info/models/index.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class Pref {
@@ -52,6 +52,11 @@ class Pref {
       createdDate: pref.getString(Pref.createdDate) ?? "",
     );
     return users;
+  }
+
+  Future<void> simpanNocif(String nocif) async {
+    final pref = await SharedPreferences.getInstance();
+    await pref.setString(Pref.nocif, nocif);
   }
 
   remove() async {

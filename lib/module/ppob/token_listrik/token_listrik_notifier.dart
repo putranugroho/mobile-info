@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:ibpr/models/index.dart';
-import 'package:ibpr/module/repository/iak_repository.dart';
-import 'package:ibpr/module/riwayat/history_detail_page.dart';
-import 'package:ibpr/pref/pref.dart';
-import 'package:ibpr/utils/button_custom.dart';
-import 'package:ibpr/utils/dialog_custom.dart';
-import 'package:ibpr/utils/dialog_loading.dart';
-import 'package:ibpr/utils/format_currency.dart';
+import 'package:mobile_info/models/index.dart';
+import 'package:mobile_info/module/repository/iak_repository.dart';
+import 'package:mobile_info/module/riwayat/history_detail_page.dart';
+import 'package:mobile_info/pref/pref.dart';
+import 'package:mobile_info/utils/button_custom.dart';
+import 'package:mobile_info/utils/dialog_custom.dart';
+import 'package:mobile_info/utils/dialog_loading.dart';
+import 'package:mobile_info/utils/format_currency.dart';
 
 import '../../../network/network.dart';
 import '../../../utils/pin_code_textfield.dart';
@@ -41,14 +41,12 @@ class TokenListrikNotifier extends ChangeNotifier {
     list.clear();
     isLoading = true;
     notifyListeners();
-    IakRepository.prabayar(token, NetworkURL.prabayar(), "pln", "pln")
-        .then((value) {
+    IakRepository.prabayar(token, NetworkURL.prabayar(), "pln", "pln").then((value) {
       if (value['value'] == 1) {
         for (Map<String, dynamic> i in value['data']['data']) {
           list.add(PrabayarModel.fromJson(i));
         }
-        listResult =
-            list.where((element) => element.status == "active").toList();
+        listResult = list.where((element) => element.status == "active").toList();
         listResult.sort((a, b) => a.pulsaPrice.compareTo(b.pulsaPrice));
         prabayarModel = listResult[0];
         isLoading = false;
@@ -72,112 +70,86 @@ class TokenListrikNotifier extends ChangeNotifier {
 
   simpan() async {
     DialogCustom().showLoading(context);
-    IakRepository.checkBill(token, NetworkURL.checkBill(), hp.text.trim())
-        .then((value) {
+    IakRepository.checkBill(token, NetworkURL.checkBill(), hp.text.trim()).then((value) {
       Navigator.pop(context);
       var rc = value['data']["rc"];
       if (rc == "00") {
         showModalBottomSheet(
-            context: context,
-            shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(16),
-              topRight: Radius.circular(16),
-            )),
-            builder: (context) {
-              return Container(
-                padding: EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Row(
-                      children: [
-                        Expanded(child: Text("Informasi Detail")),
-                        InkWell(
-                          onTap: () => Navigator.pop(context),
-                          child: Container(
-                            width: 40,
-                            height: 40,
-                            decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                color: Colors.grey[300]),
-                            child: Icon(Icons.close),
-                          ),
-                        )
-                      ],
-                    ),
-                    SizedBox(
-                      height: 16,
-                    ),
-                    Row(
-                      children: [
-                        Expanded(child: Text("Nomor Customer")),
-                        Text("${value['data']['customer_id']}")
-                      ],
-                    ),
-                    SizedBox(
-                      height: 4,
-                    ),
-                    Row(
-                      children: [
-                        Expanded(child: Text("Nama Produk")),
-                        Text(
-                            "Token Listrik ${FormatCurrency.oCcy.format(int.parse(prabayarModel!.pulsaNominal))}")
-                      ],
-                    ),
-                    SizedBox(
-                      height: 4,
-                    ),
-                    Row(
-                      children: [
-                        Expanded(child: Text("Nama")),
-                        Text("${value['data']['name']}")
-                      ],
-                    ),
-                    SizedBox(
-                      height: 4,
-                    ),
-                    Row(
-                      children: [
-                        Expanded(child: Text("Tegangan")),
-                        Text("${value['data']['segment_power']}")
-                      ],
-                    ),
-                    SizedBox(
-                      height: 4,
-                    ),
-                    Row(
-                      children: [
-                        Expanded(
-                            child: Text(
-                          "Harga",
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                          ),
-                        )),
-                        Text(
-                          "Rp. ${FormatCurrency.oCcy.format(prabayarModel!.pulsaPrice)}",
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                          ),
-                        )
-                      ],
-                    ),
-                    SizedBox(
-                      height: 16,
-                    ),
-                    ButtonPrimary(
-                      onTap: () {
-                        Navigator.pop(context);
-                        pinTransaksi();
-                      },
-                      name: "Konfirmasi",
-                    )
-                  ],
-                ),
-              );
-            });
+          context: context,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.only(topLeft: Radius.circular(16), topRight: Radius.circular(16)),
+          ),
+          builder: (context) {
+            return Container(
+              padding: EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Row(
+                    children: [
+                      Expanded(child: Text("Informasi Detail")),
+                      InkWell(
+                        onTap: () => Navigator.pop(context),
+                        child: Container(
+                          width: 40,
+                          height: 40,
+                          decoration: BoxDecoration(shape: BoxShape.circle, color: Colors.grey[300]),
+                          child: Icon(Icons.close),
+                        ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 16),
+                  Row(
+                    children: [
+                      Expanded(child: Text("Nomor Customer")),
+                      Text("${value['data']['customer_id']}"),
+                    ],
+                  ),
+                  SizedBox(height: 4),
+                  Row(
+                    children: [
+                      Expanded(child: Text("Nama Produk")),
+                      Text("Token Listrik ${FormatCurrency.oCcy.format(int.parse(prabayarModel!.pulsaNominal))}"),
+                    ],
+                  ),
+                  SizedBox(height: 4),
+                  Row(
+                    children: [
+                      Expanded(child: Text("Nama")),
+                      Text("${value['data']['name']}"),
+                    ],
+                  ),
+                  SizedBox(height: 4),
+                  Row(
+                    children: [
+                      Expanded(child: Text("Tegangan")),
+                      Text("${value['data']['segment_power']}"),
+                    ],
+                  ),
+                  SizedBox(height: 4),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Text("Harga", style: TextStyle(fontWeight: FontWeight.bold)),
+                      ),
+                      Text("Rp. ${FormatCurrency.oCcy.format(prabayarModel!.pulsaPrice)}", style: TextStyle(fontWeight: FontWeight.bold)),
+                    ],
+                  ),
+                  SizedBox(height: 16),
+                  ButtonPrimary(
+                    onTap: () {
+                      Navigator.pop(context);
+                      pinTransaksi();
+                    },
+                    name: "Konfirmasi",
+                  ),
+                ],
+              ),
+            );
+          },
+        );
       } else {
         CustomDialog.messageResponse(context, value['data']['message']);
       }
@@ -190,130 +162,94 @@ class TokenListrikNotifier extends ChangeNotifier {
     pinController.clear();
     notifyListeners();
     showModalBottomSheet(
-        context: context,
-        isScrollControlled: true,
-        shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(24),
-          topRight: Radius.circular(24),
-        )),
-        builder: (context) {
-          return Padding(
-            padding: EdgeInsets.only(
-                bottom: MediaQuery.of(context).viewInsets.bottom),
-            child: Container(
-              padding: EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Row(
-                    children: [
-                      InkWell(
-                        onTap: () {
-                          Navigator.pop(context);
-                          simpan();
-                        },
-                        child: SizedBox(
-                          width: 48,
-                          height: 48,
-                          child: Icon(
-                            Icons.arrow_back,
-                            size: 24,
-                          ),
-                        ),
-                      ),
-                      SizedBox(
-                        width: 12,
-                      ),
-                      Expanded(
-                          child: Text(
+      context: context,
+      isScrollControlled: true,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.only(topLeft: Radius.circular(24), topRight: Radius.circular(24)),
+      ),
+      builder: (context) {
+        return Padding(
+          padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+          child: Container(
+            padding: EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Row(
+                  children: [
+                    InkWell(
+                      onTap: () {
+                        Navigator.pop(context);
+                        simpan();
+                      },
+                      child: SizedBox(width: 48, height: 48, child: Icon(Icons.arrow_back, size: 24)),
+                    ),
+                    SizedBox(width: 12),
+                    Expanded(
+                      child: Text(
                         "PIN",
-                        style: TextStyle(
-                          fontFamily: "Satoshi",
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      )),
-                      InkWell(
-                        onTap: () => Navigator.pop(context),
-                        child: Container(
-                          height: 48,
-                          width: 48,
-                          padding: EdgeInsets.all(8),
-                          decoration: BoxDecoration(
-                              shape: BoxShape.circle, color: Color(0xFFF5F5F5)),
-                          child: Icon(Icons.close),
-                        ),
+                        style: TextStyle(fontFamily: "Satoshi", fontSize: 18, fontWeight: FontWeight.bold),
                       ),
-                    ],
-                  ),
-                  SizedBox(
-                    height: 24,
-                  ),
-                  Text(
-                    "Masukan MPIN Kamu...",
-                    style: TextStyle(
-                      fontFamily: "Satoshi",
-                      fontSize: 25,
-                      fontWeight: FontWeight.bold,
                     ),
-                  ),
-                  SizedBox(
-                    height: 8,
-                  ),
-                  Text(
-                    "Mohon masukan MPIN kamu untuk transaksi",
-                    style: TextStyle(
-                      fontFamily: "Satoshi",
-                      fontSize: 16,
+                    InkWell(
+                      onTap: () => Navigator.pop(context),
+                      child: Container(
+                        height: 48,
+                        width: 48,
+                        padding: EdgeInsets.all(8),
+                        decoration: BoxDecoration(shape: BoxShape.circle, color: Color(0xFFF5F5F5)),
+                        child: Icon(Icons.close),
+                      ),
                     ),
-                  ),
-                  SizedBox(
-                    height: 20,
-                  ),
-                  PinCodeTextField(
-                    pinBoxHeight: 52,
-                    pinBoxWidth: 48,
-                    autofocus: true,
-                    keyboardType: TextInputType.number,
-                    controller: pinController,
-                    hideCharacter: true,
-                    highlight: false,
-                    maskCharacter: "⚫",
-                    highlightColor: Colors.black,
-                    defaultBorderColor: Colors.black,
-                    hasTextBorderColor: Colors.black,
-                    maxLength: 6,
-                    onTextChanged: (text) {},
-                    onDone: (text) {
-                      // value.login();
-                    },
-                    pinCodeTextFieldLayoutType:
-                        PinCodeTextFieldLayoutType.normal,
-                    wrapAlignment: WrapAlignment.start,
-                    pinBoxDecoration:
-                        ProvidedPinBoxDecoration.defaultPinBoxDecoration,
-                    pinTextStyle: TextStyle(fontSize: 8.0),
-                    pinTextAnimatedSwitcherTransition:
-                        ProvidedPinBoxTextAnimation.defaultNoTransition,
-                    pinTextAnimatedSwitcherDuration: Duration(milliseconds: 50),
-                  ),
-                  SizedBox(
-                    height: 24,
-                  ),
-                  ButtonPrimary(
-                    onTap: () {
-                      Navigator.pop(context);
-                      bayar();
-                    },
-                    name: "Lanjut",
-                  )
-                ],
-              ),
+                  ],
+                ),
+                SizedBox(height: 24),
+                Text(
+                  "Masukan MPIN Kamu...",
+                  style: TextStyle(fontFamily: "Satoshi", fontSize: 25, fontWeight: FontWeight.bold),
+                ),
+                SizedBox(height: 8),
+                Text("Mohon masukan MPIN kamu untuk transaksi", style: TextStyle(fontFamily: "Satoshi", fontSize: 16)),
+                SizedBox(height: 20),
+                PinCodeTextField(
+                  pinBoxHeight: 52,
+                  pinBoxWidth: 48,
+                  autofocus: true,
+                  keyboardType: TextInputType.number,
+                  controller: pinController,
+                  hideCharacter: true,
+                  highlight: false,
+                  maskCharacter: "⚫",
+                  highlightColor: Colors.black,
+                  defaultBorderColor: Colors.black,
+                  hasTextBorderColor: Colors.black,
+                  maxLength: 6,
+                  onTextChanged: (text) {},
+                  onDone: (text) {
+                    // value.login();
+                  },
+                  pinCodeTextFieldLayoutType: PinCodeTextFieldLayoutType.normal,
+                  wrapAlignment: WrapAlignment.start,
+                  pinBoxDecoration: ProvidedPinBoxDecoration.defaultPinBoxDecoration,
+                  pinTextStyle: TextStyle(fontSize: 8.0),
+                  pinTextAnimatedSwitcherTransition: ProvidedPinBoxTextAnimation.defaultNoTransition,
+                  pinTextAnimatedSwitcherDuration: Duration(milliseconds: 50),
+                ),
+                SizedBox(height: 24),
+                ButtonPrimary(
+                  onTap: () {
+                    Navigator.pop(context);
+                    bayar();
+                  },
+                  name: "Lanjut",
+                ),
+              ],
             ),
-          );
-        });
+          ),
+        );
+      },
+    );
   }
 
   bayar() {
@@ -324,9 +260,11 @@ class TokenListrikNotifier extends ChangeNotifier {
         CustomDialog.messageResponse(context, "Lengkapi M PIN Anda ");
       } else {
         DialogCustom().showLoading(context);
-        AuthRepository.mPinGenerated(token, NetworkURL.generatedMpin(),
-                "${(((int.parse((pinController.text)) * 2) + 999999) - 111111).toString()}${users!.nomorPonsel.substring((users!.nomorPonsel.length - 4), users!.nomorPonsel.length)}")
-            .then((value) {
+        AuthRepository.mPinGenerated(
+          token,
+          NetworkURL.generatedMpin(),
+          "${(((int.parse((pinController.text)) * 2) + 999999) - 111111).toString()}${users!.nomorPonsel.substring((users!.nomorPonsel.length - 4), users!.nomorPonsel.length)}",
+        ).then((value) {
           if (value['data']['code'] == "000") {
             var mpIn = value['data']['data'];
             var invoice = DateTime.now().millisecondsSinceEpoch.toString();
@@ -353,11 +291,7 @@ class TokenListrikNotifier extends ChangeNotifier {
               if (e['value'] == 1) {
                 HistoryModel historyModel = HistoryModel.fromJson(e);
                 Navigator.pop(context);
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) =>
-                            HistoryDetailPage(model: historyModel)));
+                Navigator.push(context, MaterialPageRoute(builder: (context) => HistoryDetailPage(model: historyModel)));
               } else {
                 CustomDialog.messageResponse(context, e['message']);
               }

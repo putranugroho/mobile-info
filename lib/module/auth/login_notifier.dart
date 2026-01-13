@@ -2,16 +2,16 @@ import 'package:device_info_plus/device_info_plus.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:ibpr/models/index.dart';
-import 'package:ibpr/module/auth/lupa_mpin_page.dart';
-import 'package:ibpr/module/auth/lupa_sandi_page.dart';
-import 'package:ibpr/module/auth/verifikasi_ktp_page.dart';
-import 'package:ibpr/module/menu_page/menu_page.dart';
-import 'package:ibpr/module/repository/auth_repository.dart';
-import 'package:ibpr/pref/pref.dart';
-import 'package:ibpr/services/auth_service.dart';
-import 'package:ibpr/utils/dialog_custom.dart';
-import 'package:ibpr/utils/dialog_loading.dart';
+import 'package:mobile_info/models/index.dart';
+import 'package:mobile_info/module/auth/lupa_mpin_page.dart';
+import 'package:mobile_info/module/auth/lupa_sandi_page.dart';
+import 'package:mobile_info/module/auth/verifikasi_ktp_page.dart';
+import 'package:mobile_info/module/menu_page/menu_page.dart';
+import 'package:mobile_info/module/repository/auth_repository.dart';
+import 'package:mobile_info/pref/pref.dart';
+import 'package:mobile_info/services/auth_service.dart';
+import 'package:mobile_info/utils/dialog_custom.dart';
+import 'package:mobile_info/utils/dialog_loading.dart';
 import '../../network/network.dart';
 
 class LoginNotifier extends ChangeNotifier {
@@ -84,14 +84,7 @@ class LoginNotifier extends ChangeNotifier {
 
   simpan() async {
     DialogCustom().showLoading(context);
-    AuthRepository.login(
-      token,
-      NetworkURL.login(),
-      usersId.text.trim(),
-      "",
-      password.text.trim(),
-      "",
-    ).then((value) async {
+    AuthRepository.login(token, NetworkURL.login(), usersId.text.trim(), "", password.text.trim(), "").then((value) async {
       Navigator.pop(context);
       if (value['value'] == 1) {
         UsersModel users = UsersModel.fromJson(value);
@@ -105,23 +98,14 @@ class LoginNotifier extends ChangeNotifier {
   }
 
   aktivasiAkun() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => const VerifikasiKTPPage()),
-    );
+    Navigator.push(context, MaterialPageRoute(builder: (context) => const VerifikasiKTPPage()));
   }
 
   lupaPassword() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => const LupaSandiPage()),
-    );
+    Navigator.push(context, MaterialPageRoute(builder: (context) => const LupaSandiPage()));
   }
 
   lupaMpin() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => const LupaMpinPage()),
-    );
+    Navigator.push(context, MaterialPageRoute(builder: (context) => const LupaMpinPage()));
   }
 }

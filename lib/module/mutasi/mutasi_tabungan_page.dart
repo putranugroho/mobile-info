@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:ibpr/utils/colors.dart';
-import 'package:ibpr/utils/format_currency.dart';
+import 'package:mobile_info/utils/colors.dart';
+import 'package:mobile_info/utils/format_currency.dart';
+import 'package:mobile_info/module/video_call/video_call_screen.dart';
+// import 'package:mobile_info/module/chat/chat_page.dart';
 import '../../models/mutasi_tabungan_model.dart';
 import 'mutasi_tabungan_notifier.dart';
 
@@ -39,10 +41,8 @@ class _MutasiBodyState extends State<_MutasiBody> with SingleTickerProviderState
 
     _tabController = TabController(length: 2, vsync: this);
 
-    /// load pertama (November)
-    Future.microtask(() {
-      _loadByTab(0);
-    });
+    // Load awal setelah widget siap
+    Future.microtask(() => _loadByTab(0));
 
     _tabController.addListener(() {
       if (_tabController.indexIsChanging) return;
@@ -54,7 +54,6 @@ class _MutasiBodyState extends State<_MutasiBody> with SingleTickerProviderState
     final notifier = context.read<MutasiTabunganNotifier>();
 
     notifier.clear();
-
     notifier.loadMutasi(noRek: widget.noRekening, periode: index == 0 ? "202411" : "202412");
   }
 
@@ -73,7 +72,7 @@ class _MutasiBodyState extends State<_MutasiBody> with SingleTickerProviderState
                 borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
               ),
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16), // ⬅️ SAMA DENGAN HOME
+                padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: Column(
                   children: [
                     TabBar(
@@ -106,15 +105,39 @@ class _MutasiBodyState extends State<_MutasiBody> with SingleTickerProviderState
       ),
       child: Column(
         children: [
+          /// ==== TOP ROW ====
           Row(
             children: [
               IconButton(
                 onPressed: () => Navigator.pop(context),
                 icon: const Icon(Icons.arrow_back, color: Colors.white),
               ),
+
               const Spacer(),
+
+              /// ===== WRAPPED ACTION BUTTON =====
+              InkWell(
+                borderRadius: BorderRadius.circular(24),
+                onTap: _showBantuanCS,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(24)),
+                  child: Row(
+                    children: const [
+                      Text(
+                        "Bantuan CS",
+                        style: TextStyle(color: Colors.black, fontWeight: FontWeight.w600),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
             ],
           ),
+
+          const SizedBox(height: 16),
+
+          /// ==== CONTENT ====
           Container(
             width: 72,
             height: 48,
@@ -130,7 +153,73 @@ class _MutasiBodyState extends State<_MutasiBody> with SingleTickerProviderState
     );
   }
 
-  /// ================= LIST MUTASI =================
+  void _showBantuanCS() {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+      builder: (_) {
+        return Padding(
+          padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 40,
+                height: 4,
+                margin: const EdgeInsets.only(bottom: 16),
+                decoration: BoxDecoration(color: Colors.grey[300], borderRadius: BorderRadius.circular(2)),
+              ),
+
+              const Text("Bantuan Customer Service", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+
+              const SizedBox(height: 16),
+
+              /// ===== VIDEO CALL =====
+              ListTile(
+                leading: CircleAvatar(
+                  backgroundColor: colorPrimary.withOpacity(0.15),
+                  child: const Icon(Icons.support_agent, color: colorPrimary),
+                ),
+                title: const Text("Video Call"),
+                subtitle: const Text("Hubungi CS melalui video"),
+                onTap: () {
+                  Navigator.pop(context);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => VideoPage(channelName: widget.noRekening, invoice: ""),
+                    ),
+                  );
+                },
+              ),
+
+              /// ===== CHAT =====
+              ListTile(
+                leading: CircleAvatar(
+                  backgroundColor: Colors.green.withOpacity(0.15),
+                  child: const Icon(Icons.chat, color: Colors.green),
+                ),
+                title: const Text("Chat"),
+                subtitle: const Text("Chat dengan Customer Service"),
+                onTap: () {
+                  Navigator.pop(context);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      // builder: (_) => const ChatPage(),
+                      builder: (_) => VideoPage(channelName: widget.noRekening, invoice: ""),
+                    ),
+                  );
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  /// ================= LIST =================
   Widget _listMutasi() {
     return Consumer<MutasiTabunganNotifier>(
       builder: (_, value, __) {
@@ -143,18 +232,16 @@ class _MutasiBodyState extends State<_MutasiBody> with SingleTickerProviderState
         }
 
         return ListView.builder(
-          padding: EdgeInsets.zero, // ⬅️ BIAR IKUT WRAPPER
+          padding: EdgeInsets.zero,
           itemCount: value.data.length,
-          itemBuilder: (_, i) {
-            return _MutasiItem(item: value.data[i]);
-          },
+          itemBuilder: (_, i) => _MutasiItem(item: value.data[i]),
         );
       },
     );
   }
 }
 
-/// ================= ITEM MUTASI =================
+/// ================= ITEM =================
 class _MutasiItem extends StatelessWidget {
   final MutasiTabunganModel item;
 
@@ -162,7 +249,7 @@ class _MutasiItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bool isCredit = item.isCredit;
+    final isCredit = item.isCredit;
 
     return Container(
       margin: const EdgeInsets.only(bottom: 12),

@@ -1,45 +1,77 @@
 import 'dart:convert';
-import 'package:http/http.dart' as http;
+import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
+
 import '../../models/tabungan_model.dart';
 import '../../models/deposito_model.dart';
 import '../../models/kredit_model.dart';
+import '../../network/network.dart';
 
 class RekeningRepository {
-  static Future<Map<String, dynamic>> _fetchMasterData() async {
-    final url = Uri.parse('http://103.96.147.187:4500/cms/inquiry/masterdata');
+  /// ================= CORE FETCH =================
+  static Future<Map<String, dynamic>> fetchMasterData({
+    required String token,
+    required String endpoint,
+    required String userlogin,
+    required String bprId,
+    required String nocif,
+  }) async {
+    Dio dio = Dio();
+    dio.options.headers['x-username'] = xusername;
+    dio.options.headers['x-password'] = xpassword;
 
-    final response = await http.post(
-      url,
-      headers: {'api-key': 'l1ZJ0xStZoruZq8NgrRKNA==', 'Content-Type': 'application/json'},
-      body: jsonEncode({"userlogin": "admin", "bpr_id": "600931", "nocif": "10000043917"}),
-    );
+    final response = await dio.post(endpoint, data: {"token": token, "userlogin": userlogin, "bpr_id": bprId, "nocif": nocif});
 
-    final data = jsonDecode(response.body);
+    final raw = response.data;
 
-    if (response.statusCode == 200 && data['code'] == "000") {
-      return data['data'];
+    // 🔥 INI KUNCI NYA
+    final Map<String, dynamic> json = raw is String ? jsonDecode(raw) : raw;
+
+    if (response.statusCode == 200 && json['code'] == "000") {
+      return json['data'];
     } else {
-      throw Exception(data['message']);
+      throw Exception(json['message'] ?? 'Gagal mengambil master data');
     }
   }
 
-  /// TABUNGAN
-  static Future<List<TabunganModel>> getTabungan() async {
-    final data = await _fetchMasterData();
+  /// ================= TABUNGAN =================
+  static Future<List<TabunganModel>> getTabungan({
+    required String token,
+    required String endpoint,
+    required String userlogin,
+    required String bprId,
+    required String nocif,
+  }) async {
+    final data = await fetchMasterData(token: token, endpoint: endpoint, userlogin: userlogin, bprId: bprId, nocif: nocif);
+
     final List list = data['tabungan'] ?? [];
     return list.map((e) => TabunganModel.fromJson(e)).toList();
   }
 
-  /// DEPOSITO
-  static Future<List<DepositoModel>> getDeposito() async {
-    final data = await _fetchMasterData();
+  /// ================= DEPOSITO =================
+  static Future<List<DepositoModel>> getDeposito({
+    required String token,
+    required String endpoint,
+    required String userlogin,
+    required String bprId,
+    required String nocif,
+  }) async {
+    final data = await fetchMasterData(token: token, endpoint: endpoint, userlogin: userlogin, bprId: bprId, nocif: nocif);
+
     final List list = data['deposito'] ?? [];
     return list.map((e) => DepositoModel.fromJson(e)).toList();
   }
 
-  /// ✅ PINJAMAN
-  static Future<List<KreditModel>> getKredit() async {
-    final data = await _fetchMasterData();
+  /// ================= KREDIT =================
+  static Future<List<KreditModel>> getKredit({
+    required String token,
+    required String endpoint,
+    required String userlogin,
+    required String bprId,
+    required String nocif,
+  }) async {
+    final data = await fetchMasterData(token: token, endpoint: endpoint, userlogin: userlogin, bprId: bprId, nocif: nocif);
+
     final List list = data['kredit'] ?? [];
     return list.map((e) => KreditModel.fromJson(e)).toList();
   }

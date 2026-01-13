@@ -82,4 +82,6 @@ class ImageAssets {
 
   static const String dashboard_ = "${root}dashboard_.png";
   static const String masterData = "${root}master-data.png";
+
+  static const String logomotion = "${root}payment-motion.png";
 }

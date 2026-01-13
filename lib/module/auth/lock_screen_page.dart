@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:ibpr/module/auth/lock_screen_notiifer.dart';
-import 'package:ibpr/module/auth/lupa_sandi_page.dart';
-import 'package:ibpr/utils/button_custom.dart';
-import 'package:ibpr/utils/pin_code_textfield.dart';
+import 'package:mobile_info/module/auth/lock_screen_notiifer.dart';
+import 'package:mobile_info/module/auth/lupa_sandi_page.dart';
+import 'package:mobile_info/utils/button_custom.dart';
+import 'package:mobile_info/utils/pin_code_textfield.dart';
 import 'package:provider/provider.dart';
 
 import '../../utils/images_path.dart';
@@ -21,9 +21,7 @@ class LockScreenPage extends StatelessWidget {
             backgroundColor: Colors.grey[200],
             body: Center(
               child: Container(
-                width: MediaQuery.of(context).size.width > 600
-                    ? 400
-                    : MediaQuery.of(context).size.width,
+                width: MediaQuery.of(context).size.width > 600 ? 400 : MediaQuery.of(context).size.width,
                 decoration: BoxDecoration(color: Colors.white),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -37,18 +35,9 @@ class LockScreenPage extends StatelessWidget {
                             SizedBox(height: 64),
                             Image.asset(ImageAssets.logo, height: 140),
                             SizedBox(height: 8),
-                            Text(
-                              "Masukkan Kata Sandi",
-                              style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
+                            Text("Masukkan Kata Sandi", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                             SizedBox(height: 4),
-                            Text(
-                              "Silahkan masukan kata sandi anda untuk masuk kedalam IBPR",
-                              style: TextStyle(fontWeight: FontWeight.w300),
-                            ),
+                            Text("Silahkan masukan kata sandi anda untuk masuk kedalam IBPR", style: TextStyle(fontWeight: FontWeight.w300)),
                             SizedBox(height: 16),
                             TextFormField(
                               controller: value.smsController,
@@ -64,37 +53,21 @@ class LockScreenPage extends StatelessWidget {
                                 hintText: "Kata Sandi",
                                 suffixIcon: InkWell(
                                   onTap: () => value.gantiObsecure(),
-                                  child: Icon(
-                                    value.obSecure == true
-                                        ? Icons.visibility_off
-                                        : Icons.visibility,
-                                  ),
+                                  child: Icon(value.obSecure == true ? Icons.visibility_off : Icons.visibility),
                                 ),
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(8),
-                                  borderSide: BorderSide(
-                                    width: 1,
-                                    color:
-                                        Colors.grey[300] ?? Colors.transparent,
-                                  ),
+                                  borderSide: BorderSide(width: 1, color: Colors.grey[300] ?? Colors.transparent),
                                 ),
                               ),
                             ),
                             const SizedBox(height: 16),
                             InkWell(
-                              onTap: () => Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => LupaSandiPage(),
-                                ),
-                              ),
+                              onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => LupaSandiPage())),
                               child: Text(
                                 "Lupa Kata Sandi?",
                                 textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  color: Colors.grey,
-                                ),
+                                style: TextStyle(fontSize: 16, color: Colors.grey),
                               ),
                             ),
                           ],

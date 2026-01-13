@@ -1,13 +1,14 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:ibpr/module/home/home_notifier.dart';
-import 'package:ibpr/module/loan/loan_detail_page.dart';
-import 'package:ibpr/module/mutasi/mutasi_tabungan_page.dart';
-import 'package:ibpr/module/deposito/deposito_detail_page.dart';
-import 'package:ibpr/utils/colors.dart';
-import 'package:ibpr/utils/format_currency.dart';
-import 'package:ibpr/utils/images_path.dart';
-import 'package:ibpr/utils/pro_shimmer.dart';
+import 'package:mobile_info/module/home/home_notifier.dart';
+import 'package:mobile_info/module/loan/loan_detail_page.dart';
+import 'package:mobile_info/module/mutasi/mutasi_tabungan_page.dart';
+import 'package:mobile_info/module/deposito/deposito_detail_page.dart';
+import 'package:mobile_info/module/video_call/video_call_screen.dart';
+import 'package:mobile_info/utils/colors.dart';
+import 'package:mobile_info/utils/format_currency.dart';
+import 'package:mobile_info/utils/images_path.dart';
+import 'package:mobile_info/utils/pro_shimmer.dart';
 import 'package:provider/provider.dart';
 
 import '../../network/network.dart';
@@ -36,7 +37,7 @@ class HomePage extends StatelessWidget {
                     children: [
                       Image.asset(ImageAssets.logo, height: 90, fit: BoxFit.contain),
                       Spacer(),
-                      Image.network("https://ibprservices.medtrans.id/webServices/image-proxy.php?url=${value.users!.bprLogo}", height: 70),
+                      Image.network("https://infoservices.medtrans.id/webServices/image-proxy.php?url=${value.users!.bprLogo}", height: 70),
                     ],
                   ),
                 ),
@@ -156,7 +157,7 @@ class HomePage extends StatelessWidget {
                                                       height: 140,
                                                       width: 220,
                                                       imageUrl:
-                                                          "https://ibprservices.medtrans.id/webServices/image-proxy.php?url=$upload/${data.banners}",
+                                                          "https://infoservices.medtrans.id/webServices/image-proxy.php?url=$upload/${data.banners}",
                                                       errorWidget: (context, url, error) => const Icon(Icons.error),
                                                     ),
                                                   );

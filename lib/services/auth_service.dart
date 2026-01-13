@@ -42,10 +42,7 @@ class AuthService {
 
     if (token != null) {
       try {
-        await http.post(
-          Uri.parse('https://ibprservices.medtrans.id/webServices/logout.php'),
-          headers: {'Authorization': 'Bearer $token'},
-        );
+        await http.post(Uri.parse('https://infoservices.medtrans.id/webServices/logout.php'), headers: {'Authorization': 'Bearer $token'});
       } catch (_) {}
     }
 

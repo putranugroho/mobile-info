@@ -2,19 +2,10 @@ import 'dart:convert';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
-import 'package:ibpr/network/network.dart';
+import 'package:mobile_info/network/network.dart';
 
 class HistoryRepository {
-  static Future<dynamic> riwayat(
-    String token,
-    String url,
-    String noHp,
-    String bprId,
-    int limit,
-    int offset,
-    String tglAwal,
-    String tglAkhir,
-  ) async {
+  static Future<dynamic> riwayat(String token, String url, String noHp, String bprId, int limit, int offset, String tglAwal, String tglAkhir) async {
     FormData formData = FormData.fromMap({
       "token": token,
       "limit": limit,

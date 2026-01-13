@@ -3,9 +3,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:http/http.dart' as http;
-import 'package:ibpr/models/index.dart';
-import 'package:ibpr/module/menu_page/menu_page.dart';
-import 'package:ibpr/pref/pref.dart';
+import 'package:mobile_info/models/index.dart';
+import 'package:mobile_info/module/menu_page/menu_page.dart';
+import 'package:mobile_info/pref/pref.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class DashboardNotifier extends ChangeNotifier {
@@ -40,7 +40,7 @@ class DashboardNotifier extends ChangeNotifier {
       }
 
       final result = await http.get(
-        Uri.parse("https://ibprservices.medtrans.id/webServices/users-ibpr.php"),
+        Uri.parse("https://infoservices.medtrans.id/webServices/users-ibpr.php"),
         headers: {'Authorization': 'Bearer $token'},
       );
 

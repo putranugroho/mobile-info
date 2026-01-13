@@ -4,10 +4,10 @@ import 'dart:typed_data';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:ibpr/models/index.dart';
+import 'package:mobile_info/models/index.dart';
 
-import 'package:ibpr/pref/pref.dart';
-import 'package:ibpr/utils/format_currency.dart';
+import 'package:mobile_info/pref/pref.dart';
+import 'package:mobile_info/utils/format_currency.dart';
 import 'package:intl/intl.dart';
 import 'package:pdf/pdf.dart';
 // import 'package:printing/printing.dart';
@@ -32,9 +32,7 @@ class HistoryDetailNotifier extends ChangeNotifier {
   getProfile() async {
     Pref().getUsers().then((value) {
       users = value;
-      toObject = model.jenisTransaksi == "PPOB" && model.status == "COMPLETED"
-          ? jsonDecode(model.reff)['data']
-          : {};
+      toObject = model.jenisTransaksi == "PPOB" && model.status == "COMPLETED" ? jsonDecode(model.reff)['data'] : {};
       notifyListeners();
     });
   }
@@ -60,93 +58,48 @@ class HistoryDetailNotifier extends ChangeNotifier {
                 pw.Text(
                   "Detail Transaksi",
                   textAlign: pw.TextAlign.center,
-                  style: pw.TextStyle(
-                    fontSize: 8,
-                    fontWeight: pw.FontWeight.bold,
-                  ),
+                  style: pw.TextStyle(fontSize: 8, fontWeight: pw.FontWeight.bold),
                 ),
                 pw.SizedBox(height: 4),
-                pw.Container(
-                  width: 50,
-                  height: 0.5,
-                  decoration: pw.BoxDecoration(
-                    color: PdfColor.fromHex("#000000"),
-                  ),
-                ),
+                pw.Container(width: 50, height: 0.5, decoration: pw.BoxDecoration(color: PdfColor.fromHex("#000000"))),
                 pw.SizedBox(height: 6),
                 pw.Row(
                   children: [
-                    pw.Expanded(
-                      child: pw.Text(
-                        "Transaksi No.",
-                        style: pw.TextStyle(fontSize: 6),
-                      ),
-                    ),
-                    pw.Text(
-                      "${model.invoice}",
-                      style: pw.TextStyle(fontSize: 6),
-                    ),
+                    pw.Expanded(child: pw.Text("Transaksi No.", style: pw.TextStyle(fontSize: 6))),
+                    pw.Text("${model.invoice}", style: pw.TextStyle(fontSize: 6)),
                   ],
                 ),
                 pw.SizedBox(height: 6),
                 pw.Container(
                   width: double.infinity,
                   height: 0.3,
-                  decoration: pw.BoxDecoration(
-                    color: PdfColor.fromHex("#000000"),
-                  ),
+                  decoration: pw.BoxDecoration(color: PdfColor.fromHex("#000000")),
                 ),
                 pw.SizedBox(height: 6),
                 pw.Row(
                   children: [
-                    pw.Expanded(
-                      child: pw.Text(
-                        "Tanggal Transaksi",
-                        style: pw.TextStyle(fontSize: 6),
-                      ),
-                    ),
-                    pw.Text(
-                      "${DateFormat('dd MMM y').format(DateTime.parse(model.createdDate))}",
-                      style: pw.TextStyle(fontSize: 6),
-                    ),
+                    pw.Expanded(child: pw.Text("Tanggal Transaksi", style: pw.TextStyle(fontSize: 6))),
+                    pw.Text("${DateFormat('dd MMM y').format(DateTime.parse(model.createdDate))}", style: pw.TextStyle(fontSize: 6)),
                   ],
                 ),
                 pw.SizedBox(height: 4),
                 pw.Row(
                   children: [
-                    pw.Expanded(
-                      child: pw.Text(
-                        "Jam Transaksi",
-                        style: pw.TextStyle(fontSize: 6),
-                      ),
-                    ),
-                    pw.Text(
-                      "${DateFormat('HH:mm:ss').format(DateTime.parse(model.createdDate))}",
-                      style: pw.TextStyle(fontSize: 6),
-                    ),
+                    pw.Expanded(child: pw.Text("Jam Transaksi", style: pw.TextStyle(fontSize: 6))),
+                    pw.Text("${DateFormat('HH:mm:ss').format(DateTime.parse(model.createdDate))}", style: pw.TextStyle(fontSize: 6)),
                   ],
                 ),
                 pw.SizedBox(height: 6),
                 pw.Container(
                   width: double.infinity,
                   height: 0.3,
-                  decoration: pw.BoxDecoration(
-                    color: PdfColor.fromHex("#000000"),
-                  ),
+                  decoration: pw.BoxDecoration(color: PdfColor.fromHex("#000000")),
                 ),
                 pw.SizedBox(height: 6),
                 pw.Row(
                   children: [
-                    pw.Expanded(
-                      child: pw.Text(
-                        "Tipe Transaksi",
-                        style: pw.TextStyle(fontSize: 6),
-                      ),
-                    ),
-                    pw.Text(
-                      "${model.jenisTransaksi}",
-                      style: pw.TextStyle(fontSize: 6),
-                    ),
+                    pw.Expanded(child: pw.Text("Tipe Transaksi", style: pw.TextStyle(fontSize: 6))),
+                    pw.Text("${model.jenisTransaksi}", style: pw.TextStyle(fontSize: 6)),
                   ],
                 ),
                 model.jenisTransaksi == "Transfer" && model.tipe == "OUT"
@@ -156,27 +109,14 @@ class HistoryDetailNotifier extends ChangeNotifier {
                           pw.SizedBox(height: 4),
                           pw.Row(
                             children: [
-                              pw.Expanded(
-                                child: pw.Text(
-                                  "Bank Tujuan",
-                                  style: pw.TextStyle(fontSize: 6),
-                                ),
-                              ),
-                              pw.Text(
-                                "${model.nama.split(" | ")[0]}",
-                                style: pw.TextStyle(fontSize: 6),
-                              ),
+                              pw.Expanded(child: pw.Text("Bank Tujuan", style: pw.TextStyle(fontSize: 6))),
+                              pw.Text("${model.nama.split(" | ")[0]}", style: pw.TextStyle(fontSize: 6)),
                             ],
                           ),
                           pw.SizedBox(height: 4),
                           pw.Row(
                             children: [
-                              pw.Expanded(
-                                child: pw.Text(
-                                  "No Rekening",
-                                  style: pw.TextStyle(fontSize: 6),
-                                ),
-                              ),
+                              pw.Expanded(child: pw.Text("No Rekening", style: pw.TextStyle(fontSize: 6))),
                               pw.Text(
                                 "*********${model.nama.split(" | ")[1].substring(model.nama.split(" | ")[1].length - 4, model.nama.split(" | ")[1].length)}",
                                 style: pw.TextStyle(fontSize: 6),
@@ -186,16 +126,8 @@ class HistoryDetailNotifier extends ChangeNotifier {
                           pw.SizedBox(height: 4),
                           pw.Row(
                             children: [
-                              pw.Expanded(
-                                child: pw.Text(
-                                  "Nama Pemilik",
-                                  style: pw.TextStyle(fontSize: 6),
-                                ),
-                              ),
-                              pw.Text(
-                                "${model.nama.split(" | ")[2]}",
-                                style: pw.TextStyle(fontSize: 6),
-                              ),
+                              pw.Expanded(child: pw.Text("Nama Pemilik", style: pw.TextStyle(fontSize: 6))),
+                              pw.Text("${model.nama.split(" | ")[2]}", style: pw.TextStyle(fontSize: 6)),
                             ],
                           ),
                         ],
@@ -207,44 +139,22 @@ class HistoryDetailNotifier extends ChangeNotifier {
                           pw.SizedBox(height: 4),
                           pw.Row(
                             children: [
-                              pw.Expanded(
-                                child: pw.Text(
-                                  "Bank Tujuan",
-                                  style: pw.TextStyle(fontSize: 6),
-                                ),
-                              ),
-                              pw.Text(
-                                "${model.reff.toString().toUpperCase()}",
-                                style: pw.TextStyle(fontSize: 6),
-                              ),
+                              pw.Expanded(child: pw.Text("Bank Tujuan", style: pw.TextStyle(fontSize: 6))),
+                              pw.Text("${model.reff.toString().toUpperCase()}", style: pw.TextStyle(fontSize: 6)),
                             ],
                           ),
                           pw.SizedBox(height: 4),
                           pw.Row(
                             children: [
-                              pw.Expanded(
-                                child: pw.Text(
-                                  "Virtual Account",
-                                  style: pw.TextStyle(fontSize: 6),
-                                ),
-                              ),
-                              pw.Text(
-                                "${model.results}",
-                                style: pw.TextStyle(fontSize: 6),
-                              ),
+                              pw.Expanded(child: pw.Text("Virtual Account", style: pw.TextStyle(fontSize: 6))),
+                              pw.Text("${model.results}", style: pw.TextStyle(fontSize: 6)),
                             ],
                           ),
                           pw.SizedBox(height: 4),
                           pw.Row(
                             crossAxisAlignment: pw.CrossAxisAlignment.start,
                             children: [
-                              pw.Container(
-                                width: 50,
-                                child: pw.Text(
-                                  "Kadaluarsa",
-                                  style: pw.TextStyle(fontSize: 6),
-                                ),
-                              ),
+                              pw.Container(width: 50, child: pw.Text("Kadaluarsa", style: pw.TextStyle(fontSize: 6))),
                               pw.SizedBox(width: 10),
                               pw.Expanded(
                                 child: pw.Text(
@@ -264,66 +174,32 @@ class HistoryDetailNotifier extends ChangeNotifier {
                           pw.SizedBox(height: 4),
                           pw.Row(
                             children: [
-                              pw.Expanded(
-                                child: pw.Text(
-                                  "Kode Bank",
-                                  style: pw.TextStyle(fontSize: 6),
-                                ),
-                              ),
-                              pw.Text(
-                                "${model.bprId}",
-                                style: pw.TextStyle(fontSize: 6),
-                              ),
+                              pw.Expanded(child: pw.Text("Kode Bank", style: pw.TextStyle(fontSize: 6))),
+                              pw.Text("${model.bprId}", style: pw.TextStyle(fontSize: 6)),
                             ],
                           ),
                           pw.SizedBox(height: 4),
                           pw.Row(
                             children: [
-                              pw.Expanded(
-                                child: pw.Text(
-                                  "Nomor Ponsel",
-                                  style: pw.TextStyle(fontSize: 6),
-                                ),
-                              ),
-                              pw.Text(
-                                "${model.noHp}",
-                                style: pw.TextStyle(fontSize: 6),
-                              ),
+                              pw.Expanded(child: pw.Text("Nomor Ponsel", style: pw.TextStyle(fontSize: 6))),
+                              pw.Text("${model.noHp}", style: pw.TextStyle(fontSize: 6)),
                             ],
                           ),
                           pw.SizedBox(height: 4),
                           pw.Row(
                             children: [
-                              pw.Expanded(
-                                child: pw.Text(
-                                  "Token",
-                                  style: pw.TextStyle(fontSize: 6),
-                                ),
-                              ),
-                              pw.Text(
-                                "${model.results}",
-                                style: pw.TextStyle(fontSize: 6),
-                              ),
+                              pw.Expanded(child: pw.Text("Token", style: pw.TextStyle(fontSize: 6))),
+                              pw.Text("${model.results}", style: pw.TextStyle(fontSize: 6)),
                             ],
                           ),
                           pw.SizedBox(height: 4),
                           pw.Row(
                             crossAxisAlignment: pw.CrossAxisAlignment.start,
                             children: [
-                              pw.Container(
-                                width: 50,
-                                child: pw.Text(
-                                  "Kadaluarsa",
-                                  style: pw.TextStyle(fontSize: 6),
-                                ),
-                              ),
+                              pw.Container(width: 50, child: pw.Text("Kadaluarsa", style: pw.TextStyle(fontSize: 6))),
                               pw.SizedBox(width: 10),
                               pw.Expanded(
-                                child: pw.Text(
-                                  "${model.tglExpired}",
-                                  textAlign: pw.TextAlign.end,
-                                  style: pw.TextStyle(fontSize: 6),
-                                ),
+                                child: pw.Text("${model.tglExpired}", textAlign: pw.TextAlign.end, style: pw.TextStyle(fontSize: 6)),
                               ),
                             ],
                           ),
@@ -336,40 +212,22 @@ class HistoryDetailNotifier extends ChangeNotifier {
                           pw.Row(
                             crossAxisAlignment: pw.CrossAxisAlignment.start,
                             children: [
-                              pw.Container(
-                                width: 40,
-                                child: pw.Text(
-                                  "Keterangan",
-                                  style: pw.TextStyle(fontSize: 6),
-                                ),
-                              ),
+                              pw.Container(width: 40, child: pw.Text("Keterangan", style: pw.TextStyle(fontSize: 6))),
                               pw.SizedBox(width: 10),
                               pw.Expanded(
-                                child: pw.Text(
-                                  "${model.keterangan}",
-                                  textAlign: pw.TextAlign.end,
-                                  style: pw.TextStyle(fontSize: 6),
-                                ),
+                                child: pw.Text("${model.keterangan}", textAlign: pw.TextAlign.end, style: pw.TextStyle(fontSize: 6)),
                               ),
                             ],
                           ),
                           model.keterangan.toString().contains("Token Listrik")
                               ? pw.Column(
-                                  crossAxisAlignment:
-                                      pw.CrossAxisAlignment.stretch,
+                                  crossAxisAlignment: pw.CrossAxisAlignment.stretch,
                                   children: [
                                     pw.SizedBox(height: 4),
                                     pw.Row(
-                                      crossAxisAlignment:
-                                          pw.CrossAxisAlignment.start,
+                                      crossAxisAlignment: pw.CrossAxisAlignment.start,
                                       children: [
-                                        pw.Container(
-                                          width: 20,
-                                          child: pw.Text(
-                                            "",
-                                            style: pw.TextStyle(fontSize: 6),
-                                          ),
-                                        ),
+                                        pw.Container(width: 20, child: pw.Text("", style: pw.TextStyle(fontSize: 6))),
                                         pw.SizedBox(width: 10),
                                         pw.Expanded(
                                           child: pw.Text(
@@ -389,9 +247,7 @@ class HistoryDetailNotifier extends ChangeNotifier {
                 pw.Container(
                   width: double.infinity,
                   height: 0.3,
-                  decoration: pw.BoxDecoration(
-                    color: PdfColor.fromHex("#000000"),
-                  ),
+                  decoration: pw.BoxDecoration(color: PdfColor.fromHex("#000000")),
                 ),
                 pw.SizedBox(height: 6),
                 pw.Row(
@@ -399,23 +255,14 @@ class HistoryDetailNotifier extends ChangeNotifier {
                   children: [
                     pw.Container(
                       width: 50,
-                      child: pw.Text(
-                        "Total",
-                        style: pw.TextStyle(
-                          fontSize: 8,
-                          fontWeight: pw.FontWeight.bold,
-                        ),
-                      ),
+                      child: pw.Text("Total", style: pw.TextStyle(fontSize: 8, fontWeight: pw.FontWeight.bold)),
                     ),
                     pw.SizedBox(width: 10),
                     pw.Expanded(
                       child: pw.Text(
                         "${FormatCurrency.oCcy.format(int.parse(model.amount))}",
                         textAlign: pw.TextAlign.end,
-                        style: pw.TextStyle(
-                          fontSize: 8,
-                          fontWeight: pw.FontWeight.bold,
-                        ),
+                        style: pw.TextStyle(fontSize: 8, fontWeight: pw.FontWeight.bold),
                       ),
                     ),
                   ],
@@ -441,10 +288,7 @@ class HistoryDetailNotifier extends ChangeNotifier {
     }
 
     // 🔹 Selain WEB → share / print
-    await Printing.sharePdf(
-      bytes: bytes,
-      filename: "TRANSACTION_${model.invoice}.pdf",
-    );
+    await Printing.sharePdf(bytes: bytes, filename: "TRANSACTION_${model.invoice}.pdf");
     return bytes;
     // print(test);
     // final files = <XFile>[];

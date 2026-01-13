@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:ibpr/module/auth/login_notifier.dart';
-import 'package:ibpr/utils/button_custom.dart';
-import 'package:ibpr/utils/images_path.dart';
+import 'package:mobile_info/module/auth/login_notifier.dart';
+import 'package:mobile_info/utils/button_custom.dart';
+import 'package:mobile_info/utils/images_path.dart';
 import 'package:provider/provider.dart';
 
 class LoginPage extends StatelessWidget {
@@ -18,9 +18,7 @@ class LoginPage extends StatelessWidget {
             backgroundColor: Colors.grey[200],
             body: Center(
               child: Container(
-                width: MediaQuery.of(context).size.width > 600
-                    ? 400
-                    : MediaQuery.of(context).size.width,
+                width: MediaQuery.of(context).size.width > 600 ? 400 : MediaQuery.of(context).size.width,
                 decoration: BoxDecoration(color: Colors.white),
                 child: Stack(
                   children: [
@@ -49,11 +47,7 @@ class LoginPage extends StatelessWidget {
                                 hintText: "Users ID",
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(8),
-                                  borderSide: BorderSide(
-                                    width: 1,
-                                    color:
-                                        Colors.grey[300] ?? Colors.transparent,
-                                  ),
+                                  borderSide: BorderSide(width: 1, color: Colors.grey[300] ?? Colors.transparent),
                                 ),
                               ),
                             ),
@@ -72,19 +66,11 @@ class LoginPage extends StatelessWidget {
                                 hintText: "Kata Sandi",
                                 suffixIcon: InkWell(
                                   onTap: () => value.gantiObsecure(),
-                                  child: Icon(
-                                    value.obSecure == true
-                                        ? Icons.visibility_off
-                                        : Icons.visibility,
-                                  ),
+                                  child: Icon(value.obSecure == true ? Icons.visibility_off : Icons.visibility),
                                 ),
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(8),
-                                  borderSide: BorderSide(
-                                    width: 1,
-                                    color:
-                                        Colors.grey[300] ?? Colors.transparent,
-                                  ),
+                                  borderSide: BorderSide(width: 1, color: Colors.grey[300] ?? Colors.transparent),
                                 ),
                               ),
                             ),
@@ -102,10 +88,7 @@ class LoginPage extends StatelessWidget {
                                   onPressed: () {
                                     value.lupaPassword();
                                   },
-                                  child: Text(
-                                    "Lupa Sandi ?",
-                                    style: TextStyle(color: Colors.grey),
-                                  ),
+                                  child: Text("Lupa Sandi ?", style: TextStyle(color: Colors.grey)),
                                 ),
                                 Spacer(),
                               ],
@@ -123,19 +106,11 @@ class LoginPage extends StatelessWidget {
                         child: Container(
                           padding: EdgeInsets.all(20),
                           decoration: BoxDecoration(
-                            border: Border(
-                              top: BorderSide(
-                                width: 1,
-                                color: Colors.grey[300] ?? Colors.transparent,
-                              ),
-                            ),
+                            border: Border(top: BorderSide(width: 1, color: Colors.grey[300] ?? Colors.transparent)),
                           ),
                           child: Text(
                             "Aktivasi Akun",
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: Colors.grey,
-                            ),
+                            style: TextStyle(fontWeight: FontWeight.bold, color: Colors.grey),
                             textAlign: TextAlign.center,
                           ),
                         ),

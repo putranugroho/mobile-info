@@ -1,9 +1,9 @@
 const token = "715f8ab555438f985b579844ea227767";
 const xusername = "core@2023";
 const xpassword = "corevalue@20231234";
-const url = "https://ibprservices.medtrans.id";
-const upload = "https://ibprservices.medtrans.id/upload";
-const photo = "https://ibprservices.medtrans.id/photo";
+const url = "https://infoservices.medtrans.id";
+const upload = "https://infoservices.medtrans.id/upload";
+const photo = "https://infoservices.medtrans.id/photo";
 
 class NetworkURL {
   static String login() {
@@ -148,5 +148,25 @@ class NetworkURL {
 
   static String transferFlip() {
     return "$url/webServices/transfer_flip.php";
+  }
+
+  static String inquiryRekData() {
+    return "$url/webServices/inquery_info_rek.php";
+  }
+
+  static String inquiryMasterData() {
+    return "$url/webServices/inquery_info_masterdata.php";
+  }
+
+  static String inquiryMutasiTabungan() {
+    return "$url/webServices/inquery_info_mutasitabungan.php";
+  }
+
+  static String inquiryDepositoData() {
+    return "$url/webServices/inquery_info_deposito.php";
+  }
+
+  static String inquiryPinjamanData() {
+    return "$url/webServices/inquery_info_pinjaman.php";
   }
 }

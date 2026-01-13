@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
-import 'package:ibpr/network/network.dart';
+import 'package:mobile_info/network/network.dart';
 
 class QrisRepository {
   static Future<dynamic> createQris(
@@ -44,21 +44,8 @@ class QrisRepository {
     }
   }
 
-  static Future<dynamic> inqueryMpin(
-    String token,
-    String url,
-    String noRek,
-    String noHp,
-    String bprId,
-    String mPin,
-  ) async {
-    FormData formData = FormData.fromMap({
-      "token": token,
-      "no_rek": noRek,
-      "no_hp": noHp,
-      "bpr_id": bprId,
-      "m_pin": mPin,
-    });
+  static Future<dynamic> inqueryMpin(String token, String url, String noRek, String noHp, String bprId, String mPin) async {
+    FormData formData = FormData.fromMap({"token": token, "no_rek": noRek, "no_hp": noHp, "bpr_id": bprId, "m_pin": mPin});
     Dio dio = Dio();
     dio.options.headers['x-username'] = xusername;
     dio.options.headers['x-password'] = xpassword;
@@ -79,13 +66,8 @@ class QrisRepository {
     }
   }
 
-  static Future<dynamic> listBpr(
-    String token,
-    String url,
-  ) async {
-    FormData formData = FormData.fromMap({
-      "token": token,
-    });
+  static Future<dynamic> listBpr(String token, String url) async {
+    FormData formData = FormData.fromMap({"token": token});
     Dio dio = Dio();
     dio.options.headers['x-username'] = xusername;
     dio.options.headers['x-password'] = xpassword;
@@ -106,21 +88,8 @@ class QrisRepository {
     }
   }
 
-  static Future<dynamic> validasiKtp(
-    String token,
-    String url,
-    String ktp,
-    String bprId,
-    String noHp,
-    String noRek,
-  ) async {
-    FormData formData = FormData.fromMap({
-      "token": token,
-      "no_id": ktp,
-      "bpr_id": bprId,
-      "no_hp": noHp,
-      "no_rek": noRek,
-    });
+  static Future<dynamic> validasiKtp(String token, String url, String ktp, String bprId, String noHp, String noRek) async {
+    FormData formData = FormData.fromMap({"token": token, "no_id": ktp, "bpr_id": bprId, "no_hp": noHp, "no_rek": noRek});
     Dio dio = Dio();
     dio.options.headers['x-username'] = xusername;
     dio.options.headers['x-password'] = xpassword;
@@ -141,15 +110,8 @@ class QrisRepository {
     }
   }
 
-  static Future<dynamic> mPinGenerated(
-    String token,
-    String url,
-    String mPin,
-  ) async {
-    FormData formData = FormData.fromMap({
-      "token": token,
-      "m_pin": mPin,
-    });
+  static Future<dynamic> mPinGenerated(String token, String url, String mPin) async {
+    FormData formData = FormData.fromMap({"token": token, "m_pin": mPin});
     Dio dio = Dio();
     dio.options.headers['x-username'] = xusername;
     dio.options.headers['x-password'] = xpassword;

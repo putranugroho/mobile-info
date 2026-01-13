@@ -3,6 +3,8 @@ import 'package:provider/provider.dart';
 import '../../utils/format_currency.dart';
 import 'loan_detail_notifier.dart';
 import '../../models/loan_tagihan_model.dart';
+import 'package:mobile_info/module/video_call/video_call_screen.dart';
+import 'package:mobile_info/utils/colors.dart';
 
 class LoanDetailPage extends StatelessWidget {
   final String noRek;
@@ -11,10 +13,10 @@ class LoanDetailPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (_) => LoanDetailNotifier(noRek: noRek),
+      create: (_) => LoanDetailNotifier(noRek: noRek)..load(),
       child: Consumer<LoanDetailNotifier>(
         builder: (context, value, _) {
-          if (value.isLoading) {
+          if (value.loading) {
             return const Scaffold(body: Center(child: CircularProgressIndicator()));
           }
 
@@ -22,7 +24,28 @@ class LoanDetailPage extends StatelessWidget {
 
           return Scaffold(
             backgroundColor: Colors.grey.shade100,
-            appBar: AppBar(title: const Text("Detail Pinjaman"), backgroundColor: const Color.fromARGB(255, 0, 95, 0), foregroundColor: Colors.white),
+            appBar: AppBar(
+              title: const Text("Detail Pinjaman"),
+              backgroundColor: const Color.fromARGB(255, 0, 95, 0),
+              foregroundColor: Colors.white,
+              actions: [
+                Padding(
+                  padding: const EdgeInsets.only(right: 12),
+                  child: InkWell(
+                    borderRadius: BorderRadius.circular(20),
+                    onTap: () => _showBantuanCS(context, noRek),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(20)),
+                      child: const Text(
+                        "Bantuan CS",
+                        style: TextStyle(color: Colors.black, fontWeight: FontWeight.w600, fontSize: 12),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
             body: ListView(
               padding: const EdgeInsets.all(16),
               children: [
@@ -179,6 +202,71 @@ class LoanDetailPage extends StatelessWidget {
       ),
     );
   }
+}
+
+void _showBantuanCS(BuildContext context, String noRek) {
+  showModalBottomSheet(
+    context: context,
+    shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+    builder: (_) {
+      return Padding(
+        padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 40,
+              height: 4,
+              margin: const EdgeInsets.only(bottom: 16),
+              decoration: BoxDecoration(color: Colors.grey[300], borderRadius: BorderRadius.circular(2)),
+            ),
+
+            const Text("Bantuan Customer Service", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+
+            const SizedBox(height: 16),
+
+            /// ===== VIDEO CALL =====
+            ListTile(
+              leading: CircleAvatar(
+                backgroundColor: colorPrimary.withOpacity(0.15),
+                child: const Icon(Icons.support_agent, color: colorPrimary),
+              ),
+              title: const Text("Video Call"),
+              subtitle: const Text("Hubungi CS melalui video"),
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => VideoPage(channelName: noRek, invoice: ""),
+                  ),
+                );
+              },
+            ),
+
+            /// ===== CHAT =====
+            ListTile(
+              leading: CircleAvatar(
+                backgroundColor: Colors.green.withOpacity(0.15),
+                child: const Icon(Icons.chat, color: Colors.green),
+              ),
+              title: const Text("Chat"),
+              subtitle: const Text("Chat dengan Customer Service"),
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => VideoPage(channelName: noRek, invoice: ""),
+                  ),
+                );
+              },
+            ),
+          ],
+        ),
+      );
+    },
+  );
 }
 
 String formatTanggal(String raw) {

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:ibpr/models/index.dart';
-import 'package:ibpr/module/repository/history_repository.dart';
-import 'package:ibpr/pref/pref.dart';
+import 'package:mobile_info/models/index.dart';
+import 'package:mobile_info/module/repository/history_repository.dart';
+import 'package:mobile_info/pref/pref.dart';
 import 'package:intl/intl.dart';
 import 'package:scroll_date_picker/scroll_date_picker.dart';
 
@@ -30,73 +30,73 @@ class RiwayatNotifier extends ChangeNotifier {
 
   pilihTanggalAwal() {
     showModalBottomSheet(
-        context: context,
-        builder: (context) {
-          return Container(
-            padding: EdgeInsets.all(20),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                SizedBox(
-                  height: 200,
-                  child: ScrollDatePicker(
-                      selectedDate: tglAwal,
-                      onDateTimeChanged: (e) {
-                        tglAwal = e;
+      context: context,
+      builder: (context) {
+        return Container(
+          padding: EdgeInsets.all(20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              SizedBox(
+                height: 200,
+                child: ScrollDatePicker(
+                  selectedDate: tglAwal,
+                  onDateTimeChanged: (e) {
+                    tglAwal = e;
 
-                        notifyListeners();
-                      }),
-                ),
-                SizedBox(
-                  height: 16,
-                ),
-                ButtonPrimary(
-                  onTap: () {
-                    Navigator.pop(context);
-                    getRiwayat();
+                    notifyListeners();
                   },
-                  name: "Simpan",
-                )
-              ],
-            ),
-          );
-        });
+                ),
+              ),
+              SizedBox(height: 16),
+              ButtonPrimary(
+                onTap: () {
+                  Navigator.pop(context);
+                  getRiwayat();
+                },
+                name: "Simpan",
+              ),
+            ],
+          ),
+        );
+      },
+    );
   }
 
   pilihTanggalAkhir() {
     showModalBottomSheet(
-        context: context,
-        builder: (context) {
-          return Container(
-            padding: EdgeInsets.all(20),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                SizedBox(
-                  height: 200,
-                  child: ScrollDatePicker(
-                      selectedDate: tglAkhir,
-                      onDateTimeChanged: (e) {
-                        tglAkhir = e;
-                        notifyListeners();
-                      }),
-                ),
-                SizedBox(
-                  height: 16,
-                ),
-                ButtonPrimary(
-                  onTap: () {
-                    Navigator.pop(context);
-                    getRiwayat();
+      context: context,
+      builder: (context) {
+        return Container(
+          padding: EdgeInsets.all(20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              SizedBox(
+                height: 200,
+                child: ScrollDatePicker(
+                  selectedDate: tglAkhir,
+                  onDateTimeChanged: (e) {
+                    tglAkhir = e;
+                    notifyListeners();
                   },
-                  name: "Simpan",
-                )
-              ],
-            ),
-          );
-        });
+                ),
+              ),
+              SizedBox(height: 16),
+              ButtonPrimary(
+                onTap: () {
+                  Navigator.pop(context);
+                  getRiwayat();
+                },
+                name: "Simpan",
+              ),
+            ],
+          ),
+        );
+      },
+    );
   }
 
   var isLoading = true;

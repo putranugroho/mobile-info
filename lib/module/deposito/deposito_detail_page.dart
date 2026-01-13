@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'deposito_detail_notifier.dart';
 import '../../utils/format_currency.dart';
+import 'package:mobile_info/module/video_call/video_call_screen.dart';
+import 'package:mobile_info/utils/colors.dart';
 
 class DepositoDetailPage extends StatelessWidget {
   final String noRekening;
@@ -15,7 +17,28 @@ class DepositoDetailPage extends StatelessWidget {
       child: Consumer<DepositoDetailNotifier>(
         builder: (context, value, child) {
           return Scaffold(
-            appBar: AppBar(title: const Text("Detail Deposito"), backgroundColor: const Color.fromARGB(255, 0, 95, 0), foregroundColor: Colors.white),
+            appBar: AppBar(
+              title: const Text("Detail Deposito"),
+              backgroundColor: const Color.fromARGB(255, 0, 95, 0),
+              foregroundColor: Colors.white,
+              actions: [
+                Padding(
+                  padding: const EdgeInsets.only(right: 12),
+                  child: InkWell(
+                    borderRadius: BorderRadius.circular(20),
+                    onTap: () => _showBantuanCS(context),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(20)),
+                      child: const Text(
+                        "Bantuan CS",
+                        style: TextStyle(color: Colors.black, fontWeight: FontWeight.w600, fontSize: 12),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
             body: value.isLoading
                 ? const Center(child: CircularProgressIndicator())
                 : value.deposito == null
@@ -73,6 +96,74 @@ class DepositoDetailPage extends StatelessWidget {
       ),
     );
   }
+}
+
+void _showBantuanCS(BuildContext context) {
+  showModalBottomSheet(
+    context: context,
+    shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+    builder: (_) {
+      return Padding(
+        padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 40,
+              height: 4,
+              margin: const EdgeInsets.only(bottom: 16),
+              decoration: BoxDecoration(color: Colors.grey[300], borderRadius: BorderRadius.circular(2)),
+            ),
+
+            const Text("Bantuan Customer Service", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+
+            const SizedBox(height: 16),
+
+            /// ===== VIDEO CALL =====
+            ListTile(
+              leading: CircleAvatar(
+                backgroundColor: colorPrimary.withOpacity(0.15),
+                child: const Icon(Icons.support_agent, color: colorPrimary),
+              ),
+              title: const Text("Video Call"),
+              subtitle: const Text("Hubungi CS melalui video"),
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => VideoPage(
+                      channelName: "", // atau noRekening jika mau
+                      invoice: "",
+                    ),
+                  ),
+                );
+              },
+            ),
+
+            /// ===== CHAT =====
+            ListTile(
+              leading: CircleAvatar(
+                backgroundColor: Colors.green.withOpacity(0.15),
+                child: const Icon(Icons.chat, color: Colors.green),
+              ),
+              title: const Text("Chat"),
+              subtitle: const Text("Chat dengan Customer Service"),
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => VideoPage(channelName: "", invoice: ""),
+                  ),
+                );
+              },
+            ),
+          ],
+        ),
+      );
+    },
+  );
 }
 
 String formatTanggal(String raw) {

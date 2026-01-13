@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
-import 'package:ibpr/network/network.dart';
+import 'package:mobile_info/network/network.dart';
 
 class WithdrawRepository {
   static Future<dynamic> generatedToken(
@@ -48,13 +48,8 @@ class WithdrawRepository {
     }
   }
 
-  static Future<dynamic> denomisasi(
-    String token,
-    String url,
-  ) async {
-    FormData formData = FormData.fromMap({
-      "token": token,
-    });
+  static Future<dynamic> denomisasi(String token, String url) async {
+    FormData formData = FormData.fromMap({"token": token});
     Dio dio = Dio();
     dio.options.headers['x-username'] = xusername;
     dio.options.headers['x-password'] = xpassword;

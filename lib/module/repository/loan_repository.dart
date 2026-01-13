@@ -1,34 +1,31 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import '../../network/network.dart';
 import '../../models/loan_master_model.dart';
 import '../../models/loan_tagihan_model.dart';
 
 class LoanRepository {
-  static Future<Map<String, dynamic>> _fetchLoan(String noRek) async {
-    final url = Uri.parse('http://103.96.147.187:4500/cms/inquiry/masterdata/tagihan-loan');
-
+  static Future<Map<String, dynamic>> getLoanData({required String userlogin, required String bprId, required String noRek}) async {
     final response = await http.post(
-      url,
-      headers: {'api-key': 'l1ZJ0xStZoruZq8NgrRKNA==', 'Content-Type': 'application/json'},
-      body: jsonEncode({"userlogin": "admin", "bpr_id": "600931", "no_rek": noRek}),
+      Uri.parse(NetworkURL.inquiryPinjamanData()),
+      headers: {'x-username': xusername, 'x-password': xpassword, 'Content-Type': 'application/json'},
+      body: jsonEncode({"userlogin": userlogin, "bpr_id": bprId, "no_rek": noRek, "token": token}),
     );
 
-    final data = jsonDecode(response.body);
+    final json = jsonDecode(response.body);
 
-    if (response.statusCode == 200 && data['code'] == "000") {
-      return data['data'];
+    if (response.statusCode == 200 && json['value'] == 1) {
+      return json['data'];
     } else {
-      throw Exception(data['message']);
+      throw Exception(json['message'] ?? 'Gagal mengambil data pinjaman');
     }
   }
 
-  static Future<LoanMasterModel> getMaster(String noRek) async {
-    final data = await _fetchLoan(noRek);
+  static LoanMasterModel parseMaster(Map<String, dynamic> data) {
     return LoanMasterModel.fromJson(data['master']);
   }
 
-  static Future<List<LoanTagihanModel>> getTagihan(String noRek) async {
-    final data = await _fetchLoan(noRek);
+  static List<LoanTagihanModel> parseTagihan(Map<String, dynamic> data) {
     final List list = data['tagihan'] ?? [];
     return list.map((e) => LoanTagihanModel.fromJson(e)).toList();
   }

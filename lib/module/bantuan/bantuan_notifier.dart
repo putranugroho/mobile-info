@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:ibpr/models/index.dart';
-import 'package:ibpr/pref/pref.dart';
+import 'package:mobile_info/models/index.dart';
+import 'package:mobile_info/pref/pref.dart';
 
 class BantuanNotifier extends ChangeNotifier {
   final BuildContext context;

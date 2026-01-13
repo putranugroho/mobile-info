@@ -28,10 +28,7 @@ class SplashScreenNotifier extends ChangeNotifier {
         return;
       }
 
-      final res = await http.get(
-        Uri.parse('https://ibprservices.medtrans.id/webServices/me.php'),
-        headers: {'Authorization': 'Bearer $token'},
-      );
+      final res = await http.get(Uri.parse('https://infoservices.medtrans.id/webServices/me.php'), headers: {'Authorization': 'Bearer $token'});
 
       if (res.statusCode == 200) {
         context.go('/dashboard');

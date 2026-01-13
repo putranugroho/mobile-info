@@ -2,13 +2,13 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
-import 'package:ibpr/module/auth/login_page.dart';
-import 'package:ibpr/module/repository/auth_repository.dart';
-import 'package:ibpr/pref/pref.dart';
+import 'package:mobile_info/module/auth/login_page.dart';
+import 'package:mobile_info/module/repository/auth_repository.dart';
+import 'package:mobile_info/pref/pref.dart';
 
 import 'package:file_picker/file_picker.dart';
-import 'package:ibpr/utils/button_custom.dart';
-import 'package:ibpr/utils/dialog_loading.dart';
+import 'package:mobile_info/utils/button_custom.dart';
+import 'package:mobile_info/utils/dialog_loading.dart';
 import 'package:image_picker/image_picker.dart';
 import '../../models/users_model.dart';
 import '../../network/network.dart';
@@ -34,11 +34,7 @@ class ProfileNotiifer extends ChangeNotifier {
   File? image;
   Uint8List? byts;
   ambilCover() async {
-    final pickedFile = await picker.pickImage(
-      source: ImageSource.gallery,
-      maxHeight: 1280,
-      maxWidth: 720,
-    );
+    final pickedFile = await picker.pickImage(source: ImageSource.gallery, maxHeight: 1280, maxWidth: 720);
     if (pickedFile != null) {
       image = File(pickedFile.path);
       notifyListeners();
@@ -56,12 +52,7 @@ class ProfileNotiifer extends ChangeNotifier {
 
   upload() async {
     DialogCustom().showLoading(context);
-    AuthRepository.gantiPhoto(
-      token,
-      NetworkURL.gantiPhoto(),
-      users!.id,
-      image,
-    ).then((value) {
+    AuthRepository.gantiPhoto(token, NetworkURL.gantiPhoto(), users!.id, image).then((value) {
       Navigator.pop(context);
       if (value['value'] == 1) {
         Pref().simpanPhoto(value['image']);
@@ -75,51 +66,47 @@ class ProfileNotiifer extends ChangeNotifier {
 
   confirm() {
     showModalBottomSheet(
-        context: context,
-        builder: (context) {
-          return Container(
-            padding: EdgeInsets.all(20),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text("Anda yakin akan keluar IBPR?"),
-                SizedBox(
-                  height: 16,
-                ),
-                Row(
-                  children: [
-                    Expanded(
-                        child: ButtonSecondary(
+      context: context,
+      builder: (context) {
+        return Container(
+          padding: EdgeInsets.all(20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text("Anda yakin akan keluar IBPR?"),
+              SizedBox(height: 16),
+              Row(
+                children: [
+                  Expanded(
+                    child: ButtonSecondary(
                       onTap: () {
                         Navigator.pop(context);
                       },
                       name: "Tidak",
-                    )),
-                    SizedBox(
-                      width: 16,
                     ),
-                    Expanded(
-                        child: ButtonPrimary(
+                  ),
+                  SizedBox(width: 16),
+                  Expanded(
+                    child: ButtonPrimary(
                       onTap: () {
                         Navigator.pop(context);
                         keluar();
                       },
                       name: "Ya",
-                    )),
-                  ],
-                )
-              ],
-            ),
-          );
-        });
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        );
+      },
+    );
   }
 
   keluar() {
     Pref().remove();
-    Navigator.pushAndRemoveUntil(
-        context,
-        MaterialPageRoute(builder: (context) => const LoginPage()),
-        (route) => false);
+    Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => const LoginPage()), (route) => false);
   }
 }

@@ -1,4 +1,4 @@
-name: ibpr
+name: mobile_info
 description: A new Flutter project.
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
@@ -40,6 +40,8 @@ dependencies:
   shared_preferences: ^2.0.7
   image_cropping: ^0.0.9
 
+  agora_rtc_engine: ^6.3.2
+  http: ^1.2.0
 
 
   location: ^8.0.1 

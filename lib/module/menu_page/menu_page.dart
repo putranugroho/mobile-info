@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:ibpr/module/home/home_page.dart';
-import 'package:ibpr/module/menu_page/menu_notifier.dart';
-import 'package:ibpr/module/profile/profile_page.dart';
-import 'package:ibpr/module/riwayat/riwayat_page.dart';
-import 'package:ibpr/module/produk/produk_page.dart'; // ✅ TAMBAHAN
-import 'package:ibpr/utils/colors.dart';
-import 'package:ibpr/utils/images_path.dart';
+import 'package:mobile_info/module/home/home_page.dart';
+import 'package:mobile_info/module/menu_page/menu_notifier.dart';
+import 'package:mobile_info/module/profile/profile_page.dart';
+import 'package:mobile_info/module/riwayat/riwayat_page.dart';
+import 'package:mobile_info/module/produk/produk_page.dart';
+import 'package:mobile_info/module/video_call/video_call_screen.dart';
+import 'package:mobile_info/utils/colors.dart';
+import 'package:mobile_info/utils/images_path.dart';
 import 'package:provider/provider.dart';
 
 class MenuPage extends StatelessWidget {
@@ -27,19 +28,7 @@ class MenuPage extends StatelessWidget {
                   onWillPop: value.back,
                   child: Stack(
                     children: [
-                      Positioned(
-                        top: 0,
-                        left: 0,
-                        right: 0,
-                        bottom: 60,
-                        child: value.page == 0
-                            ? HomePage()
-                            : value.page == 1
-                            ? RiwayatPage()
-                            : value.page == 2
-                            ? ProdukPage() // ✅ PRODUK PAGE
-                            : ProfilePage(),
-                      ),
+                      Positioned(top: 0, left: 0, right: 0, bottom: 60, child: value.page == 0 ? HomePage() : ProfilePage()),
                       Positioned(
                         bottom: 0,
                         left: 0,
@@ -81,70 +70,6 @@ class MenuPage extends StatelessWidget {
                                             ),
                                             const SizedBox(height: 4),
                                             Text("Home", style: TextStyle(color: value.page == 0 ? colorPrimary : Colors.grey, fontSize: 12)),
-                                          ],
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                              InkWell(
-                                onTap: () => value.gantiPage(1),
-                                child: SizedBox(
-                                  height: 60,
-                                  width: 60,
-                                  child: Stack(
-                                    children: [
-                                      Positioned(
-                                        top: 5,
-                                        right: 0,
-                                        child: value.page == 1
-                                            ? Container(
-                                                width: 32,
-                                                height: 32,
-                                                decoration: BoxDecoration(color: colorPrimary, shape: BoxShape.circle),
-                                              )
-                                            : const SizedBox(),
-                                      ),
-                                      Positioned.fill(
-                                        child: Column(
-                                          mainAxisAlignment: MainAxisAlignment.center,
-                                          children: [
-                                            Icon(Icons.support_agent, size: 26, color: value.page == 1 ? colorSecondary : Colors.grey),
-                                            const SizedBox(height: 4),
-                                            Text("Video Call", style: TextStyle(color: value.page == 1 ? colorPrimary : Colors.grey, fontSize: 12)),
-                                          ],
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                              InkWell(
-                                onTap: () => value.gantiPage(2),
-                                child: SizedBox(
-                                  height: 60,
-                                  width: 60,
-                                  child: Stack(
-                                    children: [
-                                      Positioned(
-                                        top: 5,
-                                        right: 0,
-                                        child: value.page == 2
-                                            ? Container(
-                                                width: 32,
-                                                height: 32,
-                                                decoration: BoxDecoration(color: colorPrimary, shape: BoxShape.circle),
-                                              )
-                                            : const SizedBox(),
-                                      ),
-                                      Positioned.fill(
-                                        child: Column(
-                                          mainAxisAlignment: MainAxisAlignment.center,
-                                          children: [
-                                            Icon(Icons.chat, size: 26, color: value.page == 2 ? colorSecondary : Colors.grey),
-                                            const SizedBox(height: 4),
-                                            Text("Chat", style: TextStyle(color: value.page == 2 ? colorPrimary : Colors.grey, fontSize: 12)),
                                           ],
                                         ),
                                       ),

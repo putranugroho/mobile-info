@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
-import 'package:ibpr/network/network.dart';
+import 'package:mobile_info/network/network.dart';
 
 class IakRepository {
   static Future<dynamic> bayarPrabayar(
@@ -60,17 +60,8 @@ class IakRepository {
     }
   }
 
-  static Future<dynamic> prabayar(
-    String token,
-    String url,
-    String tipe,
-    String operator,
-  ) async {
-    FormData formData = FormData.fromMap({
-      "token": token,
-      "tipe": tipe,
-      "operator": operator,
-    });
+  static Future<dynamic> prabayar(String token, String url, String tipe, String operator) async {
+    FormData formData = FormData.fromMap({"token": token, "tipe": tipe, "operator": operator});
     Dio dio = Dio();
     dio.options.headers['x-username'] = xusername;
     dio.options.headers['x-password'] = xpassword;
@@ -91,15 +82,8 @@ class IakRepository {
     }
   }
 
-  static Future<dynamic> checkBill(
-    String token,
-    String url,
-    String hp,
-  ) async {
-    FormData formData = FormData.fromMap({
-      "token": token,
-      "hp": hp,
-    });
+  static Future<dynamic> checkBill(String token, String url, String hp) async {
+    FormData formData = FormData.fromMap({"token": token, "hp": hp});
     Dio dio = Dio();
     dio.options.headers['x-username'] = xusername;
     dio.options.headers['x-password'] = xpassword;
@@ -120,15 +104,8 @@ class IakRepository {
     }
   }
 
-  static Future<dynamic> prefix(
-    String token,
-    String url,
-    String hp,
-  ) async {
-    FormData formData = FormData.fromMap({
-      "token": token,
-      "hp": hp,
-    });
+  static Future<dynamic> prefix(String token, String url, String hp) async {
+    FormData formData = FormData.fromMap({"token": token, "hp": hp});
     Dio dio = Dio();
     dio.options.headers['x-username'] = xusername;
     dio.options.headers['x-password'] = xpassword;
@@ -149,15 +126,8 @@ class IakRepository {
     }
   }
 
-  static Future<dynamic> pascabayar(
-    String token,
-    String url,
-    String tipe,
-  ) async {
-    FormData formData = FormData.fromMap({
-      "token": token,
-      "tipe": tipe,
-    });
+  static Future<dynamic> pascabayar(String token, String url, String tipe) async {
+    FormData formData = FormData.fromMap({"token": token, "tipe": tipe});
     Dio dio = Dio();
     dio.options.headers['x-username'] = xusername;
     dio.options.headers['x-password'] = xpassword;
@@ -178,19 +148,8 @@ class IakRepository {
     }
   }
 
-  static Future<dynamic> checkPostpaid(
-    String token,
-    String url,
-    String code,
-    String hp,
-    int amount,
-  ) async {
-    FormData formData = FormData.fromMap({
-      "token": token,
-      "hp": hp,
-      "code": code,
-      "amount": amount,
-    });
+  static Future<dynamic> checkPostpaid(String token, String url, String code, String hp, int amount) async {
+    FormData formData = FormData.fromMap({"token": token, "hp": hp, "code": code, "amount": amount});
     Dio dio = Dio();
     dio.options.headers['x-username'] = xusername;
     dio.options.headers['x-password'] = xpassword;
@@ -211,13 +170,8 @@ class IakRepository {
     }
   }
 
-  static Future<dynamic> streaming(
-    String token,
-    String url,
-  ) async {
-    FormData formData = FormData.fromMap({
-      "token": token,
-    });
+  static Future<dynamic> streaming(String token, String url) async {
+    FormData formData = FormData.fromMap({"token": token});
     Dio dio = Dio();
     dio.options.headers['x-username'] = xusername;
     dio.options.headers['x-password'] = xpassword;
@@ -238,13 +192,8 @@ class IakRepository {
     }
   }
 
-  static Future<dynamic> merchantIak(
-    String token,
-    String url,
-  ) async {
-    FormData formData = FormData.fromMap({
-      "token": token,
-    });
+  static Future<dynamic> merchantIak(String token, String url) async {
+    FormData formData = FormData.fromMap({"token": token});
     Dio dio = Dio();
     dio.options.headers['x-username'] = xusername;
     dio.options.headers['x-password'] = xpassword;
@@ -265,13 +214,8 @@ class IakRepository {
     }
   }
 
-  static Future<dynamic> eToll(
-    String token,
-    String url,
-  ) async {
-    FormData formData = FormData.fromMap({
-      "token": token,
-    });
+  static Future<dynamic> eToll(String token, String url) async {
+    FormData formData = FormData.fromMap({"token": token});
     Dio dio = Dio();
     dio.options.headers['x-username'] = xusername;
     dio.options.headers['x-password'] = xpassword;
@@ -292,19 +236,8 @@ class IakRepository {
     }
   }
 
-  static Future<dynamic> checkBPJS(
-    String token,
-    String url,
-    String code,
-    String month,
-    String hp,
-  ) async {
-    FormData formData = FormData.fromMap({
-      "token": token,
-      "hp": hp,
-      "month": month,
-      "code": code,
-    });
+  static Future<dynamic> checkBPJS(String token, String url, String code, String month, String hp) async {
+    FormData formData = FormData.fromMap({"token": token, "hp": hp, "month": month, "code": code});
     Dio dio = Dio();
     dio.options.headers['x-username'] = xusername;
     dio.options.headers['x-password'] = xpassword;

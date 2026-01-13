@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:ibpr/module/dashboard/dashboard_notifier.dart';
-import 'package:ibpr/utils/pro_shimmer.dart';
+import 'package:mobile_info/module/dashboard/dashboard_notifier.dart';
+import 'package:mobile_info/utils/pro_shimmer.dart';
 import 'package:provider/provider.dart';
 
 class DashboardPage extends StatelessWidget {
@@ -16,9 +16,7 @@ class DashboardPage extends StatelessWidget {
             backgroundColor: Colors.grey[200],
             body: Center(
               child: Container(
-                width: MediaQuery.of(context).size.width > 600
-                    ? 400
-                    : MediaQuery.of(context).size.width,
+                width: MediaQuery.of(context).size.width > 600 ? 400 : MediaQuery.of(context).size.width,
                 decoration: BoxDecoration(color: Colors.white),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -28,17 +26,9 @@ class DashboardPage extends StatelessWidget {
                       padding: EdgeInsets.symmetric(horizontal: 16),
                       alignment: Alignment.centerLeft,
                       decoration: BoxDecoration(
-                        border: Border(
-                          bottom: BorderSide(
-                            width: 1,
-                            color: Colors.grey[200]!,
-                          ),
-                        ),
+                        border: Border(bottom: BorderSide(width: 1, color: Colors.grey[200]!)),
                       ),
-                      child: Text(
-                        "Bank Account BPR",
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
+                      child: Text("Bank Account BPR", style: TextStyle(fontWeight: FontWeight.bold)),
                     ),
                     Expanded(
                       child: ListView(
@@ -47,8 +37,7 @@ class DashboardPage extends StatelessWidget {
                               ? Container(
                                   padding: const EdgeInsets.all(16),
                                   child: const Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
+                                    crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
                                       ProShimmer(height: 10, width: 200),
                                       SizedBox(height: 4),
@@ -60,8 +49,7 @@ class DashboardPage extends StatelessWidget {
                                   ),
                                 )
                               : Column(
-                                  crossAxisAlignment:
-                                      CrossAxisAlignment.stretch,
+                                  crossAxisAlignment: CrossAxisAlignment.stretch,
                                   children: [
                                     ListView.builder(
                                       padding: EdgeInsets.all(20),
@@ -71,8 +59,7 @@ class DashboardPage extends StatelessWidget {
                                       itemBuilder: (context, i) {
                                         final data = value.list[i];
                                         return Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.stretch,
+                                          crossAxisAlignment: CrossAxisAlignment.stretch,
                                           children: [
                                             InkWell(
                                               onTap: () {
@@ -83,44 +70,21 @@ class DashboardPage extends StatelessWidget {
                                                 color: Colors.white,
                                                 child: Container(
                                                   padding: EdgeInsets.all(12),
-                                                  decoration: BoxDecoration(
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                          8,
-                                                        ),
-                                                  ),
+                                                  decoration: BoxDecoration(borderRadius: BorderRadius.circular(8)),
                                                   child: Row(
                                                     children: [
                                                       Expanded(
                                                         child: Column(
-                                                          crossAxisAlignment:
-                                                              CrossAxisAlignment
-                                                                  .stretch,
+                                                          crossAxisAlignment: CrossAxisAlignment.stretch,
                                                           children: [
-                                                            Text(
-                                                              "${data.bprNama}",
-                                                              style: TextStyle(
-                                                                fontSize: 12,
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .bold,
-                                                              ),
-                                                            ),
-                                                            Text(
-                                                              "${data.noRekening}",
-                                                              style: TextStyle(
-                                                                fontSize: 12,
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .w300,
-                                                              ),
-                                                            ),
+                                                            Text("${data.bprNama}", style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+                                                            Text("${data.noRekening}", style: TextStyle(fontSize: 12, fontWeight: FontWeight.w300)),
                                                           ],
                                                         ),
                                                       ),
                                                       SizedBox(width: 16),
                                                       Image.network(
-                                                        "https://ibprservices.medtrans.id/webServices/image-proxy.php?url=${data.bprLogo}",
+                                                        "https://infoservices.medtrans.id/webServices/image-proxy.php?url=${data.bprLogo}",
                                                         height: 50,
                                                       ),
                                                     ],

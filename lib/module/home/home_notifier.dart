@@ -177,7 +177,7 @@ class HomeNotifier extends ChangeNotifier {
     list.clear();
     listProduk.clear();
     notifyListeners();
-    HomeRepository.homeData(token, NetworkURL.homeData(), users!.id, users!.bprId).then((value) {
+    HomeRepository.homeData(token, NetworkURL.homeData(), users!.id, "609999").then((value) {
       if (value['value'] == 1) {
         for (Map<String, dynamic> i in value['banner']) {
           list.add(BannersModel.fromJson(i));

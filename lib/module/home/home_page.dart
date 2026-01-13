@@ -146,19 +146,20 @@ class HomePage extends StatelessWidget {
                                                   return Container(
                                                     margin: EdgeInsets.only(right: 16),
                                                     child: CachedNetworkImage(
+                                                      imageUrl:
+                                                          "https://infoservices.medtrans.id/webServices/image-proxy.php?url=$upload/${data.banners}",
+                                                      httpHeaders: const {"User-Agent": "Mozilla/5.0", "Accept": "image/*"},
                                                       placeholder: (context, url) => ProShimmer(height: 140, width: 220, radius: 8),
-                                                      fit: BoxFit.cover,
                                                       imageBuilder: (context, imageProvider) => Container(
                                                         decoration: BoxDecoration(
                                                           borderRadius: BorderRadius.circular(8),
                                                           image: DecorationImage(image: imageProvider, fit: BoxFit.cover),
                                                         ),
                                                       ),
-                                                      height: 140,
-                                                      width: 220,
-                                                      imageUrl:
-                                                          "https://infoservices.medtrans.id/webServices/image-proxy.php?url=$upload/${data.banners}",
-                                                      errorWidget: (context, url, error) => const Icon(Icons.error),
+                                                      errorWidget: (context, url, error) {
+                                                        debugPrint("IMAGE ERROR: $error");
+                                                        return const Icon(Icons.broken_image, color: Colors.red);
+                                                      },
                                                     ),
                                                   );
                                                 },

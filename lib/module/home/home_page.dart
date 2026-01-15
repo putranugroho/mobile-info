@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:mobile_info/models/banners_model.dart';
 import 'package:mobile_info/module/home/home_notifier.dart';
 import 'package:mobile_info/module/loan/loan_detail_page.dart';
 import 'package:mobile_info/module/mutasi/mutasi_tabungan_page.dart';
@@ -10,6 +11,7 @@ import 'package:mobile_info/utils/format_currency.dart';
 import 'package:mobile_info/utils/images_path.dart';
 import 'package:mobile_info/utils/pro_shimmer.dart';
 import 'package:provider/provider.dart';
+import 'package:video_player/video_player.dart';
 
 import '../../network/network.dart';
 
@@ -35,7 +37,7 @@ class HomePage extends StatelessWidget {
                   padding: EdgeInsets.all(16),
                   child: Row(
                     children: [
-                      Image.asset(ImageAssets.logo, height: 90, fit: BoxFit.contain),
+                      Image.asset(ImageAssets.logo, height: 60, fit: BoxFit.contain),
                       Spacer(),
                       Image.network("https://infoservices.medtrans.id/webServices/image-proxy.php?url=${value.users!.bprLogo}", height: 70),
                     ],
@@ -137,29 +139,35 @@ class HomePage extends StatelessWidget {
                                           crossAxisAlignment: CrossAxisAlignment.stretch,
                                           children: [
                                             Container(
-                                              height: 120,
+                                              height: 170,
+                                              decoration: BoxDecoration(
+                                                borderRadius: BorderRadius.circular(8),
+                                                color: const Color.fromARGB(255, 137, 206, 252),
+                                                boxShadow: [
+                                                  BoxShadow(offset: Offset(2, 2), color: Colors.grey[300] ?? Colors.transparent, blurRadius: 5),
+                                                ],
+                                              ),
                                               child: PageView.builder(
                                                 itemCount: value.listBanner.length,
                                                 controller: PageController(viewportFraction: 0.6),
                                                 itemBuilder: (context, i) {
                                                   final data = value.listBanner[i];
-                                                  return Container(
-                                                    margin: EdgeInsets.only(right: 16),
-                                                    child: CachedNetworkImage(
-                                                      imageUrl:
-                                                          "https://infoservices.medtrans.id/webServices/image-proxy.php?url=$upload/${data.banners}",
-                                                      httpHeaders: const {"User-Agent": "Mozilla/5.0", "Accept": "image/*"},
-                                                      placeholder: (context, url) => ProShimmer(height: 140, width: 220, radius: 8),
-                                                      imageBuilder: (context, imageProvider) => Container(
-                                                        decoration: BoxDecoration(
-                                                          borderRadius: BorderRadius.circular(8),
-                                                          image: DecorationImage(image: imageProvider, fit: BoxFit.cover),
+                                                  return GestureDetector(
+                                                    onTap: () => _onBannerTap(context, data),
+                                                    child: Container(
+                                                      margin: const EdgeInsets.only(right: 16),
+                                                      child: CachedNetworkImage(
+                                                        imageUrl:
+                                                            "https://infoservices.medtrans.id/webServices/image-proxy.php?url=$upload/${data.banners}",
+                                                        placeholder: (context, url) => ProShimmer(height: 140, width: 220, radius: 8),
+                                                        imageBuilder: (context, imageProvider) => Container(
+                                                          decoration: BoxDecoration(
+                                                            borderRadius: BorderRadius.circular(8),
+                                                            image: DecorationImage(image: imageProvider, fit: BoxFit.cover),
+                                                          ),
                                                         ),
+                                                        errorWidget: (_, __, ___) => const Icon(Icons.broken_image, color: Colors.red),
                                                       ),
-                                                      errorWidget: (context, url, error) {
-                                                        debugPrint("IMAGE ERROR: $error");
-                                                        return const Icon(Icons.broken_image, color: Colors.red);
-                                                      },
                                                     ),
                                                   );
                                                 },
@@ -521,4 +529,189 @@ Widget _rateItem(String label, String value) {
       ],
     ),
   );
+}
+
+void showMobileDialog({required BuildContext context, required Widget child}) {
+  showGeneralDialog(
+    context: context,
+    barrierDismissible: true,
+    barrierLabel: "Dismiss",
+    barrierColor: Colors.transparent,
+    transitionDuration: const Duration(milliseconds: 200),
+    pageBuilder: (_, __, ___) {
+      return GestureDetector(
+        onTap: () => Navigator.of(context).pop(), // ✅ TAP LUAR TUTUP
+        child: Material(
+          color: Colors.transparent,
+          child: Center(
+            child: GestureDetector(
+              onTap: () {}, // ❗ cegah close saat tap konten
+              child: child,
+            ),
+          ),
+        ),
+      );
+    },
+  );
+}
+
+enum DialogMode { video, image, text }
+
+Widget mobileDialogWrapper(BuildContext context, {required Widget child, DialogMode mode = DialogMode.text, double aspectRatio = 16 / 9}) {
+  final screenWidth = MediaQuery.of(context).size.width;
+  final screenHeight = MediaQuery.of(context).size.height;
+
+  final width = screenWidth > 600 ? 400.0 : screenWidth * 0.95;
+  final video_width = screenWidth > 900 ? 800.0 : screenWidth * 0.95;
+
+  double? height;
+  if (mode == DialogMode.video) {
+    height = video_width / aspectRatio;
+  } else if (mode == DialogMode.image) {
+    height = screenHeight * 0.7;
+  }
+
+  return Container(
+    width: width,
+    height: height,
+    constraints: const BoxConstraints(minHeight: 80),
+    decoration: BoxDecoration(borderRadius: BorderRadius.circular(16), color: mode == DialogMode.text ? Colors.white : Colors.transparent),
+    child: child,
+  );
+}
+
+void _onBannerTap(BuildContext context, BannersModel banner) {
+  switch (banner.jenis) {
+    case "VIDEO":
+      if (banner.url?.isNotEmpty == true) {
+        _showVideoBanner(context, "https://infoservices.medtrans.id/webServices/video-proxy.php?file=${banner.url}");
+      }
+      break;
+
+    case "IMAGE":
+      _showImageBanner(context, bannerUrl: banner.url, bannerFile: banner.banners);
+      break;
+
+    default:
+      _showTextBanner(context, title: banner.title ?? "Informasi", description: banner.description ?? "Tidak ada deskripsi");
+  }
+}
+
+void _showVideoBanner(BuildContext context, String videoUrl) {
+  showMobileDialog(
+    context: context,
+    child: mobileDialogWrapper(
+      context,
+      mode: DialogMode.video,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(16),
+        child: VideoPlayerWidget(url: videoUrl),
+      ),
+    ),
+  );
+}
+
+void _showImageBanner(BuildContext context, {String? bannerUrl, String? bannerFile}) {
+  final imageUrl = (bannerUrl?.isNotEmpty == true)
+      ? "https://infoservices.medtrans.id/webServices/image-proxy.php?url=$upload/$bannerUrl"
+      : "https://infoservices.medtrans.id/webServices/image-proxy.php?url=$upload/$bannerFile";
+
+  showMobileDialog(
+    context: context,
+    child: mobileDialogWrapper(
+      context,
+      mode: DialogMode.image,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(16),
+        child: InteractiveViewer(
+          minScale: 0.8,
+          maxScale: 4,
+          child: CachedNetworkImage(
+            imageUrl: imageUrl,
+            fit: BoxFit.contain,
+            placeholder: (_, __) => const Center(child: CircularProgressIndicator()),
+            errorWidget: (_, __, ___) => const Icon(Icons.broken_image, size: 48),
+          ),
+        ),
+      ),
+    ),
+  );
+}
+
+void _showTextBanner(BuildContext context, {required String title, required String description}) {
+  showMobileDialog(
+    context: context,
+    child: mobileDialogWrapper(
+      context,
+      mode: DialogMode.text,
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(title, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 12),
+            Text(description),
+          ],
+        ),
+      ),
+    ),
+  );
+}
+
+class VideoPlayerWidget extends StatefulWidget {
+  final String url;
+  const VideoPlayerWidget({super.key, required this.url});
+
+  @override
+  State<VideoPlayerWidget> createState() => _VideoPlayerWidgetState();
+}
+
+class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
+  late VideoPlayerController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _controller = VideoPlayerController.networkUrl(Uri.parse(widget.url))
+      ..initialize().then((_) {
+        _controller.play(); // ✅ AUTOPLAY
+        setState(() {});
+      });
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (!_controller.value.isInitialized) {
+      return const Center(child: CircularProgressIndicator(color: Colors.white));
+    }
+
+    return Stack(
+      alignment: Alignment.center,
+      children: [
+        SizedBox.expand(
+          child: AspectRatio(aspectRatio: _controller.value.aspectRatio, child: VideoPlayer(_controller)),
+        ),
+
+        // IconButton(
+        //   iconSize: 56,
+        //   color: Colors.white,
+        //   icon: Icon(_controller.value.isPlaying ? Icons.pause_circle_filled : Icons.play_circle_filled),
+        //   onPressed: () {
+        //     setState(() {
+        //       _controller.value.isPlaying ? _controller.pause() : _controller.play();
+        //     });
+        //   },
+        // ),
+      ],
+    );
+  }
 }

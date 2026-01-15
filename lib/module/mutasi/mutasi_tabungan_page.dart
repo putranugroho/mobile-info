@@ -39,10 +39,14 @@ class _MutasiBodyState extends State<_MutasiBody> with SingleTickerProviderState
   void initState() {
     super.initState();
 
-    _tabController = TabController(length: 2, vsync: this);
+    _tabController = TabController(
+      length: 2,
+      vsync: this,
+      initialIndex: 1, // ✅ default ke Desember
+    );
 
     // Load awal setelah widget siap
-    Future.microtask(() => _loadByTab(0));
+    Future.microtask(() => _loadByTab(1));
 
     _tabController.addListener(() {
       if (_tabController.indexIsChanging) return;

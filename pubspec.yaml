@@ -74,6 +74,8 @@ dependencies:
   # firebase_auth_web: ^4.0.0
   google_fonts: ^6.2.1
   # printing: ^5.9.3
+  video_player: ^2.8.2
+  chewie: ^1.7.5
   hive: ^2.2.3
   file_picker: ^10.2.0
   printing: ^5.10.0

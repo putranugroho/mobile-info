@@ -675,11 +675,9 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
   void initState() {
     super.initState();
 
-    _controller = VideoPlayerController.networkUrl(Uri.parse(widget.url))
-      ..initialize().then((_) {
-        _controller.play(); // ✅ AUTOPLAY
-        setState(() {});
-      });
+    _controller.initialize().then((_) {
+      setState(() {});
+    });
   }
 
   @override
@@ -701,16 +699,16 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
           child: AspectRatio(aspectRatio: _controller.value.aspectRatio, child: VideoPlayer(_controller)),
         ),
 
-        // IconButton(
-        //   iconSize: 56,
-        //   color: Colors.white,
-        //   icon: Icon(_controller.value.isPlaying ? Icons.pause_circle_filled : Icons.play_circle_filled),
-        //   onPressed: () {
-        //     setState(() {
-        //       _controller.value.isPlaying ? _controller.pause() : _controller.play();
-        //     });
-        //   },
-        // ),
+        IconButton(
+          iconSize: 56,
+          color: Colors.white,
+          icon: Icon(_controller.value.isPlaying ? Icons.pause_circle_filled : Icons.play_circle_filled),
+          onPressed: () {
+            setState(() {
+              _controller.value.isPlaying ? _controller.pause() : _controller.play();
+            });
+          },
+        ),
       ],
     );
   }

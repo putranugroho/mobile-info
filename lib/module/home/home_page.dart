@@ -958,19 +958,22 @@ void _showVideoBanner(BuildContext context, String videoUrl) {
     builder: (context) {
       return Dialog(
         backgroundColor: Colors.transparent,
-        child: Stack(
-          children: [
-            Center(child: VideoPlayerWidget(url: videoUrl)),
+        child: Container(
+          width: 380,
+          child: Stack(
+            children: [
+              Center(child: VideoPlayerWidget(url: videoUrl)),
 
-            Positioned(
-              top: 16,
-              right: 16,
-              child: IconButton(
-                icon: const Icon(Icons.close, color: Colors.white, size: 28),
-                onPressed: () => Navigator.pop(context),
+              Positioned(
+                top: 16,
+                right: 16,
+                child: IconButton(
+                  icon: const Icon(Icons.close, color: Colors.white, size: 28),
+                  onPressed: () => Navigator.pop(context),
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       );
     },

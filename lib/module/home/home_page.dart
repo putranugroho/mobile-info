@@ -37,9 +37,16 @@ class HomePage extends StatelessWidget {
                   padding: EdgeInsets.all(16),
                   child: Row(
                     children: [
-                      Image.asset(ImageAssets.logo, height: 60, fit: BoxFit.contain),
+                      Image.asset(
+                        ImageAssets.logo,
+                        height: 60,
+                        fit: BoxFit.contain,
+                      ),
                       Spacer(),
-                      Image.network("https://infoservices.medtrans.id/webServices/image-proxy.php?url=${value.users!.bprLogo}", height: 70),
+                      Image.network(
+                        "https://infoservices.medtrans.id/webServices/image-proxy.php?url=${value.users!.bprLogo}",
+                        height: 70,
+                      ),
                     ],
                   ),
                 ),
@@ -71,7 +78,9 @@ class HomePage extends StatelessWidget {
                                     borderRadius: BorderRadius.circular(16),
                                     child: Container(
                                       height: 110,
-                                      margin: EdgeInsets.symmetric(horizontal: 16),
+                                      margin: EdgeInsets.symmetric(
+                                        horizontal: 16,
+                                      ),
                                       child: Stack(
                                         children: [
                                           Positioned(
@@ -81,7 +90,14 @@ class HomePage extends StatelessWidget {
                                             bottom: 10,
                                             child: Container(
                                               padding: EdgeInsets.all(20),
-                                              decoration: BoxDecoration(color: const Color.fromARGB(255, 0, 95, 0)),
+                                              decoration: BoxDecoration(
+                                                color: const Color.fromARGB(
+                                                  255,
+                                                  0,
+                                                  95,
+                                                  0,
+                                                ),
+                                              ),
                                             ),
                                           ),
                                           Positioned(
@@ -90,7 +106,15 @@ class HomePage extends StatelessWidget {
                                             child: Container(
                                               height: 300,
                                               width: 300,
-                                              decoration: BoxDecoration(color: const Color.fromARGB(255, 0, 255, 0), shape: BoxShape.circle),
+                                              decoration: BoxDecoration(
+                                                color: const Color.fromARGB(
+                                                  255,
+                                                  0,
+                                                  255,
+                                                  0,
+                                                ),
+                                                shape: BoxShape.circle,
+                                              ),
                                             ),
                                           ),
                                           Positioned(
@@ -101,24 +125,44 @@ class HomePage extends StatelessWidget {
                                             child: Container(
                                               padding: EdgeInsets.all(16),
                                               child: Column(
-                                                crossAxisAlignment: CrossAxisAlignment.end,
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.end,
                                                 children: [
                                                   Spacer(),
                                                   Row(
-                                                    crossAxisAlignment: CrossAxisAlignment.end,
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment.end,
                                                     children: [
                                                       Expanded(
                                                         child: Column(
-                                                          crossAxisAlignment: CrossAxisAlignment.end,
+                                                          crossAxisAlignment:
+                                                              CrossAxisAlignment
+                                                                  .end,
                                                           children: [
                                                             Text(
                                                               "${value.users!.namaLengkap}",
-                                                              textAlign: TextAlign.end,
+                                                              textAlign:
+                                                                  TextAlign.end,
                                                               maxLines: 2,
-                                                              overflow: TextOverflow.ellipsis,
-                                                              style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+                                                              overflow:
+                                                                  TextOverflow
+                                                                      .ellipsis,
+                                                              style: TextStyle(
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold,
+                                                                color: Colors
+                                                                    .white,
+                                                              ),
                                                             ),
-                                                            Text("No CIF: 10000043917", style: TextStyle(fontSize: 12, color: Colors.white)),
+                                                            Text(
+                                                              "No CIF: 10000043917",
+                                                              style: TextStyle(
+                                                                fontSize: 12,
+                                                                color: Colors
+                                                                    .white,
+                                                              ),
+                                                            ),
                                                           ],
                                                         ),
                                                       ),
@@ -136,37 +180,87 @@ class HomePage extends StatelessWidget {
                                   SizedBox(height: 24),
                                   value.list.isNotEmpty
                                       ? Column(
-                                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.stretch,
                                           children: [
                                             Container(
                                               height: 170,
                                               decoration: BoxDecoration(
-                                                borderRadius: BorderRadius.circular(8),
-                                                color: const Color.fromARGB(255, 137, 206, 252),
+                                                borderRadius:
+                                                    BorderRadius.circular(8),
+                                                color: const Color.fromARGB(
+                                                  255,
+                                                  137,
+                                                  206,
+                                                  252,
+                                                ),
                                                 boxShadow: [
-                                                  BoxShadow(offset: Offset(2, 2), color: Colors.grey[300] ?? Colors.transparent, blurRadius: 5),
+                                                  BoxShadow(
+                                                    offset: Offset(2, 2),
+                                                    color:
+                                                        Colors.grey[300] ??
+                                                        Colors.transparent,
+                                                    blurRadius: 5,
+                                                  ),
                                                 ],
                                               ),
                                               child: PageView.builder(
-                                                itemCount: value.listBanner.length,
-                                                controller: PageController(viewportFraction: 0.6),
+                                                itemCount:
+                                                    value.listBanner.length,
+                                                controller: PageController(
+                                                  viewportFraction: 0.6,
+                                                ),
                                                 itemBuilder: (context, i) {
-                                                  final data = value.listBanner[i];
+                                                  final data =
+                                                      value.listBanner[i];
                                                   return GestureDetector(
-                                                    onTap: () => _onBannerTap(context, data),
+                                                    onTap: () => _onBannerTap(
+                                                      context,
+                                                      data,
+                                                    ),
                                                     child: Container(
-                                                      margin: const EdgeInsets.only(right: 16),
+                                                      margin:
+                                                          const EdgeInsets.only(
+                                                            right: 16,
+                                                          ),
                                                       child: CachedNetworkImage(
                                                         imageUrl:
                                                             "https://infoservices.medtrans.id/webServices/image-proxy.php?url=$upload/${data.banners}",
-                                                        placeholder: (context, url) => ProShimmer(height: 140, width: 220, radius: 8),
-                                                        imageBuilder: (context, imageProvider) => Container(
-                                                          decoration: BoxDecoration(
-                                                            borderRadius: BorderRadius.circular(8),
-                                                            image: DecorationImage(image: imageProvider, fit: BoxFit.cover),
-                                                          ),
-                                                        ),
-                                                        errorWidget: (_, __, ___) => const Icon(Icons.broken_image, color: Colors.red),
+                                                        placeholder:
+                                                            (context, url) =>
+                                                                ProShimmer(
+                                                                  height: 140,
+                                                                  width: 220,
+                                                                  radius: 8,
+                                                                ),
+                                                        imageBuilder:
+                                                            (
+                                                              context,
+                                                              imageProvider,
+                                                            ) => Container(
+                                                              decoration: BoxDecoration(
+                                                                borderRadius:
+                                                                    BorderRadius.circular(
+                                                                      8,
+                                                                    ),
+                                                                image: DecorationImage(
+                                                                  image:
+                                                                      imageProvider,
+                                                                  fit: BoxFit
+                                                                      .cover,
+                                                                ),
+                                                              ),
+                                                            ),
+                                                        errorWidget:
+                                                            (
+                                                              _,
+                                                              __,
+                                                              ___,
+                                                            ) => const Icon(
+                                                              Icons
+                                                                  .broken_image,
+                                                              color: Colors.red,
+                                                            ),
                                                       ),
                                                     ),
                                                   );
@@ -182,11 +276,25 @@ class HomePage extends StatelessWidget {
                                     padding: EdgeInsets.all(16),
                                     decoration: BoxDecoration(
                                       borderRadius: BorderRadius.circular(8),
-                                      color: const Color.fromARGB(255, 137, 206, 252),
-                                      boxShadow: [BoxShadow(offset: Offset(2, 2), color: Colors.grey[300] ?? Colors.transparent, blurRadius: 5)],
+                                      color: const Color.fromARGB(
+                                        255,
+                                        137,
+                                        206,
+                                        252,
+                                      ),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          offset: Offset(2, 2),
+                                          color:
+                                              Colors.grey[300] ??
+                                              Colors.transparent,
+                                          blurRadius: 5,
+                                        ),
+                                      ],
                                     ),
                                     child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.stretch,
                                       children: [
                                         Row(
                                           children: [
@@ -194,19 +302,46 @@ class HomePage extends StatelessWidget {
                                               child: InkWell(
                                                 onTap: () => value.gantiPage(0),
                                                 child: Container(
-                                                  padding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                                                  padding: EdgeInsets.symmetric(
+                                                    horizontal: 12,
+                                                    vertical: 12,
+                                                  ),
                                                   decoration: BoxDecoration(
-                                                    borderRadius: BorderRadius.circular(8),
-                                                    color: value.page == 0 ? const Color.fromARGB(255, 0, 95, 0) : Colors.transparent,
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                          8,
+                                                        ),
+                                                    color: value.page == 0
+                                                        ? const Color.fromARGB(
+                                                            255,
+                                                            0,
+                                                            95,
+                                                            0,
+                                                          )
+                                                        : Colors.transparent,
                                                     border: Border.all(
-                                                      color: value.page == 0 ? const Color.fromARGB(255, 0, 95, 0) : Colors.grey.shade400,
+                                                      color: value.page == 0
+                                                          ? const Color.fromARGB(
+                                                              255,
+                                                              0,
+                                                              95,
+                                                              0,
+                                                            )
+                                                          : Colors
+                                                                .grey
+                                                                .shade400,
                                                       width: 2,
                                                     ),
                                                   ),
                                                   child: Text(
                                                     "Tabungan",
                                                     textAlign: TextAlign.center,
-                                                    style: TextStyle(fontSize: 12, color: value.page == 0 ? Colors.white : Colors.black),
+                                                    style: TextStyle(
+                                                      fontSize: 12,
+                                                      color: value.page == 0
+                                                          ? Colors.white
+                                                          : Colors.black,
+                                                    ),
                                                   ),
                                                 ),
                                               ),
@@ -216,19 +351,46 @@ class HomePage extends StatelessWidget {
                                               child: InkWell(
                                                 onTap: () => value.gantiPage(1),
                                                 child: Container(
-                                                  padding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                                                  padding: EdgeInsets.symmetric(
+                                                    horizontal: 12,
+                                                    vertical: 12,
+                                                  ),
                                                   decoration: BoxDecoration(
-                                                    borderRadius: BorderRadius.circular(8),
-                                                    color: value.page == 1 ? const Color.fromARGB(255, 0, 95, 0) : Colors.transparent,
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                          8,
+                                                        ),
+                                                    color: value.page == 1
+                                                        ? const Color.fromARGB(
+                                                            255,
+                                                            0,
+                                                            95,
+                                                            0,
+                                                          )
+                                                        : Colors.transparent,
                                                     border: Border.all(
-                                                      color: value.page == 1 ? const Color.fromARGB(255, 0, 95, 0) : Colors.grey.shade400,
+                                                      color: value.page == 1
+                                                          ? const Color.fromARGB(
+                                                              255,
+                                                              0,
+                                                              95,
+                                                              0,
+                                                            )
+                                                          : Colors
+                                                                .grey
+                                                                .shade400,
                                                       width: 2,
                                                     ),
                                                   ),
                                                   child: Text(
                                                     "Deposito",
                                                     textAlign: TextAlign.center,
-                                                    style: TextStyle(fontSize: 12, color: value.page == 1 ? Colors.white : Colors.black),
+                                                    style: TextStyle(
+                                                      fontSize: 12,
+                                                      color: value.page == 1
+                                                          ? Colors.white
+                                                          : Colors.black,
+                                                    ),
                                                   ),
                                                 ),
                                               ),
@@ -238,19 +400,46 @@ class HomePage extends StatelessWidget {
                                               child: InkWell(
                                                 onTap: () => value.gantiPage(2),
                                                 child: Container(
-                                                  padding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                                                  padding: EdgeInsets.symmetric(
+                                                    horizontal: 12,
+                                                    vertical: 12,
+                                                  ),
                                                   decoration: BoxDecoration(
-                                                    borderRadius: BorderRadius.circular(8),
-                                                    color: value.page == 2 ? const Color.fromARGB(255, 0, 95, 0) : Colors.transparent,
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                          8,
+                                                        ),
+                                                    color: value.page == 2
+                                                        ? const Color.fromARGB(
+                                                            255,
+                                                            0,
+                                                            95,
+                                                            0,
+                                                          )
+                                                        : Colors.transparent,
                                                     border: Border.all(
-                                                      color: value.page == 2 ? const Color.fromARGB(255, 0, 95, 0) : Colors.grey.shade400,
+                                                      color: value.page == 2
+                                                          ? const Color.fromARGB(
+                                                              255,
+                                                              0,
+                                                              95,
+                                                              0,
+                                                            )
+                                                          : Colors
+                                                                .grey
+                                                                .shade400,
                                                       width: 2,
                                                     ),
                                                   ),
                                                   child: Text(
                                                     "Pinjaman",
                                                     textAlign: TextAlign.center,
-                                                    style: TextStyle(fontSize: 12, color: value.page == 2 ? Colors.white : Colors.black),
+                                                    style: TextStyle(
+                                                      fontSize: 12,
+                                                      color: value.page == 2
+                                                          ? Colors.white
+                                                          : Colors.black,
+                                                    ),
                                                   ),
                                                 ),
                                               ),
@@ -270,8 +459,16 @@ class HomePage extends StatelessWidget {
                                   _sukuBungaSection(),
                                   SizedBox(height: 24),
                                   Container(
-                                    padding: EdgeInsets.symmetric(horizontal: 20),
-                                    child: Text("Kenal lebih dekat Produk Kami", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                                    padding: EdgeInsets.symmetric(
+                                      horizontal: 20,
+                                    ),
+                                    child: Text(
+                                      "Kenal lebih dekat Produk Kami",
+                                      style: TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
                                   ),
                                   SizedBox(height: 16),
                                   ListView.builder(
@@ -281,42 +478,88 @@ class HomePage extends StatelessWidget {
                                     itemBuilder: (context, i) {
                                       final data = value.listProduk[i];
                                       return Column(
-                                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.stretch,
                                         children: [
                                           Container(
-                                            margin: EdgeInsets.symmetric(horizontal: 20),
+                                            margin: EdgeInsets.symmetric(
+                                              horizontal: 20,
+                                            ),
                                             padding: EdgeInsets.all(16),
                                             decoration: BoxDecoration(
-                                              borderRadius: BorderRadius.circular(8),
+                                              borderRadius:
+                                                  BorderRadius.circular(8),
                                               color: Colors.white,
                                               boxShadow: [
-                                                BoxShadow(offset: Offset(2, 2), blurRadius: 5, color: Colors.grey[300] ?? Colors.transparent),
+                                                BoxShadow(
+                                                  offset: Offset(2, 2),
+                                                  blurRadius: 5,
+                                                  color:
+                                                      Colors.grey[300] ??
+                                                      Colors.transparent,
+                                                ),
                                               ],
                                             ),
                                             child: Row(
                                               children: [
                                                 CachedNetworkImage(
-                                                  placeholder: (context, url) => ProShimmer(height: 80, width: 80, radius: 8),
+                                                  placeholder: (context, url) =>
+                                                      ProShimmer(
+                                                        height: 80,
+                                                        width: 80,
+                                                        radius: 8,
+                                                      ),
                                                   fit: BoxFit.cover,
-                                                  imageBuilder: (context, imageProvider) => Container(
-                                                    decoration: BoxDecoration(
-                                                      borderRadius: BorderRadius.circular(8),
-                                                      image: DecorationImage(image: imageProvider, fit: BoxFit.cover),
-                                                    ),
-                                                  ),
+                                                  imageBuilder:
+                                                      (
+                                                        context,
+                                                        imageProvider,
+                                                      ) => Container(
+                                                        decoration: BoxDecoration(
+                                                          borderRadius:
+                                                              BorderRadius.circular(
+                                                                8,
+                                                              ),
+                                                          image: DecorationImage(
+                                                            image:
+                                                                imageProvider,
+                                                            fit: BoxFit.cover,
+                                                          ),
+                                                        ),
+                                                      ),
                                                   height: 80,
                                                   width: 80,
-                                                  imageUrl: "$upload/${data.file}",
-                                                  errorWidget: (context, url, error) => const Icon(Icons.error),
+                                                  imageUrl:
+                                                      "$upload/${data.file}",
+                                                  errorWidget:
+                                                      (context, url, error) =>
+                                                          const Icon(
+                                                            Icons.error,
+                                                          ),
                                                 ),
                                                 SizedBox(width: 16),
                                                 Expanded(
                                                   child: Column(
-                                                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .stretch,
                                                     children: [
-                                                      Text("${data.namaProduk}", style: TextStyle(fontWeight: FontWeight.bold)),
+                                                      Text(
+                                                        "${data.namaProduk}",
+                                                        style: TextStyle(
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                        ),
+                                                      ),
                                                       SizedBox(height: 4),
-                                                      Text("${data.keterangan}", style: TextStyle(fontSize: 12, fontWeight: FontWeight.w300)),
+                                                      Text(
+                                                        "${data.keterangan}",
+                                                        style: TextStyle(
+                                                          fontSize: 12,
+                                                          fontWeight:
+                                                              FontWeight.w300,
+                                                        ),
+                                                      ),
                                                     ],
                                                   ),
                                                 ),
@@ -346,7 +589,10 @@ class HomePage extends StatelessWidget {
 
 Widget _produkTabungan(HomeNotifier value, BuildContext context) {
   if (value.loadingTabungan) {
-    return const Padding(padding: EdgeInsets.all(16), child: CircularProgressIndicator());
+    return const Padding(
+      padding: EdgeInsets.all(16),
+      child: CircularProgressIndicator(),
+    );
   }
 
   return Column(
@@ -356,24 +602,42 @@ Widget _produkTabungan(HomeNotifier value, BuildContext context) {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (_) => MutasiTabunganPage(noRekening: tabungan.noAcc, namaProduk: tabungan.namaProduk),
+              builder: (_) => MutasiTabunganPage(
+                noRekening: tabungan.noAcc,
+                namaProduk: tabungan.namaProduk,
+              ),
             ),
           );
         },
         leading: Container(
           width: 44,
           height: 44,
-          decoration: BoxDecoration(color: const Color.fromARGB(255, 0, 95, 0).withOpacity(0.12), borderRadius: BorderRadius.circular(12)),
-          child: const Icon(Icons.credit_card, color: Color.fromARGB(255, 0, 95, 0)),
+          decoration: BoxDecoration(
+            color: const Color.fromARGB(255, 0, 95, 0).withOpacity(0.12),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: const Icon(
+            Icons.credit_card,
+            color: Color.fromARGB(255, 0, 95, 0),
+          ),
         ),
         content: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(tabungan.namaProduk, style: const TextStyle(fontWeight: FontWeight.bold)),
+            Text(
+              tabungan.namaProduk,
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            ),
             const SizedBox(height: 4),
-            Text(tabungan.noAcc, style: const TextStyle(fontSize: 12, color: Colors.grey)),
+            Text(
+              tabungan.noAcc,
+              style: const TextStyle(fontSize: 12, color: Colors.grey),
+            ),
             const SizedBox(height: 6),
-            Text("Rp ${FormatCurrency.oCcy.format(tabungan.saldo)}", style: const TextStyle(fontWeight: FontWeight.bold)),
+            Text(
+              "Rp ${FormatCurrency.oCcy.format(tabungan.saldo)}",
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            ),
           ],
         ),
       );
@@ -383,33 +647,56 @@ Widget _produkTabungan(HomeNotifier value, BuildContext context) {
 
 Widget _produkDeposito(HomeNotifier value, BuildContext context) {
   if (value.loadingDeposito) {
-    return const Padding(padding: EdgeInsets.all(16), child: CircularProgressIndicator());
+    return const Padding(
+      padding: EdgeInsets.all(16),
+      child: CircularProgressIndicator(),
+    );
   }
 
   if (value.listDeposito.isEmpty) {
-    return const Padding(padding: EdgeInsets.all(16), child: Text("Belum ada deposito"));
+    return const Padding(
+      padding: EdgeInsets.all(16),
+      child: Text("Belum ada deposito"),
+    );
   }
 
   return Column(
     children: value.listDeposito.map((deposito) {
       return accountProductCard(
         onTap: () {
-          Navigator.push(context, MaterialPageRoute(builder: (_) => DepositoDetailPage(noRekening: deposito.noAcc)));
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => DepositoDetailPage(noRekening: deposito.noAcc),
+            ),
+          );
         },
         leading: Container(
           width: 44,
           height: 44,
-          decoration: BoxDecoration(color: const Color.fromARGB(255, 0, 95, 0).withOpacity(0.12), borderRadius: BorderRadius.circular(12)),
+          decoration: BoxDecoration(
+            color: const Color.fromARGB(255, 0, 95, 0).withOpacity(0.12),
+            borderRadius: BorderRadius.circular(12),
+          ),
           child: const Icon(Icons.lock, color: Color.fromARGB(255, 0, 95, 0)),
         ),
         content: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(deposito.namaProduk, style: const TextStyle(fontWeight: FontWeight.bold)),
+            Text(
+              deposito.namaProduk,
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            ),
             const SizedBox(height: 4),
-            Text(deposito.noAcc, style: const TextStyle(fontSize: 12, color: Colors.grey)),
+            Text(
+              deposito.noAcc,
+              style: const TextStyle(fontSize: 12, color: Colors.grey),
+            ),
             const SizedBox(height: 6),
-            Text("Rp ${FormatCurrency.oCcy.format(deposito.nominal)}", style: const TextStyle(fontWeight: FontWeight.bold)),
+            Text(
+              "Rp ${FormatCurrency.oCcy.format(deposito.nominal)}",
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            ),
           ],
         ),
       );
@@ -419,33 +706,59 @@ Widget _produkDeposito(HomeNotifier value, BuildContext context) {
 
 Widget _produkPinjaman(HomeNotifier value, BuildContext context) {
   if (value.loadingKredit) {
-    return const Padding(padding: EdgeInsets.all(16), child: CircularProgressIndicator());
+    return const Padding(
+      padding: EdgeInsets.all(16),
+      child: CircularProgressIndicator(),
+    );
   }
 
   if (value.listKredit.isEmpty) {
-    return const Padding(padding: EdgeInsets.all(16), child: Text("Belum ada pinjaman"));
+    return const Padding(
+      padding: EdgeInsets.all(16),
+      child: Text("Belum ada pinjaman"),
+    );
   }
 
   return Column(
     children: value.listKredit.map((kredit) {
       return accountProductCard(
         onTap: () {
-          Navigator.push(context, MaterialPageRoute(builder: (_) => LoanDetailPage(noRek: kredit.noAcc)));
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => LoanDetailPage(noRek: kredit.noAcc),
+            ),
+          );
         },
         leading: Container(
           width: 44,
           height: 44,
-          decoration: BoxDecoration(color: const Color.fromARGB(255, 0, 95, 0).withOpacity(0.12), borderRadius: BorderRadius.circular(12)),
-          child: const Icon(Icons.handshake, color: Color.fromARGB(255, 0, 95, 0)),
+          decoration: BoxDecoration(
+            color: const Color.fromARGB(255, 0, 95, 0).withOpacity(0.12),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: const Icon(
+            Icons.handshake,
+            color: Color.fromARGB(255, 0, 95, 0),
+          ),
         ),
         content: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(kredit.namaProduk, style: const TextStyle(fontWeight: FontWeight.bold)),
+            Text(
+              kredit.namaProduk,
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            ),
             const SizedBox(height: 4),
-            Text(kredit.noAcc, style: const TextStyle(fontSize: 12, color: Colors.grey)),
+            Text(
+              kredit.noAcc,
+              style: const TextStyle(fontSize: 12, color: Colors.grey),
+            ),
             const SizedBox(height: 6),
-            Text("Tagihan: Rp ${FormatCurrency.oCcy.format(kredit.tagihan)}", style: const TextStyle(fontWeight: FontWeight.bold)),
+            Text(
+              "Tagihan: Rp ${FormatCurrency.oCcy.format(kredit.tagihan)}",
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            ),
           ],
         ),
       );
@@ -468,7 +781,13 @@ Widget accountProductCard({
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
-        boxShadow: [BoxShadow(offset: const Offset(2, 2), blurRadius: 5, color: Colors.grey[300] ?? Colors.transparent)],
+        boxShadow: [
+          BoxShadow(
+            offset: const Offset(2, 2),
+            blurRadius: 5,
+            color: Colors.grey[300] ?? Colors.transparent,
+          ),
+        ],
       ),
       child: Row(
         children: [
@@ -495,14 +814,24 @@ Widget _sukuBungaSection() {
     decoration: BoxDecoration(
       color: Colors.white,
       borderRadius: BorderRadius.circular(12),
-      boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 8, offset: const Offset(0, 4))],
+      boxShadow: [
+        BoxShadow(
+          color: Colors.black.withOpacity(0.05),
+          blurRadius: 8,
+          offset: const Offset(0, 4),
+        ),
+      ],
     ),
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Text(
           "Suku Bunga",
-          style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.black87),
+          style: TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.bold,
+            color: Colors.black87,
+          ),
         ),
         const SizedBox(height: 12),
 
@@ -521,10 +850,17 @@ Widget _rateItem(String label, String value) {
     child: Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(label, style: TextStyle(fontSize: 13, color: Colors.grey.shade700)),
+        Text(
+          label,
+          style: TextStyle(fontSize: 13, color: Colors.grey.shade700),
+        ),
         Text(
           value,
-          style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Colors.green),
+          style: const TextStyle(
+            fontSize: 13,
+            fontWeight: FontWeight.w600,
+            color: Colors.green,
+          ),
         ),
       ],
     ),
@@ -557,7 +893,12 @@ void showMobileDialog({required BuildContext context, required Widget child}) {
 
 enum DialogMode { video, image, text }
 
-Widget mobileDialogWrapper(BuildContext context, {required Widget child, DialogMode mode = DialogMode.text, double aspectRatio = 16 / 9}) {
+Widget mobileDialogWrapper(
+  BuildContext context, {
+  required Widget child,
+  DialogMode mode = DialogMode.text,
+  double aspectRatio = 16 / 9,
+}) {
   final screenWidth = MediaQuery.of(context).size.width;
   final screenHeight = MediaQuery.of(context).size.height;
 
@@ -572,10 +913,13 @@ Widget mobileDialogWrapper(BuildContext context, {required Widget child, DialogM
   }
 
   return Container(
-    width: width,
+    width: 380,
     height: height,
     constraints: const BoxConstraints(minHeight: 80),
-    decoration: BoxDecoration(borderRadius: BorderRadius.circular(16), color: mode == DialogMode.text ? Colors.white : Colors.transparent),
+    decoration: BoxDecoration(
+      borderRadius: BorderRadius.circular(16),
+      color: mode == DialogMode.text ? Colors.white : Colors.transparent,
+    ),
     child: child,
   );
 }
@@ -584,79 +928,127 @@ void _onBannerTap(BuildContext context, BannersModel banner) {
   switch (banner.jenis) {
     case "VIDEO":
       if (banner.url?.isNotEmpty == true) {
-        _showVideoBanner(context, "https://infoservices.medtrans.id/webServices/video-proxy.php?file=${banner.url}");
+        _showVideoBanner(
+          context,
+          "https://infoservices.medtrans.id/webServices/video-proxy.php?file=${banner.url}",
+        );
       }
       break;
 
     case "IMAGE":
-      _showImageBanner(context, bannerUrl: banner.url, bannerFile: banner.banners);
+      _showImageBanner(
+        context,
+        bannerUrl: banner.url,
+        bannerFile: banner.banners,
+      );
       break;
 
     default:
-      _showTextBanner(context, title: banner.title ?? "Informasi", description: banner.description ?? "Tidak ada deskripsi");
+      _showTextBanner(
+        context,
+        title: banner.title ?? "Informasi",
+        description: banner.description ?? "Tidak ada deskripsi",
+      );
   }
 }
 
 void _showVideoBanner(BuildContext context, String videoUrl) {
-  showMobileDialog(
+  showDialog(
     context: context,
-    child: mobileDialogWrapper(
-      context,
-      mode: DialogMode.video,
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(16),
-        child: VideoPlayerWidget(url: videoUrl),
-      ),
-    ),
+    builder: (context) {
+      return Dialog(
+        backgroundColor: Colors.transparent,
+        child: Stack(
+          children: [
+            Center(child: VideoPlayerWidget(url: videoUrl)),
+
+            Positioned(
+              top: 16,
+              right: 16,
+              child: IconButton(
+                icon: const Icon(Icons.close, color: Colors.white, size: 28),
+                onPressed: () => Navigator.pop(context),
+              ),
+            ),
+          ],
+        ),
+      );
+    },
   );
 }
 
-void _showImageBanner(BuildContext context, {String? bannerUrl, String? bannerFile}) {
+void _showImageBanner(
+  BuildContext context, {
+  String? bannerUrl,
+  String? bannerFile,
+}) {
   final imageUrl = (bannerUrl?.isNotEmpty == true)
       ? "https://infoservices.medtrans.id/webServices/image-proxy.php?url=$upload/$bannerUrl"
       : "https://infoservices.medtrans.id/webServices/image-proxy.php?url=$upload/$bannerFile";
 
-  showMobileDialog(
+  showDialog(
     context: context,
-    child: mobileDialogWrapper(
-      context,
-      mode: DialogMode.image,
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(16),
-        child: InteractiveViewer(
-          minScale: 0.8,
-          maxScale: 4,
-          child: CachedNetworkImage(
-            imageUrl: imageUrl,
-            fit: BoxFit.contain,
-            placeholder: (_, __) => const Center(child: CircularProgressIndicator()),
-            errorWidget: (_, __, ___) => const Icon(Icons.broken_image, size: 48),
+    builder: (context) {
+      return Dialog(
+        backgroundColor: Colors.transparent,
+        child: mobileDialogWrapper(
+          context,
+          mode: DialogMode.image,
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(16),
+            child: InteractiveViewer(
+              minScale: 0.8,
+              maxScale: 4,
+              child: CachedNetworkImage(
+                imageUrl: imageUrl,
+                fit: BoxFit.contain,
+                placeholder: (_, __) =>
+                    const Center(child: CircularProgressIndicator()),
+                errorWidget: (_, __, ___) =>
+                    const Icon(Icons.broken_image, size: 48),
+              ),
+            ),
           ),
         ),
-      ),
-    ),
+      );
+    },
   );
 }
 
-void _showTextBanner(BuildContext context, {required String title, required String description}) {
-  showMobileDialog(
+void _showTextBanner(
+  BuildContext context, {
+  required String title,
+  required String description,
+}) {
+  showDialog(
     context: context,
-    child: mobileDialogWrapper(
-      context,
-      mode: DialogMode.text,
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(title, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 12),
-            Text(description),
-          ],
+    builder: (context) {
+      return Dialog(
+        backgroundColor: Colors.transparent,
+        child: mobileDialogWrapper(
+          context,
+          mode: DialogMode.text,
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Text(description),
+              ],
+            ),
+          ),
         ),
-      ),
-    ),
+      );
+    },
   );
 }
 
@@ -691,27 +1083,20 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
   @override
   Widget build(BuildContext context) {
     if (!_controller.value.isInitialized) {
-      return const Center(child: CircularProgressIndicator(color: Colors.white));
+      return const Center(
+        child: CircularProgressIndicator(color: Colors.white),
+      );
     }
 
-    return Stack(
-      alignment: Alignment.center,
-      children: [
-        SizedBox.expand(
-          child: AspectRatio(aspectRatio: _controller.value.aspectRatio, child: VideoPlayer(_controller)),
+    return Center(
+      child: FittedBox(
+        fit: BoxFit.contain,
+        child: SizedBox(
+          width: 380,
+          height: _controller.value.size.height,
+          child: VideoPlayer(_controller),
         ),
-
-        // IconButton(
-        //   iconSize: 56,
-        //   color: Colors.white,
-        //   icon: Icon(_controller.value.isPlaying ? Icons.pause_circle_filled : Icons.play_circle_filled),
-        //   onPressed: () {
-        //     setState(() {
-        //       _controller.value.isPlaying ? _controller.pause() : _controller.play();
-        //     });
-        //   },
-        // ),
-      ],
+      ),
     );
   }
 }

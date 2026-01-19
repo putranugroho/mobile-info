@@ -154,7 +154,7 @@ class ProfilePage extends StatelessWidget {
                           children: [
                             Icon(Icons.lock, size: 20),
                             SizedBox(width: 12),
-                            Text("Ganti MPIN"),
+                            Text("Ganti Password"),
                             Spacer(),
                             Icon(Icons.arrow_forward_ios, size: 15),
                           ],

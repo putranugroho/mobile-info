@@ -22,6 +22,10 @@ class NetworkURL {
     return "$url/webServices/verify_otp.php";
   }
 
+  static String gantiPassword() {
+    return "$url/webServices/ganti-password-mobile-info.php";
+  }
+
   static String aktivasiAkun() {
     return "$url/webServices/aktivasi_akun_mobile_info.php";
   }

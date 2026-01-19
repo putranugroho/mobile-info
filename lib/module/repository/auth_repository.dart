@@ -39,6 +39,39 @@ class AuthRepository {
     }
   }
 
+  static Future<dynamic> gantiPassword(
+    String token,
+    String url,
+    String username,
+    String passwordlama,
+    String passwordbaru,
+  ) async {
+    FormData formData = FormData.fromMap({
+      "token": token,
+      "username": username,
+      "passwordlama": passwordlama,
+      "passwordbaru": passwordbaru,
+    });
+    Dio dio = Dio();
+    dio.options.headers['x-username'] = xusername;
+    dio.options.headers['x-password'] = xpassword;
+    if (kDebugMode) {
+      print("ENDPOINT URL : $url");
+    }
+    final response = await dio.post(url, data: formData);
+    if (kDebugMode) {
+      print("RESPONSE STATUS CODE : ${response.statusCode}");
+    }
+    if (response.statusCode == 200) {
+      if (kDebugMode) {
+        print("RESPONSE DATA LOGIN : ${response.data}");
+      }
+      return jsonDecode(response.data);
+    } else {
+      return jsonDecode(response.data);
+    }
+  }
+
   static Future<dynamic> cekLupaPassword(
     String token,
     String url,

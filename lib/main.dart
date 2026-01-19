@@ -1,25 +1,22 @@
 import 'dart:io';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+// import 'package:flutter/services.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:mobile_info/module/splash_screen_page.dart';
 import 'package:mobile_info/utils/custom_scroll.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+// import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
-import 'app_router.dart';
+// import 'app_router.dart';
 
-/// ================================
-/// ANDROID LOCAL NOTIFICATION
-/// ================================
 final FlutterLocalNotificationsPlugin localNotif =
     FlutterLocalNotificationsPlugin();
 
 Future<void> initLocalNotif() async {
-  const androidInit = AndroidInitializationSettings('@mipmap/ic_launcher');
+  const androidInit = AndroidInitializationSettings('@mipmap/launcher_icon');
 
   const initSettings = InitializationSettings(android: androidInit);
 
@@ -118,16 +115,10 @@ void setupFCMListeners() {
   });
 }
 
-class MyHttpOverrides extends HttpOverrides {
-  @override
-  HttpClient createHttpClient(SecurityContext? context) {
-    return super.createHttpClient(context)
-      ..badCertificateCallback = (cert, host, port) => true;
-  }
-}
-
+/// ================================
+/// MAIN
+/// ================================
 void main() async {
-  // WidgetsFlutterBinding.ensureInitialized();
   WidgetsFlutterBinding.ensureInitialized();
   FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
 
@@ -138,20 +129,6 @@ void main() async {
   await initLocalNotif(); // ⬅️ WAJIB
   setupFCMListeners();
   await initPush();
-  SystemChrome.setPreferredOrientations([
-    DeviceOrientation.portraitUp,
-    DeviceOrientation.portraitDown,
-  ]);
-
-  if (kIsWeb) {
-    final uri = Uri.base;
-    final token = uri.queryParameters['token'];
-
-    if (token != null) {
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.setString('auth_token', token);
-    }
-  }
 
   runApp(const MyApp());
 }
@@ -159,7 +136,7 @@ void main() async {
 @pragma('vm:entry-point')
 Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await Firebase.initializeApp();
-  final title = message.notification?.title ?? message.data['title'] ?? 'IBPR';
+  final title = message.notification?.title ?? message.data['title'] ?? 'MOBILE INFO';
   final body = message.notification?.body ?? message.data['body'] ?? '';
 
   const androidDetails = AndroidNotificationDetails(

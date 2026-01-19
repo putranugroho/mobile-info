@@ -108,17 +108,19 @@ class HomePage extends StatelessWidget {
                                             child: Container(
                                               padding: EdgeInsets.all(20),
                                               decoration: BoxDecoration(
-                                                color: const Color.fromARGB(
-                                                  255,
-                                                  0,
-                                                  95,
-                                                  0,
+                                                gradient: LinearGradient(
+                                                  begin: Alignment.topCenter,
+                                                  end: Alignment.bottomCenter,
+                                                  colors: [
+                                                    colorTop,
+                                                    colorBottom,
+                                                  ],
                                                 ),
                                               ),
                                             ),
                                           ),
                                           Positioned(
-                                            top: -280,
+                                            top: -270,
                                             left: -100,
                                             child: Container(
                                               height: 300,
@@ -126,14 +128,15 @@ class HomePage extends StatelessWidget {
                                               decoration: BoxDecoration(
                                                 color: const Color.fromARGB(
                                                   255,
-                                                  0,
-                                                  255,
-                                                  0,
+                                                  1,
+                                                  140,
+                                                  1,
                                                 ),
                                                 shape: BoxShape.circle,
                                               ),
                                             ),
                                           ),
+
                                           Positioned(
                                             top: 0,
                                             left: 0,
@@ -168,16 +171,12 @@ class HomePage extends StatelessWidget {
                                                                 fontWeight:
                                                                     FontWeight
                                                                         .bold,
-                                                                color: Colors
-                                                                    .white,
                                                               ),
                                                             ),
                                                             Text(
                                                               "No CIF: ${value.users!.noCif}",
                                                               style: TextStyle(
                                                                 fontSize: 12,
-                                                                color: Colors
-                                                                    .white,
                                                               ),
                                                             ),
                                                           ],
@@ -200,32 +199,13 @@ class HomePage extends StatelessWidget {
                                           crossAxisAlignment:
                                               CrossAxisAlignment.stretch,
                                           children: [
-                                            Container(
+                                            SizedBox(
                                               height: 170,
-                                              decoration: BoxDecoration(
-                                                borderRadius:
-                                                    BorderRadius.circular(8),
-                                                color: const Color.fromARGB(
-                                                  255,
-                                                  137,
-                                                  206,
-                                                  252,
-                                                ),
-                                                boxShadow: [
-                                                  BoxShadow(
-                                                    offset: Offset(2, 2),
-                                                    color:
-                                                        Colors.grey[300] ??
-                                                        Colors.transparent,
-                                                    blurRadius: 5,
-                                                  ),
-                                                ],
-                                              ),
                                               child: PageView.builder(
                                                 itemCount:
                                                     value.listBanner.length,
                                                 controller: PageController(
-                                                  viewportFraction: 0.6,
+                                                  viewportFraction: 0.8,
                                                 ),
                                                 physics:
                                                     ClampingScrollPhysics(),
@@ -986,9 +966,26 @@ void _showVideoBanner(BuildContext context, String videoUrl) {
               Positioned(
                 top: 16,
                 right: 16,
-                child: IconButton(
-                  icon: const Icon(Icons.close, color: Colors.white, size: 28),
-                  onPressed: () => Navigator.pop(context),
+                child: Container(
+                  width: 40,
+                  height: 40,
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [colorTop, colorBottom],
+                    ),
+                  ),
+                  child: IconButton(
+                    icon: const Icon(
+                      Icons.close,
+                      color: Colors.black,
+                      size: 20,
+                    ),
+                    onPressed: () => Navigator.pop(context),
+                  ),
                 ),
               ),
             ],

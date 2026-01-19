@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:mobile_info/main.dart';
 import 'package:mobile_info/models/index.dart';
 import 'package:mobile_info/module/repository/auth_repository.dart';
+import 'package:mobile_info/utils/button_custom.dart';
 import 'package:mobile_info/utils/dialog_custom.dart';
 import 'package:mobile_info/utils/dialog_loading.dart';
 import 'package:http/http.dart' as http;
@@ -66,8 +67,6 @@ class VerifikasiKTPNotifier extends ChangeNotifier {
     list.clear();
     notifyListeners();
     FirebaseMessaging.instance.getToken().then((value) {
-      fCMtoken = value;
-      print("TOKEN $fCMtoken");
       getList();
       notifyListeners();
     });
@@ -132,23 +131,152 @@ class VerifikasiKTPNotifier extends ChangeNotifier {
       noKtp.text.trim(),
       bprModel!.bprId,
       nomorPonsel.text.trim(),
-      noRekening.text.trim(),
-      fCMtoken!,
     ).then((value) {
       Navigator.pop(context);
       if (value['value'] == 1) {
-        var status = value['data']['status_data'];
-        if (status == "0") {
-          ketmu = true;
-          namaLengkap.text = value['data']['nama'];
-
-          notifyListeners();
-        } else {
-          CustomDialog.messageResponse(context, value['data']['message']);
-        }
+        pinTransaksi();
       } else {
         CustomDialog.messageResponse(context, value['message']);
         ketmu = false;
+        notifyListeners();
+      }
+    });
+  }
+
+  TextEditingController pinController = TextEditingController();
+  var obSecurePin = true;
+  pinTransaksi() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(24),
+          topRight: Radius.circular(24),
+        ),
+      ),
+      builder: (context) {
+        return Padding(
+          padding: EdgeInsets.only(
+            bottom: MediaQuery.of(context).viewInsets.bottom,
+          ),
+          child: Container(
+            padding: EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Row(
+                  children: [
+                    InkWell(
+                      onTap: () {
+                        Navigator.pop(context);
+                      },
+                      child: SizedBox(
+                        width: 48,
+                        height: 48,
+                        child: Icon(Icons.arrow_back, size: 24),
+                      ),
+                    ),
+                    SizedBox(width: 12),
+                    Expanded(
+                      child: Text(
+                        "OTP",
+                        style: TextStyle(
+                          fontFamily: "Satoshi",
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                    InkWell(
+                      onTap: () => Navigator.pop(context),
+                      child: Container(
+                        height: 48,
+                        width: 48,
+                        padding: EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: Color(0xFFF5F5F5),
+                        ),
+                        child: Icon(Icons.close),
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 24),
+                Text(
+                  "Masukan OTP Kamu...",
+                  style: TextStyle(
+                    fontFamily: "Satoshi",
+                    fontSize: 25,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                SizedBox(height: 8),
+                Text(
+                  "Silahkan cek OTP Verifikasi akun Anda",
+                  style: TextStyle(fontFamily: "Satoshi", fontSize: 16),
+                ),
+                SizedBox(height: 20),
+                PinCodeTextField(
+                  pinBoxHeight: 52,
+                  pinBoxWidth: 48,
+                  autofocus: true,
+                  keyboardType: TextInputType.number,
+                  controller: pinController,
+                  hideCharacter: true,
+                  highlight: false,
+                  maskCharacter: "⚫",
+                  highlightColor: Colors.black,
+                  defaultBorderColor: Colors.black,
+                  hasTextBorderColor: Colors.black,
+                  maxLength: 6,
+                  onTextChanged: (text) {},
+                  onDone: (text) {
+                    // value.login();
+                  },
+                  pinCodeTextFieldLayoutType: PinCodeTextFieldLayoutType.normal,
+                  wrapAlignment: WrapAlignment.start,
+                  pinBoxDecoration:
+                      ProvidedPinBoxDecoration.defaultPinBoxDecoration,
+                  pinTextStyle: TextStyle(fontSize: 8.0),
+                  pinTextAnimatedSwitcherTransition:
+                      ProvidedPinBoxTextAnimation.defaultNoTransition,
+                  pinTextAnimatedSwitcherDuration: Duration(milliseconds: 50),
+                ),
+                SizedBox(height: 24),
+                ButtonPrimary(
+                  onTap: () {
+                    Navigator.pop(context);
+                    verify();
+                  },
+                  name: "Continue",
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  verify() async {
+    DialogCustom().showLoading(context);
+    AuthRepository.verifyOtp(
+      token,
+      NetworkURL.verifyOtp(),
+      nomorPonsel.text.trim(),
+      pinController.text.trim(),
+    ).then((value) {
+      Navigator.pop(context);
+      if (value['status']) {
+        ketmu = true;
+        namaLengkap.text = value['user']['nama'];
+        notifyListeners();
+      } else {
+        ketmu = false;
+        CustomDialog.messageResponse(context, value['message']);
         notifyListeners();
       }
     });
@@ -184,28 +312,15 @@ class VerifikasiKTPNotifier extends ChangeNotifier {
     _messageCount++;
     return jsonEncode({
       'token': token,
-      'data': {'via': 'FlutterFire Cloud Messaging!!!', 'count': _messageCount.toString()},
-      'notification': {'title': 'RAHASIAKAN MPIN ANDA', 'body': 'M PIN Anda adalah $mpin'},
+      'data': {
+        'via': 'FlutterFire Cloud Messaging!!!',
+        'count': _messageCount.toString(),
+      },
+      'notification': {
+        'title': 'RAHASIAKAN MPIN ANDA',
+        'body': 'M PIN Anda adalah $mpin',
+      },
     });
-  }
-
-  String? fCMtoken;
-  Future<void> sendPushMessage(String mpin) async {
-    if (fCMtoken == null) {
-      print('Unable to send FCM message, no token exists.');
-      return;
-    }
-
-    try {
-      await http.post(
-        Uri.parse('https://api.rnfirebase.io/messaging/send'),
-        headers: <String, String>{'Content-Type': 'application/json; charset=UTF-8'},
-        body: constructFCMPayload(fCMtoken, mpin),
-      );
-      print('FCM request for device sent!');
-    } catch (e) {
-      print(e);
-    }
   }
 
   var obSecure1 = true;
@@ -222,140 +337,19 @@ class VerifikasiKTPNotifier extends ChangeNotifier {
   }
 
   pinTransaksiBank() async {
-    smsController.clear();
-    notifyListeners();
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.only(topLeft: Radius.circular(24), topRight: Radius.circular(24)),
-      ),
-      builder: (context) {
-        return Padding(
-          padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
-          child: Container(
-            padding: EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Row(
-                  children: [
-                    InkWell(
-                      onTap: () {
-                        Navigator.pop(context);
-                      },
-                      child: SizedBox(width: 48, height: 48, child: Icon(Icons.arrow_back, size: 24)),
-                    ),
-                    SizedBox(width: 12),
-                    Expanded(
-                      child: Text(
-                        "PIN",
-                        style: TextStyle(fontFamily: "Satoshi", fontSize: 18, fontWeight: FontWeight.bold),
-                      ),
-                    ),
-                    InkWell(
-                      onTap: () => Navigator.pop(context),
-                      child: Container(
-                        height: 48,
-                        width: 48,
-                        padding: EdgeInsets.all(8),
-                        decoration: BoxDecoration(shape: BoxShape.circle, color: Color(0xFFF5F5F5)),
-                        child: Icon(Icons.close),
-                      ),
-                    ),
-                  ],
-                ),
-                SizedBox(height: 24),
-                SizedBox(height: 12),
-                Text(
-                  "Masukan MPIN Kamu...",
-                  style: TextStyle(fontFamily: "Satoshi", fontSize: 25, fontWeight: FontWeight.bold),
-                ),
-                SizedBox(height: 8),
-                Text("Mohon masukan MPIN kamu untuk transaksi", style: TextStyle(fontFamily: "Satoshi", fontSize: 16)),
-                SizedBox(height: 20),
-                PinCodeTextField(
-                  pinBoxHeight: 52,
-                  pinBoxWidth: 48,
-                  autofocus: true,
-                  keyboardType: TextInputType.number,
-                  controller: smsController,
-                  hideCharacter: true,
-                  highlight: false,
-                  maskCharacter: "⚫",
-                  highlightColor: Colors.black,
-                  defaultBorderColor: Colors.grey[300] ?? Colors.transparent,
-                  hasTextBorderColor: Colors.black,
-                  maxLength: 6,
-                  onTextChanged: (text) {},
-                  onDone: (text) {
-                    // value.login();
-                  },
-                  pinCodeTextFieldLayoutType: PinCodeTextFieldLayoutType.normal,
-                  wrapAlignment: WrapAlignment.start,
-                  pinBoxDecoration: ProvidedPinBoxDecoration.defaultPinBoxDecoration,
-                  pinTextStyle: TextStyle(fontSize: 8.0),
-                  pinTextAnimatedSwitcherTransition: ProvidedPinBoxTextAnimation.defaultNoTransition,
-                  pinTextAnimatedSwitcherDuration: Duration(milliseconds: 50),
-                ),
-                SizedBox(height: 16),
-                InkWell(
-                  onTap: () {
-                    Navigator.pop(context);
-                    cekPin();
-                  },
-                  child: Container(
-                    height: 52,
-                    alignment: Alignment.center,
-                    decoration: BoxDecoration(borderRadius: BorderRadius.circular(100), color: colorPrimary),
-                    child: Text(
-                      "lanjut",
-                      style: TextStyle(fontFamily: "Satoshi", fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        );
-      },
-    );
-  }
-
-  cekPin() async {
     DialogCustom().showLoading(context);
-    AuthRepository.mPinGenerated(
-      token,
-      NetworkURL.generatedMpin(),
-      "${(((int.parse((smsController.text)) * 2) + 999999) - 111111).toString()}${nomorPonsel.text.substring((nomorPonsel.text.length - 4), nomorPonsel.text.length)}",
-    ).then((value) {
-      if (value['data']['code'] == "000") {
-        var mpIn = value['data']['data'];
-        AuthRepository.aktivasiAkun(
-          token,
-          NetworkURL.aktivasiAkun(),
-          namaLengkap.text.trim(),
-          mpIn,
-          // "${smsController.text.trim()}${nomorPonsel.text.substring((nomorPonsel.text.length - 4), nomorPonsel.text.length)}",
-          // "${(((int.parse((smsController.text)) * 2) + 999999) - 111111).toString()}${nomorPonsel.text.substring((nomorPonsel.text.length - 4), nomorPonsel.text.length)}",
-          noRekening.text.trim(),
-          nomorPonsel.text.trim(),
-          noKtp.text.trim(),
-          bprModel!.bprId,
-          userId.text.trim(),
-          kataSandi.text.trim(),
-          deviceData['id'],
-          bprModel!.bprLogo,
-        ).then((values) {
-          Navigator.pop(context);
-          if (values['value'] == 1) {
-            Navigator.pop(context);
-            CustomDialog.messageResponse(context, values['data']['message']);
-          } else {
-            CustomDialog.messageResponse(context, values['message']);
-          }
-        });
+    AuthRepository.aktivasiMobileInfo(
+      NetworkURL.aktivasiAkun(),
+      nomorPonsel.text.trim(),
+      userId.text.trim(),
+      kataSandi.text.trim(),
+    ).then((values) {
+      Navigator.pop(context);
+      if (values['status']) {
+        Navigator.pop(context);
+        CustomDialog.messageResponse(context, values['message']);
+      } else {
+        CustomDialog.messageResponse(context, values['message']);
       }
     });
   }

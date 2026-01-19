@@ -37,10 +37,27 @@ class HomePage extends StatelessWidget {
                   padding: EdgeInsets.all(16),
                   child: Row(
                     children: [
-                      Image.asset(
-                        ImageAssets.logo,
-                        height: 60,
-                        fit: BoxFit.contain,
+                      Container(
+                        height: 80,
+                        width: 100,
+                        child: Column(
+                          children: [
+                            Image.asset(
+                              ImageAssets.perbarindo,
+                              height: 60,
+                              fit: BoxFit.contain,
+                            ),
+
+                            Text(
+                              "${value.users!.perbarindo}",
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.bold,
+                                color: titlePerbarindo,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                       Spacer(),
                       Image.network(
@@ -140,7 +157,7 @@ class HomePage extends StatelessWidget {
                                                                   .end,
                                                           children: [
                                                             Text(
-                                                              "${value.users!.namaLengkap}",
+                                                              "${value.users!.nama}",
                                                               textAlign:
                                                                   TextAlign.end,
                                                               maxLines: 2,
@@ -156,7 +173,7 @@ class HomePage extends StatelessWidget {
                                                               ),
                                                             ),
                                                             Text(
-                                                              "No CIF: 10000043917",
+                                                              "No CIF: ${value.users!.noCif}",
                                                               style: TextStyle(
                                                                 fontSize: 12,
                                                                 color: Colors
@@ -210,6 +227,8 @@ class HomePage extends StatelessWidget {
                                                 controller: PageController(
                                                   viewportFraction: 0.6,
                                                 ),
+                                                physics:
+                                                    ClampingScrollPhysics(),
                                                 itemBuilder: (context, i) {
                                                   final data =
                                                       value.listBanner[i];
@@ -927,7 +946,7 @@ Widget mobileDialogWrapper(
 void _onBannerTap(BuildContext context, BannersModel banner) {
   switch (banner.jenis) {
     case "VIDEO":
-      if (banner.url?.isNotEmpty == true) {
+      if (banner.url.isNotEmpty == true) {
         _showVideoBanner(
           context,
           "https://infoservices.medtrans.id/webServices/video-proxy.php?file=${banner.url}",

@@ -4,8 +4,10 @@ class ImageAssets {
   static const String hris = "${root}hris.png";
   static const String bjbSyariah = "${root}bjb-syariah.png";
   // static const String logo = "${root}ibpr_logo_fix-01.png";
-  static const String logo = "${root}dpd_jateng.jpeg";
+  static const String logo = "${root}logo-android.jpeg";
+  static const String copyright = "${root}copyright.jpeg";
   static const String logoIbpr = "${root}ibpr1-01.png";
+  static const String perbarindo = "${root}perbarindo.png";
   static const String homeSelect = "${root}home_select.png";
   static const String homeUnselect = "${root}home_unselect.png";
   static const String reportUnselect = "${root}report_unselect.png";

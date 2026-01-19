@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mobile_info/module/auth/login_notifier.dart';
 import 'package:mobile_info/utils/button_custom.dart';
+import 'package:mobile_info/utils/colors.dart';
 import 'package:mobile_info/utils/images_path.dart';
 import 'package:provider/provider.dart';
 
@@ -18,8 +19,10 @@ class LoginPage extends StatelessWidget {
             backgroundColor: Colors.grey[200],
             body: Center(
               child: Container(
-                width: MediaQuery.of(context).size.width > 600 ? 400 : MediaQuery.of(context).size.width,
-                decoration: BoxDecoration(color: Colors.white),
+                width: MediaQuery.of(context).size.width > 600
+                    ? 400
+                    : MediaQuery.of(context).size.width,
+                decoration: BoxDecoration(color: colorBackground),
                 child: Stack(
                   children: [
                     Positioned(
@@ -47,7 +50,11 @@ class LoginPage extends StatelessWidget {
                                 hintText: "Users ID",
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(8),
-                                  borderSide: BorderSide(width: 1, color: Colors.grey[300] ?? Colors.transparent),
+                                  borderSide: BorderSide(
+                                    width: 1,
+                                    color:
+                                        Colors.grey[300] ?? Colors.transparent,
+                                  ),
                                 ),
                               ),
                             ),
@@ -66,11 +73,19 @@ class LoginPage extends StatelessWidget {
                                 hintText: "Kata Sandi",
                                 suffixIcon: InkWell(
                                   onTap: () => value.gantiObsecure(),
-                                  child: Icon(value.obSecure == true ? Icons.visibility_off : Icons.visibility),
+                                  child: Icon(
+                                    value.obSecure == true
+                                        ? Icons.visibility_off
+                                        : Icons.visibility,
+                                  ),
                                 ),
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(8),
-                                  borderSide: BorderSide(width: 1, color: Colors.grey[300] ?? Colors.transparent),
+                                  borderSide: BorderSide(
+                                    width: 1,
+                                    color:
+                                        Colors.grey[300] ?? Colors.transparent,
+                                  ),
                                 ),
                               ),
                             ),
@@ -88,7 +103,10 @@ class LoginPage extends StatelessWidget {
                                   onPressed: () {
                                     value.lupaPassword();
                                   },
-                                  child: Text("Lupa Sandi ?", style: TextStyle(color: Colors.grey)),
+                                  child: Text(
+                                    "Lupa Sandi ?",
+                                    style: TextStyle(color: Colors.grey),
+                                  ),
                                 ),
                                 Spacer(),
                               ],
@@ -101,19 +119,61 @@ class LoginPage extends StatelessWidget {
                       bottom: 0,
                       left: 0,
                       right: 0,
-                      child: InkWell(
-                        onTap: () => value.aktivasiAkun(),
-                        child: Container(
-                          padding: EdgeInsets.all(20),
-                          decoration: BoxDecoration(
-                            border: Border(top: BorderSide(width: 1, color: Colors.grey[300] ?? Colors.transparent)),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          InkWell(
+                            onTap: () => value.aktivasiAkun(),
+                            child: Container(
+                              padding: EdgeInsets.all(20),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                border: Border(
+                                  top: BorderSide(
+                                    width: 1,
+                                    color:
+                                        Colors.grey[300] ?? Colors.transparent,
+                                  ),
+                                ),
+                              ),
+                              child: Text(
+                                "Aktivasi Akun",
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.grey,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                            ),
                           ),
-                          child: Text(
-                            "Aktivasi Akun",
-                            style: TextStyle(fontWeight: FontWeight.bold, color: Colors.grey),
-                            textAlign: TextAlign.center,
+                          Container(
+                            padding: EdgeInsets.all(20),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              border: Border(
+                                top: BorderSide(
+                                  width: 1,
+                                  color: Colors.grey[300]!,
+                                ),
+                              ),
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                Text(
+                                  "Versi 1.0.0",
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                SizedBox(height: 8),
+                                Image.asset(ImageAssets.copyright),
+                              ],
+                            ),
                           ),
-                        ),
+                        ],
                       ),
                     ),
                   ],

@@ -72,17 +72,26 @@ class WithdrawNotifier extends ChangeNotifier {
   TextEditingController smsController = TextEditingController();
   pinTransaksiBank() async {
     smsController.clear();
-    print((double.parse(amount.text.replaceAll(",", "")) / 50000).toStringAsFixed(6));
+    print(
+      (double.parse(amount.text.replaceAll(",", "")) / 50000).toStringAsFixed(
+        6,
+      ),
+    );
     notifyListeners();
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.only(topLeft: Radius.circular(24), topRight: Radius.circular(24)),
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(24),
+          topRight: Radius.circular(24),
+        ),
       ),
       builder: (context) {
         return Padding(
-          padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+          padding: EdgeInsets.only(
+            bottom: MediaQuery.of(context).viewInsets.bottom,
+          ),
           child: Container(
             padding: EdgeInsets.all(16),
             child: Column(
@@ -95,13 +104,21 @@ class WithdrawNotifier extends ChangeNotifier {
                       onTap: () {
                         Navigator.pop(context);
                       },
-                      child: SizedBox(width: 48, height: 48, child: Icon(Icons.arrow_back, size: 24)),
+                      child: SizedBox(
+                        width: 48,
+                        height: 48,
+                        child: Icon(Icons.arrow_back, size: 24),
+                      ),
                     ),
                     SizedBox(width: 12),
                     Expanded(
                       child: Text(
                         "PIN",
-                        style: TextStyle(fontFamily: "Satoshi", fontSize: 18, fontWeight: FontWeight.bold),
+                        style: TextStyle(
+                          fontFamily: "Satoshi",
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
                     InkWell(
@@ -110,7 +127,10 @@ class WithdrawNotifier extends ChangeNotifier {
                         height: 48,
                         width: 48,
                         padding: EdgeInsets.all(8),
-                        decoration: BoxDecoration(shape: BoxShape.circle, color: Color(0xFFF5F5F5)),
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: Color(0xFFF5F5F5),
+                        ),
                         child: Icon(Icons.close),
                       ),
                     ),
@@ -120,10 +140,17 @@ class WithdrawNotifier extends ChangeNotifier {
                 SizedBox(height: 12),
                 Text(
                   "Masukan MPIN Kamu...",
-                  style: TextStyle(fontFamily: "Satoshi", fontSize: 25, fontWeight: FontWeight.bold),
+                  style: TextStyle(
+                    fontFamily: "Satoshi",
+                    fontSize: 25,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
                 SizedBox(height: 8),
-                Text("Mohon masukan MPIN kamu untuk transaksi", style: TextStyle(fontFamily: "Satoshi", fontSize: 16)),
+                Text(
+                  "Mohon masukan MPIN kamu untuk transaksi",
+                  style: TextStyle(fontFamily: "Satoshi", fontSize: 16),
+                ),
                 SizedBox(height: 20),
                 PinCodeTextField(
                   pinBoxHeight: 52,
@@ -144,9 +171,11 @@ class WithdrawNotifier extends ChangeNotifier {
                   },
                   pinCodeTextFieldLayoutType: PinCodeTextFieldLayoutType.normal,
                   wrapAlignment: WrapAlignment.start,
-                  pinBoxDecoration: ProvidedPinBoxDecoration.defaultPinBoxDecoration,
+                  pinBoxDecoration:
+                      ProvidedPinBoxDecoration.defaultPinBoxDecoration,
                   pinTextStyle: TextStyle(fontSize: 8.0),
-                  pinTextAnimatedSwitcherTransition: ProvidedPinBoxTextAnimation.defaultNoTransition,
+                  pinTextAnimatedSwitcherTransition:
+                      ProvidedPinBoxTextAnimation.defaultNoTransition,
                   pinTextAnimatedSwitcherDuration: Duration(milliseconds: 50),
                 ),
                 SizedBox(height: 16),
@@ -158,10 +187,18 @@ class WithdrawNotifier extends ChangeNotifier {
                   child: Container(
                     height: 52,
                     alignment: Alignment.center,
-                    decoration: BoxDecoration(borderRadius: BorderRadius.circular(100), color: colorPrimary),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(100),
+                      color: colorPrimary,
+                    ),
                     child: Text(
                       "lanjut",
-                      style: TextStyle(fontFamily: "Satoshi", fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
+                      style: TextStyle(
+                        fontFamily: "Satoshi",
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
                     ),
                   ),
                 ),
@@ -181,11 +218,16 @@ class WithdrawNotifier extends ChangeNotifier {
       context: context,
       isScrollControlled: true,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.only(topLeft: Radius.circular(24), topRight: Radius.circular(24)),
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(24),
+          topRight: Radius.circular(24),
+        ),
       ),
       builder: (context) {
         return Padding(
-          padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+          padding: EdgeInsets.only(
+            bottom: MediaQuery.of(context).viewInsets.bottom,
+          ),
           child: Container(
             padding: EdgeInsets.all(16),
             child: Column(
@@ -198,13 +240,21 @@ class WithdrawNotifier extends ChangeNotifier {
                       onTap: () {
                         Navigator.pop(context);
                       },
-                      child: SizedBox(width: 48, height: 48, child: Icon(Icons.arrow_back, size: 24)),
+                      child: SizedBox(
+                        width: 48,
+                        height: 48,
+                        child: Icon(Icons.arrow_back, size: 24),
+                      ),
                     ),
                     SizedBox(width: 12),
                     Expanded(
                       child: Text(
                         "PIN",
-                        style: TextStyle(fontFamily: "Satoshi", fontSize: 18, fontWeight: FontWeight.bold),
+                        style: TextStyle(
+                          fontFamily: "Satoshi",
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
                     InkWell(
@@ -213,7 +263,10 @@ class WithdrawNotifier extends ChangeNotifier {
                         height: 48,
                         width: 48,
                         padding: EdgeInsets.all(8),
-                        decoration: BoxDecoration(shape: BoxShape.circle, color: Color(0xFFF5F5F5)),
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: Color(0xFFF5F5F5),
+                        ),
                         child: Icon(Icons.close),
                       ),
                     ),
@@ -223,10 +276,17 @@ class WithdrawNotifier extends ChangeNotifier {
                 SizedBox(height: 12),
                 Text(
                   "Masukan MPIN Kamu...",
-                  style: TextStyle(fontFamily: "Satoshi", fontSize: 25, fontWeight: FontWeight.bold),
+                  style: TextStyle(
+                    fontFamily: "Satoshi",
+                    fontSize: 25,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
                 SizedBox(height: 8),
-                Text("Mohon masukan MPIN kamu untuk transaksi", style: TextStyle(fontFamily: "Satoshi", fontSize: 16)),
+                Text(
+                  "Mohon masukan MPIN kamu untuk transaksi",
+                  style: TextStyle(fontFamily: "Satoshi", fontSize: 16),
+                ),
                 SizedBox(height: 20),
                 PinCodeTextField(
                   pinBoxHeight: 52,
@@ -247,9 +307,11 @@ class WithdrawNotifier extends ChangeNotifier {
                   },
                   pinCodeTextFieldLayoutType: PinCodeTextFieldLayoutType.normal,
                   wrapAlignment: WrapAlignment.start,
-                  pinBoxDecoration: ProvidedPinBoxDecoration.defaultPinBoxDecoration,
+                  pinBoxDecoration:
+                      ProvidedPinBoxDecoration.defaultPinBoxDecoration,
                   pinTextStyle: TextStyle(fontSize: 8.0),
-                  pinTextAnimatedSwitcherTransition: ProvidedPinBoxTextAnimation.defaultNoTransition,
+                  pinTextAnimatedSwitcherTransition:
+                      ProvidedPinBoxTextAnimation.defaultNoTransition,
                   pinTextAnimatedSwitcherDuration: Duration(milliseconds: 50),
                 ),
                 SizedBox(height: 16),
@@ -261,10 +323,18 @@ class WithdrawNotifier extends ChangeNotifier {
                   child: Container(
                     height: 52,
                     alignment: Alignment.center,
-                    decoration: BoxDecoration(borderRadius: BorderRadius.circular(100), color: colorPrimary),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(100),
+                      color: colorPrimary,
+                    ),
                     child: Text(
                       "lanjut",
-                      style: TextStyle(fontFamily: "Satoshi", fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
+                      style: TextStyle(
+                        fontFamily: "Satoshi",
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
                     ),
                   ),
                 ),
@@ -284,7 +354,10 @@ class WithdrawNotifier extends ChangeNotifier {
         CustomDialog.messageResponse(context, "Lengkapi M PIN Anda");
       } else {
         DialogCustom().showLoading(context);
-        print((((int.parse((smsController.text)) * 2) + 999999) - 111111).toString());
+        print(
+          (((int.parse((smsController.text)) * 2) + 999999) - 111111)
+              .toString(),
+        );
         var invoice = DateTime.now().millisecondsSinceEpoch.toString();
         notifyListeners();
         WithdrawRepository.generatedToken(
@@ -292,7 +365,7 @@ class WithdrawNotifier extends ChangeNotifier {
           NetworkURL.generatedToken(),
           users!.bprId,
           users!.usersId,
-          users!.noRekening,
+          "users!.noRekening",
           users!.nomorPonsel,
           int.parse(amount.text.trim().replaceAll(",", "")),
           DateFormat('yyMMddHHmmss').format(DateTime.now()),
@@ -303,7 +376,12 @@ class WithdrawNotifier extends ChangeNotifier {
           Navigator.pop(context);
           if (value['value'] == 1) {
             HistoryModel historyModel = HistoryModel.fromJson(value);
-            Navigator.push(context, MaterialPageRoute(builder: (context) => HistoryDetailPage(model: historyModel)));
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => HistoryDetailPage(model: historyModel),
+              ),
+            );
           } else {
             CustomDialog.messageResponse(context, value['message']);
           }

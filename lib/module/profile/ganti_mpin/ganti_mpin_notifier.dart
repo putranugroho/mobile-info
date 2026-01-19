@@ -61,7 +61,7 @@ class GantiMPINNotifier extends ChangeNotifier {
                 NetworkURL.gantimpinIbpr(),
                 users!.bprId,
                 users!.nomorPonsel,
-                users!.noRekening,
+                "",
                 mpInLama,
                 mpInBaru,
               ).then((f) {

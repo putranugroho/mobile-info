@@ -39,7 +39,11 @@ class TransferInNotifier extends ChangeNotifier {
     search.clear();
     isLoading = true;
     notifyListeners();
-    TransferRepository.getBankVa(token, NetworkURL.getBankVA(), users!.bprId).then((value) {
+    TransferRepository.getBankVa(
+      token,
+      NetworkURL.getBankVA(),
+      users!.bprId,
+    ).then((value) {
       if (value['value'] == "000") {
         for (Map<String, dynamic> i in value['va']) {
           list.add(VaModel.fromJson(i));
@@ -61,7 +65,10 @@ class TransferInNotifier extends ChangeNotifier {
       context: context,
       isScrollControlled: true,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.only(topLeft: Radius.circular(16), topRight: Radius.circular(16)),
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(16),
+          topRight: Radius.circular(16),
+        ),
       ),
       builder: (context) {
         return StatefulBuilder(
@@ -77,7 +84,11 @@ class TransferInNotifier extends ChangeNotifier {
                       Expanded(
                         child: Text(
                           "Pilih Bank Akun",
-                          style: TextStyle(fontFamily: "Satoshi", fontSize: 18, fontWeight: FontWeight.bold),
+                          style: TextStyle(
+                            fontFamily: "Satoshi",
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
                       InkWell(
@@ -88,7 +99,10 @@ class TransferInNotifier extends ChangeNotifier {
                           height: 44,
                           width: 44,
                           padding: EdgeInsets.all(8),
-                          decoration: BoxDecoration(shape: BoxShape.circle, color: Color(0xFFF5F5F5)),
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: Color(0xFFF5F5F5),
+                          ),
                           child: Icon(Icons.close),
                         ),
                       ),
@@ -106,7 +120,8 @@ class TransferInNotifier extends ChangeNotifier {
                         }
 
                         for (var userDetail in list) {
-                          if (userDetail.bankName.toLowerCase().contains(e)) search.add(userDetail);
+                          if (userDetail.bankName.toLowerCase().contains(e))
+                            search.add(userDetail);
                         }
 
                         notifyListeners();
@@ -133,7 +148,8 @@ class TransferInNotifier extends ChangeNotifier {
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
                                   Column(
-                                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.stretch,
                                     children: [
                                       InkWell(
                                         onTap: () {
@@ -142,14 +158,21 @@ class TransferInNotifier extends ChangeNotifier {
                                           va.text = vaModel!.bankName;
                                           notifyListeners();
                                         },
-                                        child: Container(padding: EdgeInsets.symmetric(vertical: 12), child: Text("${data.bankName}")),
+                                        child: Container(
+                                          padding: EdgeInsets.symmetric(
+                                            vertical: 12,
+                                          ),
+                                          child: Text("${data.bankName}"),
+                                        ),
                                       ),
                                     ],
                                   ),
                                   (no == list.length)
                                       ? SizedBox()
                                       : Container(
-                                          padding: EdgeInsets.symmetric(vertical: 4),
+                                          padding: EdgeInsets.symmetric(
+                                            vertical: 4,
+                                          ),
                                           child: Divider(color: Colors.grey),
                                         ),
                                 ],
@@ -166,7 +189,8 @@ class TransferInNotifier extends ChangeNotifier {
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
                                   Column(
-                                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.stretch,
                                     children: [
                                       InkWell(
                                         onTap: () {
@@ -175,14 +199,21 @@ class TransferInNotifier extends ChangeNotifier {
                                           va.text = vaModel!.bankName;
                                           notifyListeners();
                                         },
-                                        child: Container(padding: EdgeInsets.symmetric(vertical: 12), child: Text("${data.bankName}")),
+                                        child: Container(
+                                          padding: EdgeInsets.symmetric(
+                                            vertical: 12,
+                                          ),
+                                          child: Text("${data.bankName}"),
+                                        ),
                                       ),
                                     ],
                                   ),
                                   (no == list.length)
                                       ? SizedBox()
                                       : Container(
-                                          padding: EdgeInsets.symmetric(vertical: 4),
+                                          padding: EdgeInsets.symmetric(
+                                            vertical: 4,
+                                          ),
                                           child: Divider(color: Colors.grey),
                                         ),
                                 ],
@@ -209,7 +240,10 @@ class TransferInNotifier extends ChangeNotifier {
     showModalBottomSheet(
       context: context,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.only(topLeft: Radius.circular(16), topRight: Radius.circular(16)),
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(16),
+          topRight: Radius.circular(16),
+        ),
       ),
       builder: (context) {
         return Container(
@@ -226,7 +260,10 @@ class TransferInNotifier extends ChangeNotifier {
                     child: Container(
                       width: 40,
                       height: 40,
-                      decoration: BoxDecoration(shape: BoxShape.circle, color: Colors.grey[300]),
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Colors.grey[300],
+                      ),
                       child: Icon(Icons.close),
                     ),
                   ),
@@ -243,7 +280,9 @@ class TransferInNotifier extends ChangeNotifier {
               Row(
                 children: [
                   Expanded(child: Text("Nominal")),
-                  Text("${FormatCurrency.oCcy.format(int.parse(amount.text.replaceAll(",", "")))}"),
+                  Text(
+                    "${FormatCurrency.oCcy.format(int.parse(amount.text.replaceAll(",", "")))}",
+                  ),
                 ],
               ),
               SizedBox(height: 4),
@@ -285,11 +324,11 @@ class TransferInNotifier extends ChangeNotifier {
       token,
       NetworkURL.transferIN(),
       invoice,
-      users!.noRekening,
+      "users!.noRekening",
       users!.bprId,
       users!.nomorPonsel,
       "Transfer In",
-      users!.namaLengkap,
+      users!.nama,
       "umkmbangkit.id.core@gmail.com",
       users!.nomorPonsel,
       int.parse(amount.text.replaceAll(",", "")),
@@ -302,7 +341,12 @@ class TransferInNotifier extends ChangeNotifier {
       if (value['value'] == 1) {
         Navigator.pop(context);
         HistoryModel historyModel = HistoryModel.fromJson(value);
-        Navigator.push(context, MaterialPageRoute(builder: (context) => HistoryDetailPage(model: historyModel)));
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => HistoryDetailPage(model: historyModel),
+          ),
+        );
         CustomDialog.messageResponse(context, value['message']);
       } else {
         CustomDialog.messageResponse(context, value['message']);

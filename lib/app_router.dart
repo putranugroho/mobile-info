@@ -12,14 +12,14 @@ final GoRouter appRouter = GoRouter(
     final loggingIn = state.matchedLocation == '/login';
 
     if (!loggedIn && !loggingIn) return '/login';
-    if (loggedIn && loggingIn) return '/dashboard';
+    // if (loggedIn && loggingIn) return '/dashboard';
 
     return null;
   },
   routes: [
     GoRoute(path: '/splash', builder: (_, __) => const SplashScreenPage()),
     GoRoute(path: '/login', builder: (_, __) => const LoginPage()),
-    GoRoute(path: '/dashboard', builder: (_, __) => const DashboardPage()),
+    // GoRoute(path: '/dashboard', builder: (_, __) => const DashboardPage()),
     GoRoute(path: '/menu', builder: (_, __) => const MenuPage()),
   ],
 );

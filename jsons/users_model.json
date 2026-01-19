@@ -1,13 +1,14 @@
 {
     "id": 1,
-    "nama_lengkap": "",
+    "no_cif": "",
     "users_id": "",
     "bpr_id": "",
+    "nama": "",
+    "tgl_lahir": "",
+    "no_identitas": "",
+    "nomor_ponsel": "",
     "bpr_logo": "",
     "bpr_nama": "",
-    "no_rekening": "",
-    "nomor_ponsel": "",
-    "no_ktp": "",
-    "photo": "",
-    "createdDate": ""
+    "perbarindo": "",
+    "created_at": ""
 }

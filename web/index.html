@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
   <!--
     If you are serving your web app in a path other than the root, change the
@@ -27,10 +28,28 @@
   <link rel="apple-touch-icon" href="icons/Icon-192.png">
 
   <!-- Favicon -->
-  <link rel="icon" type="image/png" href="favicon.png"/>
+  <link rel="icon" type="image/png" href="favicon.png" />
 
-  <title>ibpr</title>
+  <title>MedFo</title>
   <link rel="manifest" href="manifest.json">
+
+  <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-messaging-compat.js"></script>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyAoGl7Q96mmksnylNId24uHNhg7ztMNibA",
+      authDomain: "pushnotif-3e5be.firebaseapp.com",
+      projectId: "pushnotif-3e5be",
+      storageBucket: "pushnotif-3e5be.firebasestorage.app",
+      messagingSenderId: "171015317576",
+      appId: "1:171015317576:web:a734503034489ec796107d",
+      measurementId: "G-6LXZ6D7DVF"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+  </script>
+
 
   <script>
     // The value below is injected by flutter build, do not touch.
@@ -39,16 +58,27 @@
   <!-- This script adds the flutter initialization JS code -->
   <script src="flutter.js" defer></script>
 </head>
+
 <body>
   <script>
-    window.addEventListener('load', function(ev) {
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker
+        .register('/firebase-messaging-sw.js')
+        .then((registration) => {
+          console.log('SW registered:', registration);
+        })
+        .catch(err => console.error('SW failed:', err));
+    }
+  </script>
+  <script>
+    window.addEventListener('load', function (ev) {
       // Download main.dart.js
       _flutter.loader.loadEntrypoint({
         serviceWorker: {
           serviceWorkerVersion: serviceWorkerVersion,
         },
-        onEntrypointLoaded: function(engineInitializer) {
-          engineInitializer.initializeEngine().then(function(appRunner) {
+        onEntrypointLoaded: function (engineInitializer) {
+          engineInitializer.initializeEngine().then(function (appRunner) {
             appRunner.runApp();
           });
         }
@@ -56,4 +86,5 @@
     });
   </script>
 </body>
+
 </html>

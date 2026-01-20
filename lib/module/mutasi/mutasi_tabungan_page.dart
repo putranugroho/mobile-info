@@ -34,31 +34,51 @@ class _MutasiBody extends StatefulWidget {
 
 class _MutasiBodyState extends State<_MutasiBody> with SingleTickerProviderStateMixin {
   late TabController _tabController;
+  late List<_PeriodeBulan> _periodes;
 
   @override
   void initState() {
     super.initState();
 
+    _periodes = _generatePeriode();
     _tabController = TabController(
-      length: 2,
+      length: _periodes.length,
       vsync: this,
-      initialIndex: 1, // ✅ default ke Desember
+      initialIndex: _periodes.length - 1, // 👉 default bulan sekarang
     );
 
-    // Load awal setelah widget siap
-    Future.microtask(() => _loadByTab(1));
+    /// load awal
+    Future.microtask(() => _loadByIndex(_tabController.index));
 
     _tabController.addListener(() {
       if (_tabController.indexIsChanging) return;
-      _loadByTab(_tabController.index);
+      _loadByIndex(_tabController.index);
     });
   }
 
-  void _loadByTab(int index) {
+  List<_PeriodeBulan> _generatePeriode() {
+    final now = DateTime.now();
+    final start = DateTime(2024, 1);
+
+    final List<_PeriodeBulan> result = [];
+    DateTime cursor = start;
+
+    while (cursor.isBefore(DateTime(now.year, now.month + 1))) {
+      result.add(_PeriodeBulan(cursor.year, cursor.month));
+      cursor = DateTime(cursor.year, cursor.month + 1);
+    }
+
+    return result;
+  }
+
+  void _loadByIndex(int index) {
     final notifier = context.read<MutasiTabunganNotifier>();
+    final p = _periodes[index];
+
+    final periode = "${p.year}${p.month.toString().padLeft(2, '0')}";
 
     notifier.clear();
-    notifier.loadMutasi(noRek: widget.noRekening, periode: index == 0 ? "202411" : "202412");
+    notifier.loadMutasi(noRek: widget.noRekening, periode: periode);
   }
 
   @override
@@ -73,9 +93,8 @@ class _MutasiBodyState extends State<_MutasiBody> with SingleTickerProviderState
             children: [
               _header(),
 
-              /// ===== CONTENT =====
               Positioned(
-                top: 170, // ⬅️ tinggi header (PENTING)
+                top: 170,
                 left: 0,
                 right: 0,
                 bottom: 0,
@@ -88,13 +107,11 @@ class _MutasiBodyState extends State<_MutasiBody> with SingleTickerProviderState
                     children: [
                       TabBar(
                         controller: _tabController,
+                        isScrollable: true,
                         labelColor: const Color.fromARGB(255, 0, 95, 0),
                         unselectedLabelColor: Colors.grey,
                         indicatorColor: const Color.fromARGB(255, 0, 95, 0),
-                        tabs: const [
-                          Tab(text: "November"),
-                          Tab(text: "Desember"),
-                        ],
+                        tabs: _periodes.map((e) => Tab(text: _namaBulan(e.month) + " ${e.year}")).toList(),
                       ),
                       Expanded(child: _listMutasi()),
                     ],
@@ -108,7 +125,6 @@ class _MutasiBodyState extends State<_MutasiBody> with SingleTickerProviderState
     );
   }
 
-  /// ================= HEADER =================
   Widget _header() {
     return Container(
       padding: const EdgeInsets.fromLTRB(16, 48, 16, 12),
@@ -117,39 +133,28 @@ class _MutasiBodyState extends State<_MutasiBody> with SingleTickerProviderState
       ),
       child: Column(
         children: [
-          /// ==== TOP ROW ====
           Row(
             children: [
               IconButton(
                 onPressed: () => Navigator.pop(context),
                 icon: const Icon(Icons.arrow_back, color: Colors.white),
               ),
-
               const Spacer(),
-
-              /// ===== WRAPPED ACTION BUTTON =====
               InkWell(
-                borderRadius: BorderRadius.circular(24),
                 onTap: _showBantuanCS,
+                borderRadius: BorderRadius.circular(24),
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(24)),
-                  child: Row(
-                    children: const [
-                      Text(
-                        "Bantuan CS",
-                        style: TextStyle(color: Colors.black, fontWeight: FontWeight.w600),
-                      ),
-                    ],
+                  child: const Text(
+                    "Bantuan CS",
+                    style: TextStyle(color: Colors.black, fontWeight: FontWeight.w600),
                   ),
                 ),
               ),
             ],
           ),
-
           const SizedBox(height: 16),
-
-          /// ==== CONTENT ====
           Text(widget.namaProduk, style: const TextStyle(color: Colors.white, fontSize: 18)),
           const SizedBox(height: 4),
           Text(widget.noRekening, style: const TextStyle(color: Colors.white70)),
@@ -245,7 +250,6 @@ class _MutasiBodyState extends State<_MutasiBody> with SingleTickerProviderState
     );
   }
 
-  /// ================= LIST =================
   Widget _listMutasi() {
     return Consumer<MutasiTabunganNotifier>(
       builder: (_, value, __) {
@@ -258,13 +262,25 @@ class _MutasiBodyState extends State<_MutasiBody> with SingleTickerProviderState
         }
 
         return ListView.builder(
-          padding: EdgeInsets.zero,
+          padding: const EdgeInsets.all(16),
           itemCount: value.data.length,
           itemBuilder: (_, i) => _MutasiItem(item: value.data[i]),
         );
       },
     );
   }
+
+  String _namaBulan(int bulan) {
+    const list = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+    return list[bulan - 1];
+  }
+}
+
+class _PeriodeBulan {
+  final int year;
+  final int month;
+
+  _PeriodeBulan(this.year, this.month);
 }
 
 /// ================= ITEM =================

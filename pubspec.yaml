@@ -58,8 +58,9 @@ dependencies:
   # package_info: ^2.0.2
   path_provider: ^2.0.3
   intl: ^0.20.2
-  firebase_core: ^2.27.0
-  firebase_messaging: ^14.7.10
+  firebase_core: ^4.4.0
+  firebase_messaging: ^16.1.1
+  firebase_messaging_web: ^4.1.2
   # in_app_review: ^2.0.3 
   # firebase_auth: ^3.3.8
   

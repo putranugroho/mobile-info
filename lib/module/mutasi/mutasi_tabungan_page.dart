@@ -58,7 +58,7 @@ class _MutasiBodyState extends State<_MutasiBody> with SingleTickerProviderState
 
   List<_PeriodeBulan> _generatePeriode() {
     final now = DateTime.now();
-    final start = DateTime(2024, 1);
+    final start = DateTime(now.year, now.month - 3);
 
     final List<_PeriodeBulan> result = [];
     DateTime cursor = start;

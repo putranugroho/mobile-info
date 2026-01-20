@@ -24,7 +24,7 @@ class SplashScreenPage extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     const SizedBox(height: 200),
-                    ClipRRect(borderRadius: BorderRadius.circular(8), child: Image.asset(ImageAssets.logo, height: 120)),
+                    ClipRRect(borderRadius: BorderRadius.circular(8), child: Image.asset(ImageAssets.logomedfo, height: 120)),
                     const Text(
                       "Silahkan Tunggu..",
                       textAlign: TextAlign.center,

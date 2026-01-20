@@ -62,7 +62,7 @@ class HistoryDetailPage extends StatelessWidget {
                               children: [
                                 Row(
                                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  children: [Image.asset(ImageAssets.logo, height: 90), Image.network("${value.users!.bprLogo}", height: 40)],
+                                  children: [Image.asset(ImageAssets.logomedfo, height: 90), Image.network("${value.users!.bprLogo}", height: 40)],
                                 ),
                                 SizedBox(height: 16),
                                 Container(

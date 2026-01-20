@@ -5,6 +5,10 @@ class ImageAssets {
   static const String bjbSyariah = "${root}bjb-syariah.png";
   // static const String logo = "${root}ibpr_logo_fix-01.png";
   static const String logo = "${root}dpd_jateng.jpeg";
+  static const String logomedfo = "${root}medfo_logo.jpeg";
+  static const String logomtd = "${root}mtd_logo.jpeg";
+  static const String dpdJatim = "${root}dpd_jatim.png";
+  static const String dpdJateng = "${root}dpd_jateng.png";
   static const String logoIbpr = "${root}ibpr1-01.png";
   static const String homeSelect = "${root}home_select.png";
   static const String homeUnselect = "${root}home_unselect.png";

@@ -33,7 +33,7 @@ class LockScreenPage extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
                             SizedBox(height: 64),
-                            Image.asset(ImageAssets.logo, height: 140),
+                            Image.asset(ImageAssets.logomedfo, height: 140),
                             SizedBox(height: 8),
                             Text("Masukkan Kata Sandi", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                             SizedBox(height: 4),

@@ -33,7 +33,7 @@ class LoginPage extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
                             SizedBox(height: 64),
-                            Image.asset(ImageAssets.logo, height: 140),
+                            Image.asset(ImageAssets.logomedfo, height: 140),
                             TextFormField(
                               controller: value.usersId,
                               validator: (e) {
@@ -95,6 +95,22 @@ class LoginPage extends StatelessWidget {
                             ),
                           ],
                         ),
+                      ),
+                    ),
+                    Positioned(
+                      bottom: 60,
+                      left: 0,
+                      right: 0,
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text("Ver 1.0.0", style: TextStyle(fontSize: 10.5, color: Colors.grey)),
+                          SizedBox(height: 4),
+                          ConstrainedBox(
+                            constraints: BoxConstraints(maxWidth: 300),
+                            child: Image.asset(ImageAssets.logomtd, height: 22, fit: BoxFit.contain),
+                          ),
+                        ],
                       ),
                     ),
                     Positioned(

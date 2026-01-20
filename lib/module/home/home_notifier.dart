@@ -67,6 +67,19 @@ class HomeNotifier extends ChangeNotifier {
     });
   }
 
+  String get logoByBprId {
+    final bprId = users?.bprId;
+
+    switch (bprId) {
+      case "600931":
+        return ImageAssets.dpdJatim; // dpd_jatim.png
+      case "609999":
+        return ImageAssets.dpdJateng; // dpd_jateng.png
+      default:
+        return ImageAssets.logomedfo; // medfo_logo.jpeg
+    }
+  }
+
   void logOutUser() async {
     // Log out the user if they're logged in, then cancel the timer.
     Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => LockScreenPage()), (route) => false);

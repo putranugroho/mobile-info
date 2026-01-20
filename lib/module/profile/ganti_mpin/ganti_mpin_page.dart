@@ -13,118 +13,136 @@ class GantiMPINPage extends StatelessWidget {
       child: Consumer<GantiMPINNotifier>(
         builder: (context, value, child) => SafeArea(
           child: Scaffold(
-            body: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Container(
-                  height: 50,
-                  child: Row(
-                    children: [
-                      IconButton(
-                        onPressed: () {
-                          Navigator.pop(context);
-                        },
-                        icon: Icon(Icons.arrow_back_ios),
+            backgroundColor: Colors.grey[200],
+            body: Center(
+              child: Container(
+                width: MediaQuery.of(context).size.width > 600
+                    ? 400
+                    : MediaQuery.of(context).size.width,
+                decoration: const BoxDecoration(color: Colors.white),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Container(
+                      height: 50,
+                      child: Row(
+                        children: [
+                          IconButton(
+                            onPressed: () {
+                              Navigator.pop(context);
+                            },
+                            icon: Icon(Icons.arrow_back_ios),
+                          ),
+                          Text("Ganti Password"),
+                        ],
                       ),
-                      Text("Ganti MPIN"),
-                    ],
-                  ),
-                ),
-                Expanded(
-                  child: Form(
-                    key: value.keyForm,
-                    child: ListView(
-                      padding: EdgeInsets.all(20),
-                      children: [
-                        Text("Masukkan MPIN Lama", style: TextStyle(fontSize: 12)),
-                        SizedBox(height: 4),
-                        TextFormField(
-                          obscureText: value.obscurelama,
-                          controller: value.mpinlama,
-                          maxLength: 6,
-                          keyboardType: TextInputType.number,
-                          decoration: InputDecoration(
-                            suffixIcon: IconButton(
-                              onPressed: () => value.gantiobscurelama(),
-                              icon: value.obscurelama ? Icon(Icons.visibility_off) : Icon(Icons.visibility),
-                            ),
-                          ),
-                          validator: (e) {
-                            if (e!.isEmpty) {
-                              return "Wajib diisi";
-                            } else {
-                              if (e.length < 6) {
-                                return "MPIN Kurang dari 6 digit angka";
-                              } else {
-                                return null;
-                              }
-                            }
-                          },
-                        ),
-                        SizedBox(height: 16),
-                        Text("Masukkan MPIN Baru", style: TextStyle(fontSize: 12)),
-                        SizedBox(height: 4),
-                        TextFormField(
-                          obscureText: value.obscurebaru,
-                          controller: value.mpinBaru,
-                          maxLength: 6,
-                          keyboardType: TextInputType.number,
-                          decoration: InputDecoration(
-                            suffixIcon: IconButton(
-                              onPressed: () => value.gantiobscurebaru(),
-                              icon: value.obscurebaru ? Icon(Icons.visibility_off) : Icon(Icons.visibility),
-                            ),
-                          ),
-                          validator: (e) {
-                            if (e!.isEmpty) {
-                              return "Wajib diisi";
-                            } else {
-                              if (e.length < 6) {
-                                return "MPIN Kurang dari 6 digit angka";
-                              } else {
-                                return null;
-                              }
-                            }
-                          },
-                        ),
-                        SizedBox(height: 16),
-                        Text("Masukkan Konfirmasi MPIN", style: TextStyle(fontSize: 12)),
-                        SizedBox(height: 4),
-                        TextFormField(
-                          maxLength: 6,
-                          obscureText: value.obscurebaru,
-                          controller: value.mpinKonfirmasi,
-                          keyboardType: TextInputType.number,
-                          decoration: InputDecoration(
-                            suffixIcon: IconButton(
-                              onPressed: () => value.gantiobscurebaru(),
-                              icon: value.obscurebaru ? Icon(Icons.visibility_off) : Icon(Icons.visibility),
-                            ),
-                          ),
-                          validator: (e) {
-                            if (e!.isEmpty) {
-                              return "Wajib diisi";
-                            } else {
-                              if (e.length < 6) {
-                                return "MPIN Kurang dari 6 digit angka";
-                              } else {
-                                return null;
-                              }
-                            }
-                          },
-                        ),
-                        SizedBox(height: 16),
-                        ButtonPrimary(
-                          onTap: () {
-                            value.cek();
-                          },
-                          name: "Simpan",
-                        ),
-                      ],
                     ),
-                  ),
+                    Expanded(
+                      child: Form(
+                        key: value.keyForm,
+                        child: ListView(
+                          padding: EdgeInsets.all(20),
+                          children: [
+                            Text(
+                              "Masukkan Password Lama",
+                              style: TextStyle(fontSize: 12),
+                            ),
+                            SizedBox(height: 4),
+                            TextFormField(
+                              obscureText: value.obscurelama,
+                              controller: value.mpinlama,
+                              decoration: InputDecoration(
+                                suffixIcon: IconButton(
+                                  onPressed: () => value.gantiobscurelama(),
+                                  icon: value.obscurelama
+                                      ? Icon(Icons.visibility_off)
+                                      : Icon(Icons.visibility),
+                                ),
+                              ),
+                              validator: (e) {
+                                if (e!.isEmpty) {
+                                  return "Wajib diisi";
+                                } else {
+                                  if (e.length < 6) {
+                                    return "Password Kurang dari 6 digit angka";
+                                  } else {
+                                    return null;
+                                  }
+                                }
+                              },
+                            ),
+                            SizedBox(height: 16),
+                            Text(
+                              "Masukkan Password Baru",
+                              style: TextStyle(fontSize: 12),
+                            ),
+                            SizedBox(height: 4),
+                            TextFormField(
+                              obscureText: value.obscurebaru,
+                              controller: value.mpinBaru,
+                              decoration: InputDecoration(
+                                suffixIcon: IconButton(
+                                  onPressed: () => value.gantiobscurebaru(),
+                                  icon: value.obscurebaru
+                                      ? Icon(Icons.visibility_off)
+                                      : Icon(Icons.visibility),
+                                ),
+                              ),
+                              validator: (e) {
+                                if (e!.isEmpty) {
+                                  return "Wajib diisi";
+                                } else {
+                                  if (e.length < 6) {
+                                    return "Password Kurang dari 6 digit angka";
+                                  } else {
+                                    return null;
+                                  }
+                                }
+                              },
+                            ),
+                            SizedBox(height: 16),
+                            Text(
+                              "Masukkan Konfirmasi Password",
+                              style: TextStyle(fontSize: 12),
+                            ),
+                            SizedBox(height: 4),
+                            TextFormField(
+                              obscureText: value.obscurebaru,
+                              controller: value.mpinKonfirmasi,
+                              decoration: InputDecoration(
+                                suffixIcon: IconButton(
+                                  onPressed: () => value.gantiobscurebaru(),
+                                  icon: value.obscurebaru
+                                      ? Icon(Icons.visibility_off)
+                                      : Icon(Icons.visibility),
+                                ),
+                              ),
+                              validator: (e) {
+                                if (e!.isEmpty) {
+                                  return "Wajib diisi";
+                                } else {
+                                  if (e.length < 6) {
+                                    return "Password Kurang dari 6 digit angka";
+                                  } else {
+                                    return null;
+                                  }
+                                }
+                              },
+                            ),
+                            SizedBox(height: 16),
+                            ButtonPrimary(
+                              onTap: () {
+                                value.cek();
+                              },
+                              name: "Simpan",
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-              ],
+              ),
             ),
           ),
         ),

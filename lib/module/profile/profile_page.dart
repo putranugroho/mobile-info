@@ -24,34 +24,55 @@ class ProfilePage extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    Text("Profil", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                    Text(
+                      "Profil",
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                     SizedBox(height: 24),
                     Row(
                       children: [
-                        InkWell(
-                          onTap: () => value.ambilCover(),
-                          child: CachedNetworkImage(
-                            placeholder: (context, url) => ProShimmer(height: 50, width: 50, radius: 360),
-                            fit: BoxFit.cover,
-                            imageBuilder: (context, imageProvider) => Container(
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(360),
-                                border: Border.all(width: 1, color: Colors.grey),
-                                image: DecorationImage(image: imageProvider, fit: BoxFit.cover),
-                              ),
-                            ),
-                            height: 50,
-                            width: 50,
-                            imageUrl: "https://infoservices.medtrans.id/webServices/image-proxy.php?url=$photo/${value.users!.photo}",
-                            errorWidget: (context, url, error) => const Icon(Icons.error),
-                          ),
-                        ),
+                        // InkWell(
+                        //   onTap: () => value.ambilCover(),
+                        //   child: CachedNetworkImage(
+                        //     placeholder: (context, url) =>
+                        //         ProShimmer(height: 50, width: 50, radius: 360),
+                        //     fit: BoxFit.cover,
+                        //     imageBuilder: (context, imageProvider) => Container(
+                        //       decoration: BoxDecoration(
+                        //         borderRadius: BorderRadius.circular(360),
+                        //         border: Border.all(
+                        //           width: 1,
+                        //           color: Colors.grey,
+                        //         ),
+                        //         image: DecorationImage(
+                        //           image: imageProvider,
+                        //           fit: BoxFit.cover,
+                        //         ),
+                        //       ),
+                        //     ),
+                        //     height: 50,
+                        //     width: 50,
+                        //     imageUrl:
+                        //         "https://infoservices.medtrans.id/webServices/image-proxy.php?url=$photo/${value.users!.photo}",
+                        //     errorWidget: (context, url, error) =>
+                        //         const Icon(Icons.error),
+                        //   ),
+                        // ),
                         SizedBox(width: 12),
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.stretch,
                             children: [
-                              Text("${value.users!.namaLengkap}", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                              Text(
+                                "${value.users!.nama}",
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
                               SizedBox(height: 4),
                               Row(
                                 children: [
@@ -66,7 +87,11 @@ class ProfilePage extends StatelessWidget {
                                     onTap: () {
                                       value.gantihide();
                                     },
-                                    child: Icon(value.hide ? Icons.visibility_off : Icons.visibility),
+                                    child: Icon(
+                                      value.hide
+                                          ? Icons.visibility_off
+                                          : Icons.visibility,
+                                    ),
                                   ),
                                 ],
                               ),
@@ -92,7 +117,13 @@ class ProfilePage extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(8),
-                  boxShadow: [BoxShadow(offset: Offset(2, 2), color: Colors.grey, blurRadius: 5)],
+                  boxShadow: [
+                    BoxShadow(
+                      offset: Offset(2, 2),
+                      color: Colors.grey,
+                      blurRadius: 5,
+                    ),
+                  ],
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -111,14 +142,19 @@ class ProfilePage extends StatelessWidget {
                     ),
                     SizedBox(height: 16),
                     InkWell(
-                      onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const GantiMPINPage())),
+                      onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const GantiMPINPage(),
+                        ),
+                      ),
                       child: Container(
                         padding: EdgeInsets.symmetric(vertical: 8),
                         child: Row(
                           children: [
                             Icon(Icons.lock, size: 20),
                             SizedBox(width: 12),
-                            Text("Ganti MPIN"),
+                            Text("Ganti Password"),
                             Spacer(),
                             Icon(Icons.arrow_forward_ios, size: 15),
                           ],

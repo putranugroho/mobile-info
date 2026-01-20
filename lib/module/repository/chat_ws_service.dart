@@ -10,7 +10,7 @@ class ChatWsService {
     required void Function() onConnected,
     required void Function(dynamic error) onError,
   }) {
-    final uri = Uri.parse("ws://api-chat.medtrans.id:8008?token=$token");
+    final uri = Uri.parse("wss://api-chat.medtrans.id/ws?token=$token");
     _channel = WebSocketChannel.connect(uri);
 
     _channel!.stream.listen((data) {

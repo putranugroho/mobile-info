@@ -37,7 +37,20 @@ class HomePage extends StatelessWidget {
                   padding: EdgeInsets.all(16),
                   child: Row(
                     children: [
-                      Image.asset(value.logoByBprId, height: 60, fit: BoxFit.contain),
+                      Container(
+                        height: 80,
+                        width: 100,
+                        child: Column(
+                          children: [
+                            Image.asset(ImageAssets.perbarindo, height: 60, fit: BoxFit.contain),
+
+                            Text(
+                              "${value.users!.perbarindo}",
+                              style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: titlePerbarindo),
+                            ),
+                          ],
+                        ),
+                      ),
                       Spacer(),
                       Image.network("https://infoservices.medtrans.id/webServices/image-proxy.php?url=${value.users!.bprLogo}", height: 70),
                     ],
@@ -81,18 +94,25 @@ class HomePage extends StatelessWidget {
                                             bottom: 10,
                                             child: Container(
                                               padding: EdgeInsets.all(20),
-                                              decoration: BoxDecoration(color: const Color.fromARGB(255, 0, 95, 0)),
+                                              decoration: BoxDecoration(
+                                                gradient: LinearGradient(
+                                                  begin: Alignment.topCenter,
+                                                  end: Alignment.bottomCenter,
+                                                  colors: [colorTop, colorBottom],
+                                                ),
+                                              ),
                                             ),
                                           ),
                                           Positioned(
-                                            top: -280,
+                                            top: -270,
                                             left: -100,
                                             child: Container(
                                               height: 300,
                                               width: 300,
-                                              decoration: BoxDecoration(color: const Color.fromARGB(255, 0, 255, 0), shape: BoxShape.circle),
+                                              decoration: BoxDecoration(color: const Color.fromARGB(255, 1, 140, 1), shape: BoxShape.circle),
                                             ),
                                           ),
+
                                           Positioned(
                                             top: 0,
                                             left: 0,
@@ -112,13 +132,13 @@ class HomePage extends StatelessWidget {
                                                           crossAxisAlignment: CrossAxisAlignment.end,
                                                           children: [
                                                             Text(
-                                                              "${value.users!.namaLengkap}",
+                                                              "${value.users!.nama}",
                                                               textAlign: TextAlign.end,
                                                               maxLines: 2,
                                                               overflow: TextOverflow.ellipsis,
-                                                              style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+                                                              style: TextStyle(fontWeight: FontWeight.bold),
                                                             ),
-                                                            Text("No CIF: 10000043917", style: TextStyle(fontSize: 12, color: Colors.white)),
+                                                            Text("No CIF: ${value.users!.noCif}", style: TextStyle(fontSize: 12)),
                                                           ],
                                                         ),
                                                       ),
@@ -138,18 +158,12 @@ class HomePage extends StatelessWidget {
                                       ? Column(
                                           crossAxisAlignment: CrossAxisAlignment.stretch,
                                           children: [
-                                            Container(
+                                            SizedBox(
                                               height: 170,
-                                              decoration: BoxDecoration(
-                                                borderRadius: BorderRadius.circular(8),
-                                                color: const Color.fromARGB(255, 137, 206, 252),
-                                                boxShadow: [
-                                                  BoxShadow(offset: Offset(2, 2), color: Colors.grey[300] ?? Colors.transparent, blurRadius: 5),
-                                                ],
-                                              ),
                                               child: PageView.builder(
                                                 itemCount: value.listBanner.length,
-                                                controller: PageController(viewportFraction: 0.6),
+                                                controller: PageController(viewportFraction: 0.8),
+                                                physics: ClampingScrollPhysics(),
                                                 itemBuilder: (context, i) {
                                                   final data = value.listBanner[i];
                                                   return GestureDetector(
@@ -583,7 +597,7 @@ Widget mobileDialogWrapper(BuildContext context, {required Widget child, DialogM
 void _onBannerTap(BuildContext context, BannersModel banner) {
   switch (banner.jenis) {
     case "VIDEO":
-      if (banner.url?.isNotEmpty == true) {
+      if (banner.url.isNotEmpty == true) {
         _showVideoBanner(context, "https://infoservices.medtrans.id/webServices/video-proxy.php?file=${banner.url}");
       }
       break;
@@ -612,9 +626,18 @@ void _showVideoBanner(BuildContext context, String videoUrl) {
               Positioned(
                 top: 16,
                 right: 16,
-                child: IconButton(
-                  icon: const Icon(Icons.close, color: Colors.white, size: 28),
-                  onPressed: () => Navigator.pop(context),
+                child: Container(
+                  width: 40,
+                  height: 40,
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [colorTop, colorBottom]),
+                  ),
+                  child: IconButton(
+                    icon: const Icon(Icons.close, color: Colors.black, size: 20),
+                    onPressed: () => Navigator.pop(context),
+                  ),
                 ),
               ),
             ],

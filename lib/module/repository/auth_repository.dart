@@ -6,8 +6,19 @@ import 'package:flutter/foundation.dart';
 import 'package:mobile_info/network/network.dart';
 
 class AuthRepository {
-  static Future<dynamic> login(String token, String url, String username, String deviceId, String password, String fcmToken) async {
-    FormData formData = FormData.fromMap({"token": token, "username": username, "device_id": deviceId, "password": password, "fcmToken": fcmToken});
+  static Future<dynamic> login(
+    String token,
+    String url,
+    String username,
+    String password,
+    String fcmToken,
+  ) async {
+    FormData formData = FormData.fromMap({
+      "token": token,
+      "username": username,
+      "password": password,
+      "fcmToken": fcmToken,
+    });
     Dio dio = Dio();
     dio.options.headers['x-username'] = xusername;
     dio.options.headers['x-password'] = xpassword;
@@ -28,8 +39,19 @@ class AuthRepository {
     }
   }
 
-  static Future<dynamic> cekLupaPassword(String token, String url, String usersId, String norek, String nohp) async {
-    FormData formData = FormData.fromMap({"token": token, "users_id": usersId, "no_rek": norek, "no_hp": nohp});
+  static Future<dynamic> gantiPassword(
+    String token,
+    String url,
+    String username,
+    String passwordlama,
+    String passwordbaru,
+  ) async {
+    FormData formData = FormData.fromMap({
+      "token": token,
+      "username": username,
+      "passwordlama": passwordlama,
+      "passwordbaru": passwordbaru,
+    });
     Dio dio = Dio();
     dio.options.headers['x-username'] = xusername;
     dio.options.headers['x-password'] = xpassword;
@@ -50,8 +72,19 @@ class AuthRepository {
     }
   }
 
-  static Future<dynamic> updateLupaPassword(String token, String url, String usersId, String norek, String nohp, String sandi) async {
-    FormData formData = FormData.fromMap({"token": token, "users_id": usersId, "no_rek": norek, "no_hp": nohp, "sandi": sandi});
+  static Future<dynamic> cekLupaPassword(
+    String token,
+    String url,
+    String usersId,
+    String norek,
+    String nohp,
+  ) async {
+    FormData formData = FormData.fromMap({
+      "token": token,
+      "users_id": usersId,
+      "no_rek": norek,
+      "no_hp": nohp,
+    });
     Dio dio = Dio();
     dio.options.headers['x-username'] = xusername;
     dio.options.headers['x-password'] = xpassword;
@@ -72,8 +105,21 @@ class AuthRepository {
     }
   }
 
-  static Future<dynamic> lockScreen(String token, String url, String username, String password) async {
-    FormData formData = FormData.fromMap({"token": token, "username": username, "password": password});
+  static Future<dynamic> updateLupaPassword(
+    String token,
+    String url,
+    String usersId,
+    String norek,
+    String nohp,
+    String sandi,
+  ) async {
+    FormData formData = FormData.fromMap({
+      "token": token,
+      "users_id": usersId,
+      "no_rek": norek,
+      "no_hp": nohp,
+      "sandi": sandi,
+    });
     Dio dio = Dio();
     dio.options.headers['x-username'] = xusername;
     dio.options.headers['x-password'] = xpassword;
@@ -94,7 +140,43 @@ class AuthRepository {
     }
   }
 
-  static Future<dynamic> gantiPhoto(String token, String url, int idUsers, File? _file) async {
+  static Future<dynamic> lockScreen(
+    String token,
+    String url,
+    String username,
+    String password,
+  ) async {
+    FormData formData = FormData.fromMap({
+      "token": token,
+      "username": username,
+      "password": password,
+    });
+    Dio dio = Dio();
+    dio.options.headers['x-username'] = xusername;
+    dio.options.headers['x-password'] = xpassword;
+    if (kDebugMode) {
+      print("ENDPOINT URL : $url");
+    }
+    final response = await dio.post(url, data: formData);
+    if (kDebugMode) {
+      print("RESPONSE STATUS CODE : ${response.statusCode}");
+    }
+    if (response.statusCode == 200) {
+      if (kDebugMode) {
+        print("RESPONSE DATA LOGIN : ${response.data}");
+      }
+      return jsonDecode(response.data);
+    } else {
+      return jsonDecode(response.data);
+    }
+  }
+
+  static Future<dynamic> gantiPhoto(
+    String token,
+    String url,
+    int idUsers,
+    File? _file,
+  ) async {
     String? fileName = _file!.path.split('/').last;
     FormData formData = FormData.fromMap({
       "token": token,
@@ -121,8 +203,21 @@ class AuthRepository {
     }
   }
 
-  static Future<dynamic> inqueryMpin(String token, String url, String noRek, String noHp, String bprId, String mPin) async {
-    FormData formData = FormData.fromMap({"token": token, "no_rek": noRek, "no_hp": noHp, "bpr_id": bprId, "m_pin": mPin});
+  static Future<dynamic> inqueryMpin(
+    String token,
+    String url,
+    String noRek,
+    String noHp,
+    String bprId,
+    String mPin,
+  ) async {
+    FormData formData = FormData.fromMap({
+      "token": token,
+      "no_rek": noRek,
+      "no_hp": noHp,
+      "bpr_id": bprId,
+      "m_pin": mPin,
+    });
     Dio dio = Dio();
     dio.options.headers['x-username'] = xusername;
     dio.options.headers['x-password'] = xpassword;
@@ -165,8 +260,19 @@ class AuthRepository {
     }
   }
 
-  static Future<dynamic> validasiKtp(String token, String url, String ktp, String bprId, String noHp, String noRek, String fcmUsers) async {
-    FormData formData = FormData.fromMap({"token": token, "no_id": ktp, "bpr_id": bprId, "no_hp": noHp, "no_rek": noRek, "fcm_users": fcmUsers});
+  static Future<dynamic> validasiKtp(
+    String token,
+    String url,
+    String ktp,
+    String bprId,
+    String noHp,
+  ) async {
+    FormData formData = FormData.fromMap({
+      "token": token,
+      "no_id": ktp,
+      "bpr_id": bprId,
+      "no_hp": noHp,
+    });
     Dio dio = Dio();
     dio.options.headers['x-username'] = xusername;
     dio.options.headers['x-password'] = xpassword;
@@ -187,7 +293,46 @@ class AuthRepository {
     }
   }
 
-  static Future<dynamic> gantimpinIbpr(String token, String url, String bprId, String noHp, String noRek, String mpinLama, String mpinBaru) async {
+  static Future<dynamic> verifyOtp(
+    String token,
+    String url,
+    String phone_number,
+    String otp,
+  ) async {
+    FormData formData = FormData.fromMap({
+      "token": token,
+      "phone_number": phone_number,
+      "otp": otp,
+    });
+    Dio dio = Dio();
+    dio.options.headers['x-username'] = xusername;
+    dio.options.headers['x-password'] = xpassword;
+    if (kDebugMode) {
+      print("ENDPOINT URL : $url");
+    }
+    final response = await dio.post(url, data: formData);
+    if (kDebugMode) {
+      print("RESPONSE STATUS CODE : ${response.statusCode}");
+    }
+    if (response.statusCode == 200) {
+      if (kDebugMode) {
+        print("RESPONSE DATA LOGIN : ${response.data}");
+      }
+      return jsonDecode(response.data);
+    } else {
+      return jsonDecode(response.data);
+    }
+  }
+
+  static Future<dynamic> gantimpinIbpr(
+    String token,
+    String url,
+    String bprId,
+    String noHp,
+    String noRek,
+    String mpinLama,
+    String mpinBaru,
+  ) async {
     FormData formData = FormData.fromMap({
       "token": token,
       "bpr_id": bprId,
@@ -216,7 +361,11 @@ class AuthRepository {
     }
   }
 
-  static Future<dynamic> mPinGenerated(String token, String url, String mPin) async {
+  static Future<dynamic> mPinGenerated(
+    String token,
+    String url,
+    String mPin,
+  ) async {
     FormData formData = FormData.fromMap({"token": token, "m_pin": mPin});
     Dio dio = Dio();
     dio.options.headers['x-username'] = xusername;
@@ -264,6 +413,38 @@ class AuthRepository {
       "sandi": sandi,
       "device_id": deviceId,
       "bpr_logo": bprLogo,
+    });
+    print(formData.fields);
+    Dio dio = Dio();
+    dio.options.headers['x-username'] = xusername;
+    dio.options.headers['x-password'] = xpassword;
+    if (kDebugMode) {
+      print("ENDPOINT URL : $url");
+    }
+    final response = await dio.post(url, data: formData);
+    if (kDebugMode) {
+      print("RESPONSE STATUS CODE : ${response.statusCode}");
+    }
+    if (response.statusCode == 200) {
+      if (kDebugMode) {
+        print("RESPONSE DATA LOGIN : ${response.data}");
+      }
+      return jsonDecode(response.data);
+    } else {
+      return jsonDecode(response.data);
+    }
+  }
+
+  static Future<dynamic> aktivasiMobileInfo(
+    String url,
+    String phone,
+    String userid,
+    String password,
+  ) async {
+    FormData formData = FormData.fromMap({
+      "phone": phone,
+      "userid": userid,
+      "password": password,
     });
     print(formData.fields);
     Dio dio = Dio();

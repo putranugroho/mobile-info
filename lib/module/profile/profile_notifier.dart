@@ -34,7 +34,11 @@ class ProfileNotiifer extends ChangeNotifier {
   File? image;
   Uint8List? byts;
   ambilCover() async {
-    final pickedFile = await picker.pickImage(source: ImageSource.gallery, maxHeight: 1280, maxWidth: 720);
+    final pickedFile = await picker.pickImage(
+      source: ImageSource.gallery,
+      maxHeight: 1280,
+      maxWidth: 720,
+    );
     if (pickedFile != null) {
       image = File(pickedFile.path);
       notifyListeners();
@@ -52,10 +56,15 @@ class ProfileNotiifer extends ChangeNotifier {
 
   upload() async {
     DialogCustom().showLoading(context);
-    AuthRepository.gantiPhoto(token, NetworkURL.gantiPhoto(), users!.id, image).then((value) {
+    AuthRepository.gantiPhoto(
+      token,
+      NetworkURL.gantiPhoto(),
+      users!.id,
+      image,
+    ).then((value) {
       Navigator.pop(context);
       if (value['value'] == 1) {
-        Pref().simpanPhoto(value['image']);
+        // Pref().simpanPhoto(value['image']);
         CustomDialog.messageResponse(context, value['message']);
         getProfile();
       } else {
@@ -107,6 +116,10 @@ class ProfileNotiifer extends ChangeNotifier {
 
   keluar() {
     Pref().remove();
-    Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => const LoginPage()), (route) => false);
+    Navigator.pushAndRemoveUntil(
+      context,
+      MaterialPageRoute(builder: (context) => const LoginPage()),
+      (route) => false,
+    );
   }
 }

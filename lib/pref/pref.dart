@@ -3,17 +3,17 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class Pref {
   static String id = "id";
-  static String nocif = "nocif";
-  static String namaLengkap = "nama_lengkap";
+  static String noCif = "no_cif";
   static String usersId = "users_id";
   static String bprId = "bpr_id";
-  static String bprNama = "bpr_nama";
-  static String bprLogo = "bpr_logo";
-  static String noRekening = "no_rekening";
+  static String nama = "nama";
+  static String tglLahir = "tgl_lahir";
+  static String noIdentitas = "no_identitas";
   static String nomorPonsel = "nomor_ponsel";
-  static String noKtp = "no_ktp";
-  static String photo = "photo";
-  static String createdDate = "createdDate";
+  static String bprLogo = "bpr_logo";
+  static String bprNama = "bpr_nama";
+  static String perbarindo = "perbarindo";
+  static String createdAt = "created_at";
   static String token = "token";
 
   saveToken(String token) async {
@@ -26,62 +26,54 @@ class Pref {
     return pref.getString(Pref.token) ?? "";
   }
 
-  simpanPhoto(String photo) async {
-    SharedPreferences pref = await SharedPreferences.getInstance();
-    pref.setString(Pref.photo, photo);
-  }
-
   simpan(UsersModel users) async {
     SharedPreferences pref = await SharedPreferences.getInstance();
     pref.setInt(Pref.id, users.id);
-    pref.setString(Pref.namaLengkap, users.namaLengkap);
-    pref.setString(Pref.bprId, users.bprId);
+    pref.setString(Pref.noCif, users.noCif);
     pref.setString(Pref.usersId, users.usersId);
-    pref.setString(Pref.bprNama, users.bprNama);
-    pref.setString(Pref.bprLogo, users.bprLogo);
-    pref.setString(Pref.noRekening, users.noRekening);
+    pref.setString(Pref.bprId, users.bprId);
+    pref.setString(Pref.nama, users.nama);
+    pref.setString(Pref.tglLahir, users.tglLahir);
+    pref.setString(Pref.perbarindo, users.perbarindo);
+    pref.setString(Pref.noIdentitas, users.noIdentitas);
     pref.setString(Pref.nomorPonsel, users.nomorPonsel);
-    pref.setString(Pref.noKtp, users.noKtp);
-    pref.setString(Pref.photo, users.photo);
-    pref.setString(Pref.createdDate, users.createdDate);
+    pref.setString(Pref.bprLogo, users.bprLogo);
+    pref.setString(Pref.bprNama, users.bprNama);
+    pref.setString(Pref.createdAt, users.createdAt);
   }
 
   Future<UsersModel> getUsers() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
     UsersModel users = UsersModel(
       id: pref.getInt(Pref.id) ?? 0,
-      nocif: pref.getString(Pref.nocif) ?? "",
-      namaLengkap: pref.getString(Pref.namaLengkap) ?? "",
+      noCif: pref.getString(Pref.noCif) ?? "",
       usersId: pref.getString(Pref.usersId) ?? "",
       bprId: pref.getString(Pref.bprId) ?? "",
+      nama: pref.getString(Pref.nama) ?? "",
+      perbarindo: pref.getString(Pref.perbarindo) ?? "",
+      tglLahir: pref.getString(Pref.tglLahir) ?? "",
+      noIdentitas: pref.getString(Pref.noIdentitas) ?? "",
+      nomorPonsel: pref.getString(Pref.nomorPonsel) ?? "",
       bprLogo: pref.getString(Pref.bprLogo) ?? "",
       bprNama: pref.getString(Pref.bprNama) ?? "",
-      noRekening: pref.getString(Pref.noRekening) ?? "",
-      nomorPonsel: pref.getString(Pref.nomorPonsel) ?? "",
-      noKtp: pref.getString(Pref.noKtp) ?? "",
-      photo: pref.getString(Pref.photo) ?? "",
-      createdDate: pref.getString(Pref.createdDate) ?? "",
+      createdAt: pref.getString(Pref.createdAt) ?? "",
     );
     return users;
-  }
-
-  Future<void> simpanNocif(String nocif) async {
-    final pref = await SharedPreferences.getInstance();
-    await pref.setString(Pref.nocif, nocif);
   }
 
   remove() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
     pref.remove(Pref.id);
-    pref.remove(Pref.namaLengkap);
+    pref.remove(Pref.noCif);
     pref.remove(Pref.usersId);
     pref.remove(Pref.bprId);
-    pref.remove(Pref.bprNama);
-    pref.remove(Pref.noRekening);
+    pref.remove(Pref.nama);
+    pref.remove(Pref.tglLahir);
+    pref.remove(Pref.noIdentitas);
     pref.remove(Pref.nomorPonsel);
-    pref.remove(Pref.noKtp);
-    pref.remove(Pref.photo);
-    pref.remove(Pref.createdDate);
+    pref.remove(Pref.perbarindo);
     pref.remove(Pref.bprLogo);
+    pref.remove(Pref.bprNama);
+    pref.remove(Pref.createdAt);
   }
 }

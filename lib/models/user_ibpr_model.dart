@@ -5,9 +5,9 @@ import 'index.dart';
 
 @immutable
 class UserIbprModel {
+
   const UserIbprModel({
     required this.id,
-    required this.nocif,
     required this.usersId,
     required this.namaLengkap,
     required this.nomorPonsel,
@@ -21,7 +21,6 @@ class UserIbprModel {
   });
 
   final int id;
-  final String nocif;
   final String usersId;
   final String namaLengkap;
   final String nomorPonsel;
@@ -33,9 +32,8 @@ class UserIbprModel {
   final String bprLogo;
   final String bprNama;
 
-  factory UserIbprModel.fromJson(Map<String, dynamic> json) => UserIbprModel(
+  factory UserIbprModel.fromJson(Map<String,dynamic> json) => UserIbprModel(
     id: json['id'] as int,
-    nocif: json['nocif'].toString(),
     usersId: json['users_id'].toString(),
     namaLengkap: json['nama_lengkap'].toString(),
     nomorPonsel: json['nomor_ponsel'].toString(),
@@ -45,12 +43,11 @@ class UserIbprModel {
     photo: json['photo'].toString(),
     createdDate: json['createdDate'].toString(),
     bprLogo: json['bpr_logo'].toString(),
-    bprNama: json['bpr_nama'].toString(),
+    bprNama: json['bpr_nama'].toString()
   );
-
+  
   Map<String, dynamic> toJson() => {
     'id': id,
-    'nocif': nocif,
     'users_id': usersId,
     'nama_lengkap': namaLengkap,
     'nomor_ponsel': nomorPonsel,
@@ -60,12 +57,11 @@ class UserIbprModel {
     'photo': photo,
     'createdDate': createdDate,
     'bpr_logo': bprLogo,
-    'bpr_nama': bprNama,
+    'bpr_nama': bprNama
   };
 
   UserIbprModel clone() => UserIbprModel(
     id: id,
-    nocif: nocif,
     usersId: usersId,
     namaLengkap: namaLengkap,
     nomorPonsel: nomorPonsel,
@@ -75,12 +71,12 @@ class UserIbprModel {
     photo: photo,
     createdDate: createdDate,
     bprLogo: bprLogo,
-    bprNama: bprNama,
+    bprNama: bprNama
   );
+
 
   UserIbprModel copyWith({
     int? id,
-    String? nocif,
     String? usersId,
     String? namaLengkap,
     String? nomorPonsel,
@@ -90,10 +86,9 @@ class UserIbprModel {
     String? photo,
     String? createdDate,
     String? bprLogo,
-    String? bprNama,
+    String? bprNama
   }) => UserIbprModel(
     id: id ?? this.id,
-    nocif: nocif ?? this.nocif,
     usersId: usersId ?? this.usersId,
     namaLengkap: namaLengkap ?? this.namaLengkap,
     nomorPonsel: nomorPonsel ?? this.nomorPonsel,
@@ -107,34 +102,9 @@ class UserIbprModel {
   );
 
   @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is UserIbprModel &&
-          id == other.id &&
-          nocif == other.nocif &&
-          usersId == other.usersId &&
-          namaLengkap == other.namaLengkap &&
-          nomorPonsel == other.nomorPonsel &&
-          bprId == other.bprId &&
-          noRekening == other.noRekening &&
-          noKtp == other.noKtp &&
-          photo == other.photo &&
-          createdDate == other.createdDate &&
-          bprLogo == other.bprLogo &&
-          bprNama == other.bprNama;
+  bool operator ==(Object other) => identical(this, other)
+    || other is UserIbprModel && id == other.id && usersId == other.usersId && namaLengkap == other.namaLengkap && nomorPonsel == other.nomorPonsel && bprId == other.bprId && noRekening == other.noRekening && noKtp == other.noKtp && photo == other.photo && createdDate == other.createdDate && bprLogo == other.bprLogo && bprNama == other.bprNama;
 
   @override
-  int get hashCode =>
-      id.hashCode ^
-      nocif.hashCode ^
-      usersId.hashCode ^
-      namaLengkap.hashCode ^
-      nomorPonsel.hashCode ^
-      bprId.hashCode ^
-      noRekening.hashCode ^
-      noKtp.hashCode ^
-      photo.hashCode ^
-      createdDate.hashCode ^
-      bprLogo.hashCode ^
-      bprNama.hashCode;
+  int get hashCode => id.hashCode ^ usersId.hashCode ^ namaLengkap.hashCode ^ nomorPonsel.hashCode ^ bprId.hashCode ^ noRekening.hashCode ^ noKtp.hashCode ^ photo.hashCode ^ createdDate.hashCode ^ bprLogo.hashCode ^ bprNama.hashCode;
 }

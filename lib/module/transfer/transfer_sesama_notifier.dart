@@ -182,7 +182,7 @@ class TransferSesamaNotifier extends ChangeNotifier {
               users!.usersId,
               users!.nomorPonsel,
               users!.bprId,
-              users!.noRekening,
+              "users!.noRekening",
               users!.bprId,
               // users!.bprId,
               noRekening.text.trim(),

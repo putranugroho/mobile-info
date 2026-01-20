@@ -7,19 +7,27 @@ const photo = "https://infoservices.medtrans.id/photo";
 
 class NetworkURL {
   static String login() {
-    return "$url/webServices/login_ibpr.php";
+    return "$url/webServices/login_info.php";
   }
 
   static String listBpr() {
-    return "$url/list-bpr";
+    return "$url/webServices/get_list_bpr.php";
   }
 
   static String validasiKtp() {
-    return "$url/validasi-ktp";
+    return "$url/webServices/validasi_medfo.php";
+  }
+
+  static String verifyOtp() {
+    return "$url/webServices/verify_otp.php";
+  }
+
+  static String gantiPassword() {
+    return "$url/webServices/ganti-password-mobile-info.php";
   }
 
   static String aktivasiAkun() {
-    return "$url/verifikasi-akun-baru";
+    return "$url/webServices/aktivasi_akun_mobile_info.php";
   }
 
   static String generatedMpin() {

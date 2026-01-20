@@ -31,21 +31,6 @@ class HomeNotifier extends ChangeNotifier {
   getProfile() async {
     users = await Pref().getUsers();
 
-    /// 1. cek nocif
-    if (users!.nocif.isEmpty && users!.noRekening.isNotEmpty) {
-      final nocif = await RekeningInquiryRepository.inquiryNocif(
-        token: token,
-        userlogin: users!.usersId,
-        bprId: users!.bprId,
-        noRek: users!.noRekening,
-      );
-
-      await Pref().simpanNocif(nocif);
-
-      /// reload user
-      users = await Pref().getUsers();
-    }
-
     /// 2. sekarang BARU aman
     getHome();
     loadTabungan();
@@ -82,7 +67,11 @@ class HomeNotifier extends ChangeNotifier {
 
   void logOutUser() async {
     // Log out the user if they're logged in, then cancel the timer.
-    Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => LockScreenPage()), (route) => false);
+    Navigator.pushAndRemoveUntil(
+      context,
+      MaterialPageRoute(builder: (context) => LockScreenPage()),
+      (route) => false,
+    );
     _rootTimer?.cancel();
   }
 
@@ -116,8 +105,8 @@ class HomeNotifier extends ChangeNotifier {
         endpoint: NetworkURL.inquiryMasterData(),
         userlogin: "admin",
         // bprId: users!.bprId,
-        bprId: "600931",
-        nocif: users!.nocif,
+        bprId: users!.bprId,
+        nocif: users!.noCif,
       );
     } catch (e) {
       debugPrint("ERROR TABUNGAN: $e");
@@ -140,8 +129,8 @@ class HomeNotifier extends ChangeNotifier {
         endpoint: NetworkURL.inquiryMasterData(),
         userlogin: "admin",
         // bprId: users!.bprId,
-        bprId: "600931",
-        nocif: users!.nocif,
+        bprId: users!.bprId,
+        nocif: users!.noCif,
       );
     } catch (e) {
       debugPrint("ERROR DEPOSITO: $e");
@@ -164,8 +153,8 @@ class HomeNotifier extends ChangeNotifier {
         endpoint: NetworkURL.inquiryMasterData(),
         userlogin: "admin",
         // bprId: users!.bprId,
-        bprId: "600931",
-        nocif: users!.nocif,
+        bprId: users!.bprId,
+        nocif: users!.noCif,
       );
     } catch (e) {
       debugPrint("ERROR KREDIT: $e");
@@ -190,7 +179,12 @@ class HomeNotifier extends ChangeNotifier {
     list.clear();
     listProduk.clear();
     notifyListeners();
-    HomeRepository.homeData(token, NetworkURL.homeData(), users!.id, "609999").then((value) {
+    HomeRepository.homeData(
+      token,
+      NetworkURL.homeData(),
+      users!.id,
+      users!.bprId,
+    ).then((value) {
       if (value['value'] == 1) {
         for (Map<String, dynamic> i in value['banner']) {
           list.add(BannersModel.fromJson(i));
@@ -205,19 +199,26 @@ class HomeNotifier extends ChangeNotifier {
             context: context,
             builder: (context) {
               return Dialog(
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
                 child: CachedNetworkImage(
-                  placeholder: (context, url) => ProShimmer(height: 300, width: 400, radius: 8),
+                  placeholder: (context, url) =>
+                      ProShimmer(height: 300, width: 400, radius: 8),
                   fit: BoxFit.cover,
                   imageBuilder: (context, imageProvider) => Container(
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(8),
-                      image: DecorationImage(image: imageProvider, fit: BoxFit.cover),
+                      image: DecorationImage(
+                        image: imageProvider,
+                        fit: BoxFit.cover,
+                      ),
                     ),
                   ),
                   height: 300,
                   width: 400,
-                  imageUrl: "https://infoservices.medtrans.id/webServices/image-proxy.php?url=$upload/${listDialog[0].banners}",
+                  imageUrl:
+                      "https://infoservices.medtrans.id/webServices/image-proxy.php?url=$upload/${listDialog[0].banners}",
                   errorWidget: (context, url, error) => const Icon(Icons.error),
                 ),
               );
@@ -236,31 +237,14 @@ class HomeNotifier extends ChangeNotifier {
   var isLoadingSaldo = false;
   var hideSaldo = true;
   int saldo = 0;
-  cekSaldo() async {
-    if (hideSaldo) {
-      isLoadingSaldo = true;
-      notifyListeners();
-      HomeRepository.cekBalance(token, NetworkURL.cekBalance(), users!.noRekening, users!.nomorPonsel, users!.bprId).then((value) {
-        if (value['value'] == 1) {
-          saldo = value['saldo'];
-          isLoadingSaldo = false;
-          hideSaldo = false;
-          notifyListeners();
-        } else {
-          isLoadingSaldo = false;
-          notifyListeners();
-        }
-      });
-    } else {
-      hideSaldo = !hideSaldo;
-      notifyListeners();
-    }
-  }
 
   transferModul() {
     showModalBottomSheet(
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.only(topLeft: Radius.circular(16), topRight: Radius.circular(16)),
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(16),
+          topRight: Radius.circular(16),
+        ),
       ),
       context: context,
       builder: (context) {
@@ -273,14 +257,23 @@ class HomeNotifier extends ChangeNotifier {
               Row(
                 children: [
                   Expanded(
-                    child: Text("Pilih Metode Transfer", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                    child: Text(
+                      "Pilih Metode Transfer",
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                   ),
                   InkWell(
                     onTap: () => Navigator.pop(context),
                     child: Container(
                       width: 40,
                       height: 40,
-                      decoration: BoxDecoration(shape: BoxShape.circle, color: Colors.grey[300]),
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Colors.grey[300],
+                      ),
                       child: Icon(Icons.close),
                     ),
                   ),
@@ -290,7 +283,10 @@ class HomeNotifier extends ChangeNotifier {
               InkWell(
                 onTap: () {
                   Navigator.pop(context);
-                  Navigator.push(context, MaterialPageRoute(builder: (context) => TransferInPage()));
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => TransferInPage()),
+                  );
                 },
                 child: Row(
                   children: [
@@ -298,8 +294,15 @@ class HomeNotifier extends ChangeNotifier {
                       width: 40,
                       height: 40,
                       padding: EdgeInsets.all(12),
-                      decoration: BoxDecoration(shape: BoxShape.circle, color: colorPrimary),
-                      child: Image.asset(ImageAssets.download, height: 40, color: Colors.white),
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: colorPrimary,
+                      ),
+                      child: Image.asset(
+                        ImageAssets.download,
+                        height: 40,
+                        color: Colors.white,
+                      ),
                     ),
                     SizedBox(width: 8),
                     Expanded(child: Text("Transfer Ke Rekening Sendiri")),
@@ -313,7 +316,12 @@ class HomeNotifier extends ChangeNotifier {
               InkWell(
                 onTap: () {
                   Navigator.pop(context);
-                  Navigator.push(context, MaterialPageRoute(builder: (context) => TransferSesamaPage()));
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => TransferSesamaPage(),
+                    ),
+                  );
                 },
                 child: Row(
                   children: [
@@ -321,8 +329,15 @@ class HomeNotifier extends ChangeNotifier {
                       width: 40,
                       height: 40,
                       padding: EdgeInsets.all(12),
-                      decoration: BoxDecoration(shape: BoxShape.circle, color: colorPrimary),
-                      child: Image.asset(ImageAssets.trasnferIcon, height: 40, color: Colors.white),
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: colorPrimary,
+                      ),
+                      child: Image.asset(
+                        ImageAssets.trasnferIcon,
+                        height: 40,
+                        color: Colors.white,
+                      ),
                     ),
                     SizedBox(width: 8),
                     Expanded(child: Text("Pindah Buku")),
@@ -336,7 +351,12 @@ class HomeNotifier extends ChangeNotifier {
               InkWell(
                 onTap: () {
                   Navigator.pop(context);
-                  Navigator.push(context, MaterialPageRoute(builder: (context) => const TransferPage()));
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const TransferPage(),
+                    ),
+                  );
                 },
                 child: Row(
                   children: [
@@ -344,8 +364,15 @@ class HomeNotifier extends ChangeNotifier {
                       width: 40,
                       height: 40,
                       padding: EdgeInsets.all(12),
-                      decoration: BoxDecoration(shape: BoxShape.circle, color: colorPrimary),
-                      child: Image.asset(ImageAssets.upload, height: 40, color: Colors.white),
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: colorPrimary,
+                      ),
+                      child: Image.asset(
+                        ImageAssets.upload,
+                        height: 40,
+                        color: Colors.white,
+                      ),
                     ),
                     SizedBox(width: 8),
                     Expanded(child: Text("Transfer Ke Bank Lain")),

@@ -5,7 +5,6 @@ import 'index.dart';
 
 @immutable
 class BannersModel {
-
   const BannersModel({
     required this.id,
     required this.banners,
@@ -15,6 +14,7 @@ class BannersModel {
     required this.url,
     required this.title,
     required this.description,
+    required this.urutan,
   });
 
   final int id;
@@ -25,8 +25,9 @@ class BannersModel {
   final String url;
   final String title;
   final String description;
+  final int? urutan;
 
-  factory BannersModel.fromJson(Map<String,dynamic> json) => BannersModel(
+  factory BannersModel.fromJson(Map<String, dynamic> json) => BannersModel(
     id: json['id'] as int,
     banners: json['banners'].toString(),
     tipe: json['tipe'].toString(),
@@ -34,9 +35,10 @@ class BannersModel {
     jenis: json['jenis'].toString(),
     url: json['url'].toString(),
     title: json['title'].toString(),
-    description: json['description'].toString()
+    description: json['description'].toString(),
+    urutan: json['urutan'] == null ? null : int.tryParse(json['urutan'].toString()),
   );
-  
+
   Map<String, dynamic> toJson() => {
     'id': id,
     'banners': banners,
@@ -45,7 +47,8 @@ class BannersModel {
     'jenis': jenis,
     'url': url,
     'title': title,
-    'description': description
+    'description': description,
+    'urutan': urutan,
   };
 
   BannersModel clone() => BannersModel(
@@ -56,9 +59,9 @@ class BannersModel {
     jenis: jenis,
     url: url,
     title: title,
-    description: description
+    description: description,
+    urutan: urutan,
   );
-
 
   BannersModel copyWith({
     int? id,
@@ -68,7 +71,8 @@ class BannersModel {
     String? jenis,
     String? url,
     String? title,
-    String? description
+    String? description,
+    int? urutan,
   }) => BannersModel(
     id: id ?? this.id,
     banners: banners ?? this.banners,
@@ -78,12 +82,32 @@ class BannersModel {
     url: url ?? this.url,
     title: title ?? this.title,
     description: description ?? this.description,
+    urutan: urutan ?? this.urutan,
   );
 
   @override
-  bool operator ==(Object other) => identical(this, other)
-    || other is BannersModel && id == other.id && banners == other.banners && tipe == other.tipe && results == other.results && jenis == other.jenis && url == other.url && title == other.title && description == other.description;
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is BannersModel &&
+          id == other.id &&
+          banners == other.banners &&
+          tipe == other.tipe &&
+          results == other.results &&
+          jenis == other.jenis &&
+          url == other.url &&
+          title == other.title &&
+          description == other.description &&
+          urutan == other.urutan;
 
   @override
-  int get hashCode => id.hashCode ^ banners.hashCode ^ tipe.hashCode ^ results.hashCode ^ jenis.hashCode ^ url.hashCode ^ title.hashCode ^ description.hashCode;
+  int get hashCode =>
+      id.hashCode ^
+      banners.hashCode ^
+      tipe.hashCode ^
+      results.hashCode ^
+      jenis.hashCode ^
+      url.hashCode ^
+      title.hashCode ^
+      description.hashCode ^
+      urutan.hashCode;
 }

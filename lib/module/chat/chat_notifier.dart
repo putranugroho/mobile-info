@@ -20,7 +20,11 @@ class ChatNotifier extends ChangeNotifier {
     final position = scrollController.position.maxScrollExtent;
 
     if (animate) {
-      scrollController.animateTo(position, duration: const Duration(milliseconds: 300), curve: Curves.easeOut);
+      scrollController.animateTo(
+        position,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeOut,
+      );
     } else {
       scrollController.jumpTo(position);
     }
@@ -41,7 +45,10 @@ class ChatNotifier extends ChangeNotifier {
         if (data["room_id"] != roomId) return;
         if (data["user_id"] == currentUserId) return;
 
-        messages.add({"from": data["role"] == "admin" ? "admin" : "user", "message": data["message"]});
+        messages.add({
+          "from": data["role"] == "admin" ? "admin" : "user",
+          "message": data["message"],
+        });
         WidgetsBinding.instance.addPostFrameCallback((_) {
           scrollToBottom();
         });
@@ -105,15 +112,15 @@ class ChatNotifier extends ChangeNotifier {
 
     _addUser(text);
 
+    notifyListeners();
     if (mode == SupportMode.bot) {
-      await _api.sendFirstSupportMessage(roomId!, text);
-
-      _addAdmin("Baik kami akan mencoba menghubungkan Anda dengan Customer Service Live Agent Kami");
-
-      mode = SupportMode.waiting;
-      notifyListeners();
-
-      await _assignAgent();
+      // await _api.sendFirstSupportMessage(roomId!, text);
+      await _api.sendMessage(roomId!, text);
+      _addAdmin(
+        "Baik kami akan mencoba menghubungkan Anda dengan Customer Service Live Agent Kami",
+      );
+      mode = SupportMode.liveChat;
+      // await _assignAgent();
       return;
     }
 
@@ -127,7 +134,9 @@ class ChatNotifier extends ChangeNotifier {
 
     mode = SupportMode.liveChat;
 
-    _addSystem("Customer Service telah bergabung. Silakan lanjutkan percakapan.");
+    _addSystem(
+      "Customer Service telah bergabung. Silakan lanjutkan percakapan.",
+    );
 
     notifyListeners();
   }

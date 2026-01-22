@@ -11,21 +11,30 @@ import 'package:mobile_info/utils/button_custom.dart';
 import 'package:mobile_info/utils/dialog_custom.dart';
 import 'package:mobile_info/utils/dialog_loading.dart';
 import 'package:http/http.dart' as http;
+import 'package:pin_code_text_field/pin_code_text_field.dart';
+// import 'package:mobile_info/utils/pin_code_textfield.dart';
 
 import '../../network/network.dart';
 import '../../utils/colors.dart';
 import '../../utils/notification_api.dart';
-import '../../utils/pin_code_textfield.dart';
+// import '../../utils/pin_code_textfield.dart';
 
 class VerifikasiKTPNotifier extends ChangeNotifier {
   final BuildContext context;
 
   VerifikasiKTPNotifier({required this.context}) {
     getProfile();
+    _hiddenController.addListener(() {
+      if (_hiddenController.text.length <= 6) {
+        pinController.text = _hiddenController.text;
+      }
+    });
   }
   List<BprModel> list = [];
   BprModel? bprModel;
   var isLoading = true;
+
+  final FocusNode otpFocusNode = FocusNode();
 
   getProfile() async {
     isLoading = true;
@@ -107,9 +116,15 @@ class VerifikasiKTPNotifier extends ChangeNotifier {
     });
   }
 
+  final FocusNode _hiddenFocus = FocusNode();
+  final TextEditingController _hiddenController = TextEditingController();
+
   TextEditingController pinController = TextEditingController();
   var obSecurePin = true;
+  var hasError = false;
   pinTransaksi() {
+    smsController.clear();
+    notifyListeners();
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -186,29 +201,31 @@ class VerifikasiKTPNotifier extends ChangeNotifier {
                 PinCodeTextField(
                   pinBoxHeight: 52,
                   pinBoxWidth: 48,
-                  autofocus: true,
+                  // autofocus: true,
                   keyboardType: TextInputType.number,
-                  controller: pinController,
-                  hideCharacter: true,
+                  controller: smsController,
+                  hideCharacter: false,
                   highlight: false,
-                  maskCharacter: "⚫",
+                  // maskCharacter: "⚫",
                   highlightColor: Colors.black,
                   defaultBorderColor: Colors.black,
                   hasTextBorderColor: Colors.black,
                   maxLength: 6,
+                  hasError: hasError,
                   onTextChanged: (text) {},
                   onDone: (text) {
                     // value.login();
+                    // value.authentication();
                   },
-                  pinCodeTextFieldLayoutType: PinCodeTextFieldLayoutType.normal,
                   wrapAlignment: WrapAlignment.start,
                   pinBoxDecoration:
                       ProvidedPinBoxDecoration.defaultPinBoxDecoration,
-                  pinTextStyle: TextStyle(fontSize: 8.0),
+                  pinTextStyle: TextStyle(fontSize: 18),
                   pinTextAnimatedSwitcherTransition:
                       ProvidedPinBoxTextAnimation.defaultNoTransition,
                   pinTextAnimatedSwitcherDuration: Duration(milliseconds: 50),
                 ),
+
                 SizedBox(height: 24),
                 ButtonPrimary(
                   onTap: () {
@@ -231,7 +248,7 @@ class VerifikasiKTPNotifier extends ChangeNotifier {
       token,
       NetworkURL.verifyOtp(),
       nomorPonsel.text.trim(),
-      pinController.text.trim(),
+      smsController.text.trim(),
     ).then((value) {
       Navigator.pop(context);
       if (value['status']) {

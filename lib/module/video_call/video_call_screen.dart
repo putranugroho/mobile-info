@@ -13,7 +13,8 @@ import 'package:permission_handler/permission_handler.dart';
 class VideoPage extends StatefulWidget {
   final String channelName;
   final String invoice;
-  const VideoPage({Key? key, required this.channelName, required this.invoice}) : super(key: key);
+  const VideoPage({Key? key, required this.channelName, required this.invoice})
+    : super(key: key);
 
   @override
   _VideoPageState createState() => _VideoPageState();
@@ -47,7 +48,11 @@ class _VideoPageState extends State<VideoPage> {
     });
 
     try {
-      final response = await http.get(Uri.parse('https://tesseract.metimes.id/agora/agora_token.php?channel=cs_ai'));
+      final response = await http.get(
+        Uri.parse(
+          'https://tesseract.metimes.id/agora/agora_token.php?channel=cs_ai',
+        ),
+      );
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
@@ -74,7 +79,12 @@ class _VideoPageState extends State<VideoPage> {
 
     //create the engine
     _engine = createAgoraRtcEngine();
-    await _engine.initialize(RtcEngineContext(appId: appId, channelProfile: ChannelProfileType.channelProfileCommunication));
+    await _engine.initialize(
+      RtcEngineContext(
+        appId: appId,
+        channelProfile: ChannelProfileType.channelProfileCommunication,
+      ),
+    );
 
     await _engine.enableVideo();
     _engine.registerEventHandler(
@@ -98,7 +108,12 @@ class _VideoPageState extends State<VideoPage> {
       ),
     );
 
-    await _engine.joinChannel(token: token, channelId: channel!, uid: uid, options: ChannelMediaOptions());
+    await _engine.joinChannel(
+      token: token,
+      channelId: channel!,
+      uid: uid,
+      options: ChannelMediaOptions(),
+    );
     ;
   }
 
@@ -121,12 +136,18 @@ class _VideoPageState extends State<VideoPage> {
         body: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Container(height: Platform.isIOS ? 32 : 30, color: Colors.transparent),
+            Container(
+              height: Platform.isIOS ? 32 : 30,
+              color: Colors.transparent,
+            ),
             Container(
               height: 50,
               child: Row(
                 children: [
-                  IconButton(onPressed: () => back(), icon: Icon(Icons.arrow_back)),
+                  IconButton(
+                    onPressed: () => back(),
+                    icon: Icon(Icons.arrow_back),
+                  ),
                   Text("CS Online"),
                 ],
               ),
@@ -142,8 +163,14 @@ class _VideoPageState extends State<VideoPage> {
                       child: Container(
                         width: 100,
                         height: 150,
-                        decoration: BoxDecoration(borderRadius: BorderRadius.circular(16)),
-                        child: Center(child: _localUserJoined ? _localPreview() : CircularProgressIndicator()),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        child: Center(
+                          child: _localUserJoined
+                              ? _localPreview()
+                              : CircularProgressIndicator(),
+                        ),
                       ),
                     ),
                     Positioned(
@@ -162,8 +189,14 @@ class _VideoPageState extends State<VideoPage> {
                                 height: 60,
                                 width: 60,
                                 padding: EdgeInsets.all(16),
-                                decoration: BoxDecoration(shape: BoxShape.circle, color: Colors.red[900]),
-                                child: Icon(Icons.call_end, color: Colors.white),
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: Colors.red[900],
+                                ),
+                                child: Icon(
+                                  Icons.call_end,
+                                  color: Colors.white,
+                                ),
                               ),
                             ),
                             SizedBox(width: 16),
@@ -179,11 +212,20 @@ class _VideoPageState extends State<VideoPage> {
                                 width: 60,
                                 padding: EdgeInsets.all(16),
                                 decoration: BoxDecoration(
-                                  boxShadow: [BoxShadow(blurRadius: 10, color: Colors.grey, offset: Offset(2, 2))],
+                                  boxShadow: [
+                                    BoxShadow(
+                                      blurRadius: 10,
+                                      color: Colors.grey,
+                                      offset: Offset(2, 2),
+                                    ),
+                                  ],
                                   shape: BoxShape.circle,
                                   color: Colors.white,
                                 ),
-                                child: Icon(muted ? Icons.mic_off : Icons.mic, color: Colors.black),
+                                child: Icon(
+                                  muted ? Icons.mic_off : Icons.mic,
+                                  color: Colors.black,
+                                ),
                               ),
                             ),
                             SizedBox(width: 16),
@@ -198,11 +240,20 @@ class _VideoPageState extends State<VideoPage> {
                                 width: 60,
                                 padding: EdgeInsets.all(16),
                                 decoration: BoxDecoration(
-                                  boxShadow: [BoxShadow(blurRadius: 10, color: Colors.grey, offset: Offset(2, 2))],
+                                  boxShadow: [
+                                    BoxShadow(
+                                      blurRadius: 10,
+                                      color: Colors.grey,
+                                      offset: Offset(2, 2),
+                                    ),
+                                  ],
                                   shape: BoxShape.circle,
                                   color: Colors.white,
                                 ),
-                                child: Icon(Icons.cameraswitch, color: Colors.black),
+                                child: Icon(
+                                  Icons.cameraswitch,
+                                  color: Colors.black,
+                                ),
                               ),
                             ),
                           ],
@@ -244,9 +295,12 @@ class _VideoPageState extends State<VideoPage> {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Image.asset(ImageAssets.logomotion, height: 120),
+        Image.asset(ImageAssets.logo, height: 100),
         const SizedBox(height: 12),
-        const Text('Please wait...', style: TextStyle(color: Colors.white, fontSize: 18)),
+        const Text(
+          'Please wait...',
+          style: TextStyle(color: Colors.white, fontSize: 18),
+        ),
       ],
     );
   }

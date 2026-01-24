@@ -6,6 +6,8 @@ class ImageAssets {
   // static const String logo = "${root}ibpr_logo_fix-01.png";
   static const String logo = "${root}logo-android.jpeg";
   static const String copyright = "${root}copyright.jpeg";
+  static const String logo_perbamida = "${root}logo_perbamida.png";
+  static const String pekalongan = "${root}pekalongan.png";
   // static const String logo = "${root}dpd_jateng.jpeg";
   static const String logomedfo = "${root}medfo_logo.jpeg";
   static const String logomtd = "${root}mtd_logo.jpeg";

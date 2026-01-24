@@ -128,19 +128,6 @@ class ProfilePage extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    Container(
-                      padding: EdgeInsets.symmetric(vertical: 8),
-                      child: Row(
-                        children: [
-                          Icon(Icons.account_circle_rounded, size: 20),
-                          SizedBox(width: 12),
-                          Text("Edit Profil"),
-                          Spacer(),
-                          Icon(Icons.arrow_forward_ios, size: 15),
-                        ],
-                      ),
-                    ),
-                    SizedBox(height: 16),
                     InkWell(
                       onTap: () => Navigator.push(
                         context,

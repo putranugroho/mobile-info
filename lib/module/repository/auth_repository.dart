@@ -39,6 +39,27 @@ class AuthRepository {
     }
   }
 
+  static Future<dynamic> post(String url, Map<String, dynamic> body) async {
+    Dio dio = Dio();
+    dio.options.headers['x-username'] = xusername;
+    dio.options.headers['x-password'] = xpassword;
+    if (kDebugMode) {
+      print("ENDPOINT URL : $url");
+    }
+    final response = await dio.post(url, data: body);
+    if (kDebugMode) {
+      print("RESPONSE STATUS CODE : ${response.statusCode}");
+    }
+    if (response.statusCode == 200) {
+      if (kDebugMode) {
+        print("RESPONSE DATA LOGIN : ${response.data}");
+      }
+      return jsonDecode(response.data);
+    } else {
+      return jsonDecode(response.data);
+    }
+  }
+
   static Future<dynamic> gantiPassword(
     String token,
     String url,

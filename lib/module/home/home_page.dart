@@ -455,7 +455,10 @@ class HomePage extends StatelessWidget {
                                     ),
                                   ),
                                   SizedBox(height: 24),
-                                  _sukuBungaSection(),
+                                  _sukuBungaSection(
+                                    value.listtabungan,
+                                    value.listdeposito,
+                                  ),
                                   SizedBox(height: 24),
                                   Container(
                                     padding: EdgeInsets.symmetric(
@@ -806,7 +809,10 @@ Widget accountProductCard({
   );
 }
 
-Widget _sukuBungaSection() {
+Widget _sukuBungaSection(
+  List<Map<String, dynamic>> listtabungan,
+  List<Map<String, dynamic>> listdeposito,
+) {
   return Container(
     margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
     padding: const EdgeInsets.all(16),
@@ -833,11 +839,35 @@ Widget _sukuBungaSection() {
           ),
         ),
         const SizedBox(height: 12),
-
-        _rateItem("Tabungan", "2,5%"),
-        _rateItem("Deposito 1 Bulan", "5%"),
-        _rateItem("Deposito 6 Bulan", "5,5%"),
-        _rateItem("Deposito 12 Bulan", "6%"),
+        Text(
+          "Tabugnan",
+          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+        ),
+        SizedBox(height: 8),
+        ListView.builder(
+          itemCount: listtabungan.length,
+          shrinkWrap: true,
+          physics: ClampingScrollPhysics(),
+          itemBuilder: (context, i) {
+            final data = listtabungan[i];
+            return _rateItem("${data['nama_prd']}", "${data['rate']}%");
+          },
+        ),
+        SizedBox(height: 16),
+        Text(
+          "Deposito",
+          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+        ),
+        SizedBox(height: 8),
+        ListView.builder(
+          itemCount: listdeposito.length,
+          shrinkWrap: true,
+          physics: ClampingScrollPhysics(),
+          itemBuilder: (context, i) {
+            final data = listdeposito[i];
+            return _rateItem("${data['nama_prd']}", "${data['rate']}%");
+          },
+        ),
       ],
     ),
   );

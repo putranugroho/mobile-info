@@ -177,4 +177,8 @@ class NetworkURL {
   static String inquiryPinjamanData() {
     return "$url/webServices/inquery_info_pinjaman.php";
   }
+
+  static String rateproduk() {
+    return "$url/webServices/rate_produk.php";
+  }
 }

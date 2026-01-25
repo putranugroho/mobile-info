@@ -4,6 +4,7 @@ import 'package:mobile_info/utils/colors.dart';
 import 'package:mobile_info/utils/format_currency.dart';
 import 'package:mobile_info/module/video_call/video_call_screen.dart';
 import 'package:mobile_info/module/chat/chat_page.dart';
+import 'package:mobile_info/module/mutasi/mutasi_pdf_generator.dart';
 import '../../models/mutasi_tabungan_model.dart';
 import 'mutasi_tabungan_notifier.dart';
 
@@ -58,7 +59,7 @@ class _MutasiBodyState extends State<_MutasiBody> with SingleTickerProviderState
 
   List<_PeriodeBulan> _generatePeriode() {
     final now = DateTime.now();
-    final start = DateTime(now.year, now.month - 3);
+    final start = DateTime(now.year, now.month - 2);
 
     final List<_PeriodeBulan> result = [];
     DateTime cursor = start;
@@ -83,7 +84,7 @@ class _MutasiBodyState extends State<_MutasiBody> with SingleTickerProviderState
 
   @override
   Widget build(BuildContext context) {
-  return Scaffold(
+    return Scaffold(
       backgroundColor: Colors.grey[100],
       body: Center(
         child: Container(
@@ -140,6 +141,30 @@ class _MutasiBodyState extends State<_MutasiBody> with SingleTickerProviderState
                 icon: const Icon(Icons.arrow_back, color: Colors.white),
               ),
               const Spacer(),
+
+              /// ===== DOWNLOAD MUTASI =====
+              InkWell(
+                onTap: _downloadMutasi,
+                borderRadius: BorderRadius.circular(24),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  decoration: BoxDecoration(color: Colors.white.withOpacity(0.9), borderRadius: BorderRadius.circular(24)),
+                  child: Row(
+                    children: const [
+                      Icon(Icons.download, size: 18, color: Colors.black),
+                      SizedBox(width: 6),
+                      Text(
+                        "Download",
+                        style: TextStyle(color: Colors.black, fontWeight: FontWeight.w600),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+
+              const SizedBox(width: 8),
+
+              /// ===== BANTUAN CS =====
               InkWell(
                 onTap: _showBantuanCS,
                 borderRadius: BorderRadius.circular(24),
@@ -161,6 +186,17 @@ class _MutasiBodyState extends State<_MutasiBody> with SingleTickerProviderState
         ],
       ),
     );
+  }
+
+  void _downloadMutasi() async {
+    final notifier = context.read<MutasiTabunganNotifier>();
+
+    if (notifier.data.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Data mutasi kosong")));
+      return;
+    }
+
+    await MutasiPdfGenerator.generate(context: context, noRek: widget.noRekening, namaProduk: widget.namaProduk, data: notifier.data);
   }
 
   void _showBantuanCS() {

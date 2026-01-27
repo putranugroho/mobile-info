@@ -8,7 +8,6 @@ import 'package:flutter/material.dart';
 import 'package:mobile_info/models/index.dart';
 import 'package:mobile_info/pref/pref.dart';
 import 'package:mobile_info/utils/images_path.dart';
-import 'package:mobile_info/utils/dialog_vc_custom.dart';
 
 import 'package:permission_handler/permission_handler.dart';
 

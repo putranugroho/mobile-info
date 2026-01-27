@@ -5,6 +5,8 @@ import 'package:http/http.dart' as http;
 import 'package:agora_rtc_engine/agora_rtc_engine.dart';
 
 import 'package:flutter/material.dart';
+import 'package:mobile_info/models/index.dart';
+import 'package:mobile_info/pref/pref.dart';
 import 'package:mobile_info/utils/images_path.dart';
 import 'package:mobile_info/utils/dialog_vc_custom.dart';
 
@@ -28,7 +30,7 @@ class _VideoPageState extends State<VideoPage> {
   String appId = "";
   String? channel = "";
   int uid = 0;
-
+  UsersModel? users;
   int? remoteUuid;
   bool localUserJoined = false;
 
@@ -48,9 +50,10 @@ class _VideoPageState extends State<VideoPage> {
     });
 
     try {
+      users = await Pref().getUsers();
       final response = await http.get(
         Uri.parse(
-          'https://tesseract.metimes.id/agora/agora_token.php?channel=cs_ai',
+          'https://ibprservices.medtrans.id/agora/agora_token.php?channel=mobile_info&phone=${users!.nomorPonsel}&bpr_id=${users!.bprId}',
         ),
       );
 

@@ -7,7 +7,6 @@ import 'package:path_provider/path_provider.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 
-// WEB only
 import 'dart:html' as html;
 
 import '../../models/mutasi_tabungan_model.dart';
@@ -22,28 +21,35 @@ class MutasiPdfGenerator {
   }) async {
     final pdf = pw.Document();
 
-    /// ================= WEB =================
+    // ================= BUILD PDF =================
     if (kIsWeb) {
       pdf.addPage(pw.Page(pageFormat: PdfPageFormat.a4, build: (_) => _buildContent(noRek, namaProduk, data)));
     } else {
-      /// ================= ANDROID =================
       pdf.addPage(pw.MultiPage(pageFormat: PdfPageFormat.a4, build: (_) => [_buildContent(noRek, namaProduk, data)]));
     }
 
     final Uint8List bytes = await pdf.save();
 
+    // ================= FILE NAME =================
+    final DateTime firstDate = data.first.date;
+    final String bulan = _bulanIndonesia(firstDate.month);
+    final String waktu = _downloadTime();
+
+    final String fileName = 'Mutasi_${bulan}_$waktu.pdf';
+
+    // ================= SAVE / DOWNLOAD =================
     if (kIsWeb) {
       final blob = html.Blob([bytes], 'application/pdf');
       final url = html.Url.createObjectUrlFromBlob(blob);
 
       html.AnchorElement(href: url)
-        ..setAttribute('download', 'mutasi_$noRek.pdf')
+        ..setAttribute('download', fileName)
         ..click();
 
       html.Url.revokeObjectUrl(url);
     } else {
       final dir = await getApplicationDocumentsDirectory();
-      final file = File('${dir.path}/mutasi_$noRek.pdf');
+      final file = File('${dir.path}/$fileName');
       await file.writeAsBytes(bytes);
     }
   }
@@ -60,17 +66,11 @@ class MutasiPdfGenerator {
 
         pw.Table(
           border: pw.TableBorder.all(width: 0.5),
-          columnWidths: const {0: pw.FlexColumnWidth(2), 1: pw.FlexColumnWidth(6), 2: pw.FlexColumnWidth(3), 3: pw.FlexColumnWidth(3)},
+          columnWidths: const {0: pw.FixedColumnWidth(70), 1: pw.FlexColumnWidth(), 2: pw.FixedColumnWidth(90), 3: pw.FixedColumnWidth(90)},
           children: [
-            /// HEADER
             pw.TableRow(
               decoration: const pw.BoxDecoration(color: PdfColors.grey300),
-              children: [
-                _headerCell('Tanggal'),
-                _headerCell('Deskripsi'),
-                _headerCell('Debit', align: pw.TextAlign.right),
-                _headerCell('Kredit', align: pw.TextAlign.right),
-              ],
+              children: [_headerCell('Tanggal'), _headerCell('Deskripsi'), _headerCell('Debit'), _headerCell('Kredit')],
             ),
 
             ...data.map(
@@ -89,13 +89,13 @@ class MutasiPdfGenerator {
     );
   }
 
-  static pw.Widget _headerCell(String text, {pw.TextAlign align = pw.TextAlign.left}) {
+  static pw.Widget _headerCell(String text) {
     return pw.Padding(
       padding: const pw.EdgeInsets.all(6),
       child: pw.Text(
         text,
-        textAlign: align,
-        style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
+        textAlign: pw.TextAlign.center,
+        style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 12),
       ),
     );
   }
@@ -103,7 +103,21 @@ class MutasiPdfGenerator {
   static pw.Widget _cell(String text, {pw.TextAlign align = pw.TextAlign.left}) {
     return pw.Padding(
       padding: const pw.EdgeInsets.all(6),
-      child: pw.Text(text, textAlign: align),
+      child: pw.Text(text, textAlign: align, style: const pw.TextStyle(fontSize: 8)),
     );
+  }
+
+  static String _downloadTime() {
+    final now = DateTime.now();
+    return '${now.year}'
+        '${now.month.toString().padLeft(2, '0')}'
+        '${now.day.toString().padLeft(2, '0')}'
+        '${now.hour.toString().padLeft(2, '0')}'
+        '${now.minute.toString().padLeft(2, '0')}';
+  }
+
+  static String _bulanIndonesia(int month) {
+    const list = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+    return list[month - 1];
   }
 }

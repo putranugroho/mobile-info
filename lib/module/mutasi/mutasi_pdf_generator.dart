@@ -8,7 +8,6 @@ import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 
 // WEB only
-// ignore: avoid_web_libraries_in_flutter
 import 'dart:html' as html;
 
 import '../../models/mutasi_tabungan_model.dart';
@@ -23,58 +22,17 @@ class MutasiPdfGenerator {
   }) async {
     final pdf = pw.Document();
 
-    pdf.addPage(
-      pw.Page(
-        pageFormat: PdfPageFormat.a4,
-        build: (context) {
-          return pw.Column(
-            crossAxisAlignment: pw.CrossAxisAlignment.start,
-            children: [
-              pw.Text('Mutasi Rekening', style: pw.TextStyle(fontSize: 18, fontWeight: pw.FontWeight.bold)),
-              pw.SizedBox(height: 8),
-              pw.Text('Produk : $namaProduk'),
-              pw.Text('No Rekening : $noRek'),
-              pw.SizedBox(height: 16),
-
-              /// ===== TABLE =====
-              pw.Table(
-                border: pw.TableBorder.all(width: 0.5),
-                columnWidths: const {0: pw.FlexColumnWidth(2), 1: pw.FlexColumnWidth(6), 2: pw.FlexColumnWidth(3), 3: pw.FlexColumnWidth(3)},
-                children: [
-                  /// HEADER
-                  pw.TableRow(
-                    decoration: const pw.BoxDecoration(color: PdfColors.grey300),
-                    children: [
-                      _headerCell('Tanggal'),
-                      _headerCell('Deskripsi'),
-                      _headerCell('Debit', align: pw.TextAlign.right),
-                      _headerCell('Kredit', align: pw.TextAlign.right),
-                    ],
-                  ),
-
-                  /// DATA
-                  ...data.map(
-                    (e) => pw.TableRow(
-                      children: [
-                        _cell('${e.date.day}-${e.date.month}-${e.date.year}'),
-                        _cell(e.keterangan),
-                        _cell(e.isCredit ? '' : FormatCurrency.oCcy.format(e.nominal), align: pw.TextAlign.right),
-                        _cell(e.isCredit ? FormatCurrency.oCcy.format(e.nominal) : '', align: pw.TextAlign.right),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          );
-        },
-      ),
-    );
+    /// ================= WEB =================
+    if (kIsWeb) {
+      pdf.addPage(pw.Page(pageFormat: PdfPageFormat.a4, build: (_) => _buildContent(noRek, namaProduk, data)));
+    } else {
+      /// ================= ANDROID =================
+      pdf.addPage(pw.MultiPage(pageFormat: PdfPageFormat.a4, build: (_) => [_buildContent(noRek, namaProduk, data)]));
+    }
 
     final Uint8List bytes = await pdf.save();
 
     if (kIsWeb) {
-      /// ===== WEB DOWNLOAD =====
       final blob = html.Blob([bytes], 'application/pdf');
       final url = html.Url.createObjectUrlFromBlob(blob);
 
@@ -84,11 +42,51 @@ class MutasiPdfGenerator {
 
       html.Url.revokeObjectUrl(url);
     } else {
-      /// ===== MOBILE SAVE =====
       final dir = await getApplicationDocumentsDirectory();
       final file = File('${dir.path}/mutasi_$noRek.pdf');
       await file.writeAsBytes(bytes);
     }
+  }
+
+  static pw.Widget _buildContent(String noRek, String namaProduk, List<MutasiTabunganModel> data) {
+    return pw.Column(
+      crossAxisAlignment: pw.CrossAxisAlignment.start,
+      children: [
+        pw.Text('Mutasi Rekening', style: pw.TextStyle(fontSize: 18, fontWeight: pw.FontWeight.bold)),
+        pw.SizedBox(height: 8),
+        pw.Text('Produk : $namaProduk'),
+        pw.Text('No Rekening : $noRek'),
+        pw.SizedBox(height: 16),
+
+        pw.Table(
+          border: pw.TableBorder.all(width: 0.5),
+          columnWidths: const {0: pw.FlexColumnWidth(2), 1: pw.FlexColumnWidth(6), 2: pw.FlexColumnWidth(3), 3: pw.FlexColumnWidth(3)},
+          children: [
+            /// HEADER
+            pw.TableRow(
+              decoration: const pw.BoxDecoration(color: PdfColors.grey300),
+              children: [
+                _headerCell('Tanggal'),
+                _headerCell('Deskripsi'),
+                _headerCell('Debit', align: pw.TextAlign.right),
+                _headerCell('Kredit', align: pw.TextAlign.right),
+              ],
+            ),
+
+            ...data.map(
+              (e) => pw.TableRow(
+                children: [
+                  _cell('${e.date.day}-${e.date.month}-${e.date.year}'),
+                  _cell(e.keterangan),
+                  _cell(e.isCredit ? '' : FormatCurrency.oCcy.format(e.nominal), align: pw.TextAlign.right),
+                  _cell(e.isCredit ? FormatCurrency.oCcy.format(e.nominal) : '', align: pw.TextAlign.right),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
   }
 
   static pw.Widget _headerCell(String text, {pw.TextAlign align = pw.TextAlign.left}) {

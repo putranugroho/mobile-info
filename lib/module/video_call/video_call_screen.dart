@@ -52,7 +52,7 @@ class _VideoPageState extends State<VideoPage> {
       users = await Pref().getUsers();
       final response = await http.get(
         Uri.parse(
-          'https://ibprservices.medtrans.id/agora/agora_token.php?channel=mobile_info&phone=${users!.nomorPonsel}&bpr_id=${users!.bprId}',
+          'https://ibprservices.medtrans.id/agora/agora_token.php?channel=mobile_info_${users!.nomorPonsel}&phone=${users!.nomorPonsel}&bpr_id=${users!.bprId}',
         ),
       );
 

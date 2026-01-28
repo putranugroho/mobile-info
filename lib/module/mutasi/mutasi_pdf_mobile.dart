@@ -38,7 +38,7 @@ Future<void> downloadPdf({
   final dir = await getExternalStorageDirectory();
   final downloadPath = dir!.path.split('Android')[0] + 'Download';
 
-  final file = File('$downloadPath/mutasi_$noRek.pdf');
+  final file = File('$downloadPath/mutasi__$noRek.pdf');
   await file.writeAsBytes(bytes);
 
   await OpenFilex.open(file.path);

@@ -12,12 +12,8 @@ class MutasiPdfGenerator {
     required String namaProduk,
     required List<MutasiTabunganModel> data,
   }) async {
-    final bytes = await buildPdf(
-      noRek: noRek,
-      namaProduk: namaProduk,
-      data: data,
-    );
+    final Uint8List bytes = await buildPdf(noRek: noRek, namaProduk: namaProduk, data: data);
 
-    await downloadPdf(context: context, bytes: bytes, noRek: noRek);
+    await downloadPdf(context: context, bytes: bytes, data: data);
   }
 }

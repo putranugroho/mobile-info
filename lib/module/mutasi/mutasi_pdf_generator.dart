@@ -12,8 +12,19 @@ class MutasiPdfGenerator {
     required String namaProduk,
     required List<MutasiTabunganModel> data,
   }) async {
-    final Uint8List bytes = await buildPdf(noRek: noRek, namaProduk: namaProduk, data: data);
+    if (data.isEmpty) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Data mutasi kosong')));
+      return;
+    }
 
-    await downloadPdf(context: context, bytes: bytes, data: data);
+    final Uint8List bytes = await buildPdf(
+      noRek: noRek,
+      namaProduk: namaProduk,
+      data: data,
+    );
+
+    await openOrDownloadPdf(context: context, bytes: bytes, data: data);
   }
 }

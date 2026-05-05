@@ -214,7 +214,7 @@ class _HomePageState extends State<HomePage> {
                                         ),
                                       ),
                                     ),
-                                    SizedBox(height: 24),
+                                    // SizedBox(height: 8),
                                     value.list.isNotEmpty
                                         ? Column(
                                             crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -345,11 +345,11 @@ class _HomePageState extends State<HomePage> {
                                         ],
                                       ),
                                     ),
-                                    SizedBox(height: 8),
+                                    // SizedBox(height: 8),
                                     _loanMenuSection(context),
-                                    SizedBox(height: 24),
+                                    // SizedBox(height: 8),
                                     _sukuBungaSection(value.listtabungan, value.listdeposito),
-                                    SizedBox(height: 24),
+                                    // SizedBox(height: 8),
                                     Container(
                                       padding: EdgeInsets.symmetric(horizontal: 20),
                                       child: Text("Kenal lebih dekat Produk Kami", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
@@ -430,14 +430,35 @@ Widget _produkTabungan(HomeNotifier value, BuildContext context) {
             ),
           );
         },
-        content: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        content: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Text(tabungan.namaProduk, style: const TextStyle(fontWeight: FontWeight.bold)),
-            const SizedBox(height: 4),
-            Text(tabungan.noAcc, style: const TextStyle(fontSize: 12, color: Colors.grey)),
-            const SizedBox(height: 6),
-            Text("Rp ${FormatCurrency.oCcy.format(tabungan.saldo)}", style: const TextStyle(fontWeight: FontWeight.bold)),
+            // KIRI (nama + no rek)
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    tabungan.namaProduk,
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    tabungan.noAcc,
+                    style: const TextStyle(fontSize: 12, color: Colors.grey),
+                  ),
+                ],
+              ),
+            ),
+
+            // KANAN (saldo)
+            Text(
+              "Rp ${FormatCurrency.oCcy.format(tabungan.saldo)}",
+              style: const TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 13,
+              ),
+            ),
           ],
         ),
       );
@@ -672,7 +693,7 @@ Widget _sukuBungaSection(List<Map<String, dynamic>> listtabungan, List<Map<Strin
 
 Widget _rateItem(String label, String value) {
   return Padding(
-    padding: const EdgeInsets.symmetric(vertical: 6),
+    padding: const EdgeInsets.symmetric(vertical: 2),
     child: Row(
       children: [
         Expanded(

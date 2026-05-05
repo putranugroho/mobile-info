@@ -25,10 +25,7 @@ class LoginNotifier extends ChangeNotifier {
 
   String? fcmToken;
   getProfile() async {
-    fcmToken = await messaging.getToken(
-      vapidKey:
-          "BLTB29Uy3GxtzvXpg7XdMJmCx_8v0hT-3mRRc_DxydjTb6erLTwwJlflthGZF9TFDi_ef7SU42W5MqGLCUCdzIM",
-    );
+    fcmToken = await messaging.getToken(vapidKey: "BLTB29Uy3GxtzvXpg7XdMJmCx_8v0hT-3mRRc_DxydjTb6erLTwwJlflthGZF9TFDi_ef7SU42W5MqGLCUCdzIM");
     debugPrint("TOKEN $fcmToken");
     notifyListeners();
     // FirebaseMessaging.instance.getToken().then((value) {
@@ -92,23 +89,14 @@ class LoginNotifier extends ChangeNotifier {
 
   simpan() async {
     DialogCustom().showLoading(context);
-    AuthRepository.login(
-      token,
-      NetworkURL.login(),
-      usersId.text.trim(),
-      password.text.trim(),
-      fcmToken!,
-    ).then((value) async {
+    AuthRepository.login(token, NetworkURL.login(), usersId.text.trim(), password.text.trim(), fcmToken!).then((value) async {
       Navigator.pop(context);
       if (value['value'] == 1) {
         UsersModel users = UsersModel.fromJson(value);
         Pref().simpan(users);
+        await Pref().setSplashShownAfterLogin(false);
         // await AuthService.setLoggedIn(true);
-        Navigator.pushAndRemoveUntil(
-          context,
-          CupertinoPageRoute(builder: (context) => MenuPage()),
-          (route) => false,
-        );
+        Navigator.pushAndRemoveUntil(context, CupertinoPageRoute(builder: (context) => MenuPage()), (route) => false);
       } else {
         CustomDialog.messageResponse(context, value['message']);
       }
@@ -116,23 +104,14 @@ class LoginNotifier extends ChangeNotifier {
   }
 
   aktivasiAkun() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => const VerifikasiKTPPage()),
-    );
+    Navigator.push(context, MaterialPageRoute(builder: (context) => const VerifikasiKTPPage()));
   }
 
   lupaPassword() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => const LupaSandiPage()),
-    );
+    Navigator.push(context, MaterialPageRoute(builder: (context) => const LupaSandiPage()));
   }
 
   lupaMpin() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => const LupaMpinPage()),
-    );
+    Navigator.push(context, MaterialPageRoute(builder: (context) => const LupaMpinPage()));
   }
 }

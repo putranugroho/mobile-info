@@ -37,7 +37,7 @@ class LockScreenPage extends StatelessWidget {
                             SizedBox(height: 8),
                             Text("Masukkan Kata Sandi", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                             SizedBox(height: 4),
-                            Text("Silahkan masukan kata sandi anda untuk masuk kedalam IBPR", style: TextStyle(fontWeight: FontWeight.w300)),
+                            Text("Silahkan masukan kata sandi anda untuk kembali ke dalam MEDFO", style: TextStyle(fontWeight: FontWeight.w300)),
                             SizedBox(height: 16),
                             TextFormField(
                               controller: value.smsController,

@@ -48,4 +48,70 @@ class HomeRepository {
       return jsonDecode(response.data);
     }
   }
+
+  static Future<dynamic> productData(String url, String bprId) async {
+    Dio dio = Dio();
+
+    dio.options.headers['x-username'] = xusername;
+    dio.options.headers['x-password'] = xpassword;
+
+    final response = await dio.post(url, data: {"bpr_id": bprId, "term": "MOBILE", "user_login": "admin"});
+
+    if (response.data is String) {
+      return jsonDecode(response.data);
+    }
+
+    return response.data;
+  }
+
+  static Future<dynamic> publicBanner(String url, String bprId) async {
+    Dio dio = Dio();
+
+    dio.options.headers['x-username'] = xusername;
+    dio.options.headers['x-password'] = xpassword;
+
+    if (kDebugMode) {
+      print("ENDPOINT URL : $url");
+      print("REQUEST BODY : {'bpr_id': $bprId}");
+    }
+
+    final response = await dio.post(url, data: {"bpr_id": bprId});
+
+    if (kDebugMode) {
+      print("RESPONSE STATUS CODE : ${response.statusCode}");
+      print("RESPONSE DATA BANNER : ${response.data}");
+    }
+
+    if (response.data is String) {
+      return jsonDecode(response.data);
+    }
+
+    return response.data;
+  }
+
+  static Future<dynamic> bprProfile(String url, String bprId) async {
+    Dio dio = Dio();
+
+    dio.options.headers['api-key'] = '123';
+
+    final response = await dio.post(url, data: {"action": "detail", "bpr_id": bprId});
+
+    if (response.data is String) {
+      return jsonDecode(response.data);
+    }
+
+    return response.data;
+  }
+
+  static Future<dynamic> splashBannerPublic(String url) async {
+    Dio dio = Dio();
+
+    final response = await dio.post(url);
+
+    if (response.data is String) {
+      return jsonDecode(response.data);
+    }
+
+    return response.data;
+  }
 }

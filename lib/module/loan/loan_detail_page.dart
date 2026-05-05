@@ -60,7 +60,7 @@ class LoanDetailPage extends StatelessWidget {
                     children: [
                       /// ================= RINCIAN PINJAMAN =================
                       _section(
-                        title: "Rincian Angsuran",
+                        title: "Data Pinjaman",
                         children: [
                           _item("No Rekening", m.noRek),
                           _item("Nama", m.nama),

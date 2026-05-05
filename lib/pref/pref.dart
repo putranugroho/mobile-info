@@ -15,6 +15,7 @@ class Pref {
   static String perbarindo = "perbarindo";
   static String createdAt = "created_at";
   static String token = "token";
+  static String splashShownAfterLogin = "splash_shown_after_login";
 
   saveToken(String token) async {
     SharedPreferences pref = await SharedPreferences.getInstance();
@@ -24,6 +25,16 @@ class Pref {
   Future<String> getToken() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
     return pref.getString(Pref.token) ?? "";
+  }
+
+  setSplashShownAfterLogin(bool value) async {
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    pref.setBool(Pref.splashShownAfterLogin, value);
+  }
+
+  Future<bool> getSplashShownAfterLogin() async {
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    return pref.getBool(Pref.splashShownAfterLogin) ?? false;
   }
 
   simpan(UsersModel users) async {
@@ -75,5 +86,6 @@ class Pref {
     pref.remove(Pref.bprLogo);
     pref.remove(Pref.bprNama);
     pref.remove(Pref.createdAt);
+    pref.remove(Pref.splashShownAfterLogin);
   }
 }

@@ -2,6 +2,8 @@ const token = "715f8ab555438f985b579844ea227767";
 const xusername = "core@2023";
 const xpassword = "corevalue@20231234";
 const url = "https://infoservices.medtrans.id";
+const url_medfo = "https://api-dev-medfo.medtrans.id";
+const url_go = "https://api-dev-cms.medtrans.id";
 const upload = "https://infoservices.medtrans.id/upload";
 const photo = "https://infoservices.medtrans.id/photo";
 
@@ -40,6 +42,10 @@ class NetworkURL {
 
   static String homeData() {
     return "$url/webServices/get_home_data.php";
+  }
+
+  static String productData() {
+    return "$url_medfo/inquiry/promosi-by-all";
   }
 
   static String getBankAccount() {
@@ -179,6 +185,58 @@ class NetworkURL {
   }
 
   static String rateproduk() {
-    return "$url/webServices/rate_produk.php";
+    return "$url_medfo/inquiry/rate-produk";
+  }
+
+  static String publicBanner() {
+    return "$url_go/banner/public";
+  }
+
+  static String bannerViewImage(String file) {
+    return "$url_go/banner/view?type=image&file=$file";
+  }
+
+  static String bannerViewVideo(String file) {
+    return "$url_go/banner/view?type=video&file=$file";
+  }
+
+  static String inquiryNotifikasiPinjaman() {
+    return "$url_medfo/inquiry/notifikasi-pinjaman";
+  }
+
+  static String daftarPermohonanPinjaman() {
+    return "$url_medfo/permohonan-pinjaman/daftar";
+  }
+
+  static String pushNotifPinjaman() {
+    return "$url/webServices/push_notif.php";
+  }
+
+  static String inquirySetupPinjaman() {
+    return "$url_medfo/inquiry/pinjaman";
+  }
+
+  static String simulasiTagihanPinjaman() {
+    return "$url_medfo/simulasi-tagihan";
+  }
+
+  static String inquiryJaminanAll() {
+    return "$url_medfo/inquiry/jaminan-all";
+  }
+
+  static String bprProfile() {
+    return "$url_go/bpr_profile";
+  }
+
+  static String logoBprView(String file) {
+    return "$url_go/photo/view?file=$file&type=logo_bpr";
+  }
+
+  static String splashBannerPublic() {
+    return "$url_go/splash-banner/public";
+  }
+
+  static String inquiryPermohonanPinjaman() {
+    return "$url_medfo/inquiry/permohonan-pinjaman";
   }
 }

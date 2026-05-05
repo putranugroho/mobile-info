@@ -23,6 +23,11 @@ import '../../utils/pro_shimmer.dart';
 
 class HomeNotifier extends ChangeNotifier {
   final BuildContext context;
+  bool splashReady = false;
+  bool splashDialogOpening = false;
+  String splashTitle = "";
+  String splashDescription = "";
+  String splashImageFile = "";
 
   HomeNotifier({required this.context}) {
     getProfile();
@@ -37,6 +42,9 @@ class HomeNotifier extends ChangeNotifier {
 
     /// 2. sekarang BARU aman
     getHome();
+    getProduct();
+    getBprProfile();
+    getSplashBanner();
     loadTabungan();
     loadDeposito();
     loadKredit();
@@ -52,15 +60,33 @@ class HomeNotifier extends ChangeNotifier {
     listtabungan.clear();
     listdeposito.clear();
     notifyListeners();
-    AuthRepository.post(NetworkURL.rateproduk(), {"bpr_id": users!.bprId}).then((value) {
-      for (Map<String, dynamic> i in value['data']['data']['tabungan']) {
-        listtabungan.add(i);
+
+    try {
+      final value = await AuthRepository.post(NetworkURL.rateproduk(), {"bpr_id": users!.bprId, "userlogin": "FADLY", "term": "WEB"});
+
+      final body = value is Map<String, dynamic> ? value : {};
+
+      final data = body['data'];
+
+      if (body['code'] == '000' && data is Map<String, dynamic>) {
+        final tabungan = data['tabungan'];
+        final deposito = data['deposito'];
+
+        if (tabungan is List) {
+          listtabungan.addAll(tabungan.map((e) => Map<String, dynamic>.from(e)).toList());
+        }
+
+        if (deposito is List) {
+          listdeposito.addAll(deposito.map((e) => Map<String, dynamic>.from(e)).toList());
+        }
+      } else {
+        debugPrint("RATE PRODUK RESPONSE TIDAK VALID: $value");
       }
-      for (Map<String, dynamic> i in value['data']['data']['deposito']) {
-        listdeposito.add(i);
-      }
-      notifyListeners();
-    });
+    } catch (e) {
+      debugPrint("ERROR RATE PRODUK: $e");
+    }
+
+    notifyListeners();
   }
 
   Timer? _rootTimer;
@@ -195,55 +221,128 @@ class HomeNotifier extends ChangeNotifier {
   Future getHome() async {
     isLoading = true;
     list.clear();
+    listBanner.clear();
+    listDialog.clear();
+    notifyListeners();
+
+    try {
+      final value = await HomeRepository.publicBanner(NetworkURL.publicBanner(), users!.bprId);
+
+      final body = value is Map<String, dynamic> ? value : {};
+      final data = body['data'];
+
+      if (body['code'] == '000' && data is List) {
+        final banners = data.map((e) => BannersModel.fromJson(Map<String, dynamic>.from(e))).toList();
+
+        banners.sort((a, b) {
+          final aIsBpr = a.scopeType.toUpperCase() == "BPR";
+          final bIsBpr = b.scopeType.toUpperCase() == "BPR";
+
+          if (aIsBpr != bIsBpr) {
+            return aIsBpr ? -1 : 1;
+          }
+
+          return (a.urutan ?? 9999).compareTo(b.urutan ?? 9999);
+        });
+
+        list.addAll(banners);
+        listBanner = banners;
+
+        isLoading = false;
+        notifyListeners();
+        return;
+      }
+
+      debugPrint("BANNER RESPONSE TIDAK VALID: $value");
+    } catch (e) {
+      debugPrint("ERROR GET BANNER: $e");
+    }
+
+    isLoading = false;
+    notifyListeners();
+  }
+
+  Future getProduct() async {
     listProduk.clear();
     notifyListeners();
-    HomeRepository.homeData(token, NetworkURL.homeData(), users!.id, users!.bprId).then((value) {
-      if (value['value'] == 1) {
-        for (Map<String, dynamic> i in value['banner']) {
-          list.add(BannersModel.fromJson(i));
-        }
-        for (Map<String, dynamic> i in value['produk']) {
-          listProduk.add(ProdukModel.fromJson(i));
-        }
-        listDialog = list.where((e) => e.tipe == "DIALOG" && e.urutan != null).toList()..sort((a, b) => a.urutan!.compareTo(b.urutan!));
 
-        listBanner = list.where((e) => e.tipe != "DIALOG" && e.urutan != null).toList()..sort((a, b) => a.urutan!.compareTo(b.urutan!));
-        if (listDialog.isNotEmpty) {
-          showDialog(
-            context: context,
-            builder: (context) {
-              return Dialog(
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                child: CachedNetworkImage(
-                  placeholder: (context, url) => ProShimmer(height: 300, width: 400, radius: 8),
-                  fit: BoxFit.cover,
-                  imageBuilder: (context, imageProvider) => Container(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(8),
-                      image: DecorationImage(image: imageProvider, fit: BoxFit.cover),
-                    ),
-                  ),
-                  height: 300,
-                  width: 400,
-                  imageUrl: "https://infoservices.medtrans.id/webServices/image-proxy.php?url=$upload/${listDialog[0].banners}",
-                  errorWidget: (context, url, error) => const Icon(Icons.error),
-                ),
-              );
-            },
-          );
-        }
-        isLoading = false;
-        notifyListeners();
+    try {
+      final value = await HomeRepository.productData(NetworkURL.productData(), users!.bprId);
+
+      final data = value['data'];
+
+      if (value['code'] == '000' && data is List) {
+        final tempList = data.map((e) => ProdukModel.fromJson(Map<String, dynamic>.from(e))).toList();
+
+        tempList.sort((a, b) {
+          final kodeA = int.tryParse(a.kodePrd ?? '') ?? 0;
+          final kodeB = int.tryParse(b.kodePrd ?? '') ?? 0;
+          return kodeA.compareTo(kodeB);
+        });
+
+        listProduk = tempList;
       } else {
-        isLoading = false;
-        notifyListeners();
+        debugPrint("PRODUCT RESPONSE TIDAK VALID: $value");
       }
-    });
+    } catch (e) {
+      debugPrint("ERROR PRODUCT: $e");
+    }
+
+    notifyListeners();
   }
 
   var isLoadingSaldo = false;
   var hideSaldo = true;
   int saldo = 0;
+  String logoBprFile = "";
+  String namaBprProfile = "";
+
+  Future getBprProfile() async {
+    try {
+      final value = await HomeRepository.bprProfile(NetworkURL.bprProfile(), users!.bprId);
+
+      final body = value is Map<String, dynamic> ? value : {};
+      final data = body['data'];
+
+      if (body['code'] == '000' && data is Map<String, dynamic>) {
+        logoBprFile = "${data['logo_bpr'] ?? ''}";
+        namaBprProfile = "${data['nama_bpr'] ?? ''}";
+      }
+    } catch (e) {
+      debugPrint("ERROR GET BPR PROFILE: $e");
+    }
+
+    notifyListeners();
+  }
+
+  Future getSplashBanner() async {
+    try {
+      final alreadyShown = await Pref().getSplashShownAfterLogin();
+      if (alreadyShown) return;
+
+      final value = await HomeRepository.splashBannerPublic(NetworkURL.splashBannerPublic());
+
+      final body = value is Map<String, dynamic> ? value : {};
+      final data = body['data'];
+
+      if (body['code'] == '000' && data is Map<String, dynamic>) {
+        splashTitle = "${data['title'] ?? ''}";
+        splashDescription = "${data['description'] ?? ''}";
+        splashImageFile = "${data['image_file'] ?? ''}";
+        splashReady = splashImageFile.isNotEmpty;
+      }
+    } catch (e) {
+      debugPrint("ERROR GET SPLASH BANNER: $e");
+    }
+
+    notifyListeners();
+  }
+
+  Future markSplashShown() async {
+    splashReady = false;
+    await Pref().setSplashShownAfterLogin(true);
+    notifyListeners();
+  }
 
   transferModul() {
     showModalBottomSheet(

@@ -12,7 +12,8 @@ class RekeningRepository {
   static Future<Map<String, dynamic>> fetchMasterData({
     required String token,
     required String endpoint,
-    required String userlogin,
+    required String user_login,
+    required String term,
     required String bprId,
     required String nocif,
   }) async {
@@ -20,7 +21,7 @@ class RekeningRepository {
     dio.options.headers['x-username'] = xusername;
     dio.options.headers['x-password'] = xpassword;
 
-    final response = await dio.post(endpoint, data: {"token": token, "userlogin": userlogin, "bpr_id": bprId, "nocif": nocif});
+    final response = await dio.post(endpoint, data: {"token": token, "user_login": user_login, "term": term, "bpr_id": bprId, "nocif": nocif});
 
     final raw = response.data;
 
@@ -38,11 +39,12 @@ class RekeningRepository {
   static Future<List<TabunganModel>> getTabungan({
     required String token,
     required String endpoint,
-    required String userlogin,
+    required String user_login,
+    required String term,
     required String bprId,
     required String nocif,
   }) async {
-    final data = await fetchMasterData(token: token, endpoint: endpoint, userlogin: userlogin, bprId: bprId, nocif: nocif);
+    final data = await fetchMasterData(token: token, endpoint: endpoint, user_login: user_login, term: term, bprId: bprId, nocif: nocif);
 
     final List list = data['tabungan'] ?? [];
     return list.map((e) => TabunganModel.fromJson(e)).toList();
@@ -52,11 +54,12 @@ class RekeningRepository {
   static Future<List<DepositoModel>> getDeposito({
     required String token,
     required String endpoint,
-    required String userlogin,
+    required String user_login,
+    required String term,
     required String bprId,
     required String nocif,
   }) async {
-    final data = await fetchMasterData(token: token, endpoint: endpoint, userlogin: userlogin, bprId: bprId, nocif: nocif);
+    final data = await fetchMasterData(token: token, endpoint: endpoint, user_login: user_login, term: term, bprId: bprId, nocif: nocif);
 
     final List list = data['deposito'] ?? [];
     return list.map((e) => DepositoModel.fromJson(e)).toList();
@@ -66,11 +69,12 @@ class RekeningRepository {
   static Future<List<KreditModel>> getKredit({
     required String token,
     required String endpoint,
-    required String userlogin,
+    required String user_login,
+    required String term,
     required String bprId,
     required String nocif,
   }) async {
-    final data = await fetchMasterData(token: token, endpoint: endpoint, userlogin: userlogin, bprId: bprId, nocif: nocif);
+    final data = await fetchMasterData(token: token, endpoint: endpoint, user_login: user_login, term: term, bprId: bprId, nocif: nocif);
 
     final List list = data['kredit'] ?? [];
     return list.map((e) => KreditModel.fromJson(e)).toList();

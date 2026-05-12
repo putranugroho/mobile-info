@@ -1,12 +1,10 @@
 import 'dart:convert';
 import 'package:dio/dio.dart';
-import 'package:flutter/foundation.dart';
 
 import '../../models/mutasi_tabungan_model.dart';
 import '../../network/network.dart';
 
 class MutasiRepository {
-  /// ================= CORE FETCH =================
   static Future<List<dynamic>> fetchMutasi({
     required String endpoint,
     required String token,
@@ -15,25 +13,23 @@ class MutasiRepository {
     required String noRek,
     required String periode,
   }) async {
-    Dio dio = Dio();
+    final dio = Dio();
 
-    dio.options.headers['x-username'] = xusername;
-    dio.options.headers['x-password'] = xpassword;
+    dio.options.headers['api-key'] = '123';
     dio.options.headers['Content-Type'] = 'application/json';
 
-    final response = await dio.post(endpoint, data: {"token": token, "userlogin": userlogin, "bpr_id": bprId, "no_rek": noRek, "periode": periode});
+    final response = await dio.post(endpoint, data: {"userlogin": userlogin, "bpr_id": bprId, "term": "WEB", "no_rek": noRek, "periode": periode});
 
     final raw = response.data;
-    final Map<String, dynamic> json = raw is String ? jsonDecode(raw) : raw;
+    final Map<String, dynamic> json = raw is String ? jsonDecode(raw) : Map<String, dynamic>.from(raw);
 
-    if (response.statusCode == 200 && json['value'] == 1) {
+    if (response.statusCode == 200 && json['code'] == '000') {
       return json['data'] ?? [];
-    } else {
-      throw Exception(json['message'] ?? 'Gagal mengambil mutasi tabungan');
     }
+
+    throw Exception(json['message'] ?? 'Gagal mengambil mutasi tabungan');
   }
 
-  /// ================= MUTASI TABUNGAN =================
   static Future<List<MutasiTabunganModel>> getMutasiTabungan({
     required String endpoint,
     required String token,
@@ -42,8 +38,8 @@ class MutasiRepository {
     required String noRek,
     required String periode,
   }) async {
-    final List list = await fetchMutasi(endpoint: endpoint, token: token, userlogin: userlogin, bprId: bprId, noRek: noRek, periode: periode);
+    final list = await fetchMutasi(endpoint: endpoint, token: token, userlogin: userlogin, bprId: bprId, noRek: noRek, periode: periode);
 
-    return list.map((e) => MutasiTabunganModel.fromJson(e)).toList();
+    return list.map((e) => MutasiTabunganModel.fromJson(Map<String, dynamic>.from(e))).toList();
   }
 }

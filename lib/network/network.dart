@@ -4,12 +4,13 @@ const xpassword = "corevalue@20231234";
 const url = "https://infoservices.medtrans.id";
 const url_medfo = "https://api-dev-medfo.medtrans.id";
 const url_go = "https://api-dev-cms.medtrans.id";
+const url_biz = "https://ibprbiz.medtrans.id";
 const upload = "https://infoservices.medtrans.id/upload";
 const photo = "https://infoservices.medtrans.id/photo";
 
 class NetworkURL {
   static String login() {
-    return "$url/webServices/login_info.php";
+    return "$url_biz/user-medfo-login";
   }
 
   static String listBpr() {
@@ -17,19 +18,19 @@ class NetworkURL {
   }
 
   static String validasiKtp() {
-    return "$url/webServices/validasi_medfo.php";
+    return "$url_biz/user-medfo-aktivasi";
   }
 
   static String verifyOtp() {
-    return "$url/webServices/verify_otp.php";
+    return "$url_biz/user-medfo-verify-otp";
   }
 
   static String gantiPassword() {
-    return "$url/webServices/ganti-password-mobile-info.php";
+    return "$url_biz/user-medfo-ganti-password";
   }
 
   static String aktivasiAkun() {
-    return "$url/webServices/aktivasi_akun_mobile_info.php";
+    return "$url_biz/aktivasi-medfo";
   }
 
   static String generatedMpin() {
@@ -62,6 +63,10 @@ class NetworkURL {
 
   static String cekBalance() {
     return "$url/webServices/cek_saldo.php";
+  }
+
+  static String inquiryBalance() {
+    return "$url_go/inquiry_balance";
   }
 
   static String generatedToken() {
@@ -169,19 +174,19 @@ class NetworkURL {
   }
 
   static String inquiryMasterData() {
-    return "$url/webServices/inquery_info_masterdata.php";
+    return "$url_medfo/inquiry/master-data";
   }
 
   static String inquiryMutasiTabungan() {
-    return "$url/webServices/inquery_info_mutasitabungan.php";
+    return "$url_medfo/inquiry/mutasi-tabungan";
   }
 
   static String inquiryDepositoData() {
-    return "$url/webServices/inquery_info_deposito.php";
+    return "$url_medfo/inquiry/detail-deposito";
   }
 
   static String inquiryPinjamanData() {
-    return "$url/webServices/inquery_info_pinjaman.php";
+    return "$url_medfo/inquiry/tagihan-kredit";
   }
 
   static String rateproduk() {

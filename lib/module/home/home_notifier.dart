@@ -1,16 +1,14 @@
 import 'dart:async';
 
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:mobile_info/models/index.dart';
 import 'package:mobile_info/models/deposito_model.dart';
 import 'package:mobile_info/models/tabungan_model.dart';
 import 'package:mobile_info/models/kredit_model.dart';
-import 'package:mobile_info/module/auth/lock_screen_page.dart';
+import 'package:mobile_info/module/auth/login_page.dart';
 import 'package:mobile_info/module/repository/auth_repository.dart';
 import 'package:mobile_info/module/repository/home_repository.dart';
 import 'package:mobile_info/module/repository/rekening_repository.dart';
-import 'package:mobile_info/module/repository/rekening_inquiry_repository.dart';
 import 'package:mobile_info/module/transfer/transfer_in_page.dart';
 import 'package:mobile_info/module/transfer/transfer_page.dart';
 import 'package:mobile_info/module/transfer/transfer_sesama_page.dart';
@@ -19,7 +17,6 @@ import 'package:mobile_info/utils/colors.dart';
 import 'package:mobile_info/utils/images_path.dart';
 
 import '../../network/network.dart';
-import '../../utils/pro_shimmer.dart';
 
 class HomeNotifier extends ChangeNotifier {
   final BuildContext context;
@@ -114,8 +111,8 @@ class HomeNotifier extends ChangeNotifier {
   }
 
   void logOutUser() async {
-    // Log out the user if they're logged in, then cancel the timer.
-    Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => LockScreenPage()), (route) => false);
+    Pref().remove();
+    Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => const LoginPage()), (route) => false);
     _rootTimer?.cancel();
   }
 
@@ -147,7 +144,8 @@ class HomeNotifier extends ChangeNotifier {
       listTabungan = await RekeningRepository.getTabungan(
         token: token,
         endpoint: NetworkURL.inquiryMasterData(),
-        userlogin: "admin",
+        user_login: "admin",
+        term: "WEB",
         // bprId: users!.bprId,
         bprId: users!.bprId,
         nocif: users!.noCif,
@@ -171,7 +169,8 @@ class HomeNotifier extends ChangeNotifier {
       listDeposito = await RekeningRepository.getDeposito(
         token: token,
         endpoint: NetworkURL.inquiryMasterData(),
-        userlogin: "admin",
+        user_login: "admin",
+        term: "WEB",
         // bprId: users!.bprId,
         bprId: users!.bprId,
         nocif: users!.noCif,
@@ -195,7 +194,8 @@ class HomeNotifier extends ChangeNotifier {
       listKredit = await RekeningRepository.getKredit(
         token: token,
         endpoint: NetworkURL.inquiryMasterData(),
-        userlogin: "admin",
+        user_login: "admin",
+        term: "WEB",
         // bprId: users!.bprId,
         bprId: users!.bprId,
         nocif: users!.noCif,

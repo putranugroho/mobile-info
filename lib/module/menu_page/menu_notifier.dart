@@ -2,6 +2,8 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:mobile_info/module/auth/login_page.dart';
+import 'package:mobile_info/module/repository/auth_repository.dart';
+import 'package:mobile_info/network/network.dart';
 import 'package:mobile_info/pref/pref.dart';
 
 class MenuNotifier extends ChangeNotifier {
@@ -26,8 +28,14 @@ class MenuNotifier extends ChangeNotifier {
     _initTimer();
   }
 
-  void _logOut() {
-    Pref().remove();
+  void _logOut() async {
+    final users = await Pref().getUsers();
+    if (users.id != 0) {
+      try {
+        await AuthRepository.logoutMedfo(token, NetworkURL.logoutMedfo(), users.id);
+      } catch (_) {}
+    }
+    await Pref().remove();
     if (!context.mounted) return;
     Navigator.pushAndRemoveUntil(
       context,

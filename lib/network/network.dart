@@ -260,4 +260,8 @@ class NetworkURL {
   static String inquiryPermohonanPinjaman() {
     return "$url_medfo/inquiry/permohonan-pinjaman";
   }
+
+  static String logoutMedfo() {
+    return "$url_biz/webServices/logout_medfo.php";
+  }
 }

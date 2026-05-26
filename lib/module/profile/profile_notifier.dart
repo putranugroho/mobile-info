@@ -114,8 +114,15 @@ class ProfileNotiifer extends ChangeNotifier {
     );
   }
 
-  keluar() {
-    Pref().remove();
+  keluar() async {
+    final users = await Pref().getUsers();
+    if (users.id != 0) {
+      try {
+        await AuthRepository.logoutMedfo(token, NetworkURL.logoutMedfo(), users.id);
+      } catch (_) {}
+    }
+    await Pref().remove();
+    if (!context.mounted) return;
     Navigator.pushAndRemoveUntil(
       context,
       MaterialPageRoute(builder: (context) => const LoginPage()),

@@ -389,6 +389,17 @@ class AuthRepository {
     return response.data;
   }
 
+  static Future<dynamic> logoutMedfo(String token, String url, int idUsers) async {
+    FormData formData = FormData.fromMap({"token": token, "id_users": idUsers});
+    Dio dio = Dio();
+    dio.options.headers['x-username'] = xusername;
+    dio.options.headers['x-password'] = xpassword;
+    if (kDebugMode) print("ENDPOINT URL : $url");
+    final response = await dio.post(url, data: formData);
+    if (response.data is String) return jsonDecode(response.data);
+    return response.data;
+  }
+
   static Future<dynamic> aktivasiMobileInfo(String url, String phone, String userid, String password) async {
     FormData formData = FormData.fromMap({"phone": phone, "userid": userid, "password": password});
     print(formData.fields);

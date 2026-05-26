@@ -26,7 +26,23 @@ class NetworkURL {
   }
 
   static String gantiPassword() {
-    return "$url_biz/user-medfo-ganti-password";
+    return "$url_biz/webServices/ganti-password-mobile-info.php";
+  }
+
+  static String verifyOtpWebService() {
+    return "$url_biz/webServices/verify_otp.php";
+  }
+
+  static String lupaSandiMedfo() {
+    return "$url_biz/webServices/lupa_sandi_medfo.php";
+  }
+
+  static String updateSandiMedfo() {
+    return "$url_biz/webServices/update_sandi_medfo.php";
+  }
+
+  static String updateProfileMedfo() {
+    return "$url_biz/webServices/update_profile_medfo.php";
   }
 
   static String aktivasiAkun() {

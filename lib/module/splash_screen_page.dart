@@ -34,9 +34,11 @@ class SplashScreenPage extends StatelessWidget {
                     const CupertinoActivityIndicator(radius: 20),
                     const SizedBox(height: 32),
                     Spacer(),
-                    Text("Powered by", textAlign: TextAlign.center, style: TextStyle(fontSize: 12)),
+                    
                     SizedBox(height: 8),
-                    Image.asset(ImageAssets.bjbSyariah, height: 60),
+                    Container(
+                      padding: EdgeInsets.all(12),
+                      child: Image.asset(ImageAssets.copyright)),
                     const SizedBox(height: 12),
                     Text(
                       "",

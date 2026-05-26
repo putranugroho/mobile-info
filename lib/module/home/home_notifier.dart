@@ -1,11 +1,8 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:mobile_info/models/index.dart';
 import 'package:mobile_info/models/deposito_model.dart';
 import 'package:mobile_info/models/tabungan_model.dart';
 import 'package:mobile_info/models/kredit_model.dart';
-import 'package:mobile_info/module/auth/login_page.dart';
 import 'package:mobile_info/module/repository/auth_repository.dart';
 import 'package:mobile_info/module/repository/home_repository.dart';
 import 'package:mobile_info/module/repository/rekening_repository.dart';
@@ -45,7 +42,6 @@ class HomeNotifier extends ChangeNotifier {
     loadTabungan();
     loadDeposito();
     loadKredit();
-    initializeTimer();
     getRateProduk();
 
     notifyListeners();
@@ -86,17 +82,6 @@ class HomeNotifier extends ChangeNotifier {
     notifyListeners();
   }
 
-  Timer? _rootTimer;
-
-  void initializeTimer() {
-    if (_rootTimer != null) _rootTimer!.cancel();
-    const time = const Duration(minutes: 5);
-    print(time);
-    _rootTimer = Timer(time, () {
-      logOutUser();
-    });
-  }
-
   String get logoByBprId {
     final bprId = users?.bprId;
 
@@ -108,22 +93,6 @@ class HomeNotifier extends ChangeNotifier {
       default:
         return ImageAssets.logomedfo; // medfo_logo.jpeg
     }
-  }
-
-  void logOutUser() async {
-    Pref().remove();
-    Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => const LoginPage()), (route) => false);
-    _rootTimer?.cancel();
-  }
-
-  void handleUserInteraction([_]) {
-    if (_rootTimer != null && !_rootTimer!.isActive) {
-      // This means the user has been logged out
-      return;
-    }
-    _rootTimer?.cancel();
-
-    initializeTimer();
   }
 
   int page = 0;

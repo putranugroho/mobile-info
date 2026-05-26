@@ -270,7 +270,15 @@ class _MutasiBodyState extends State<_MutasiBody> with SingleTickerProviderState
                             subtitle: const Text("Chat dengan Customer Service"),
                             onTap: () {
                               Navigator.pop(context);
-                              Navigator.push(context, MaterialPageRoute(builder: (_) => const ChatPage()));
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => ChatPage(
+                                    noRekening: widget.noRekening,
+                                    namaProduk: widget.namaProduk,
+                                  ),
+                                ),
+                              );
                             },
                           ),
                         ],

@@ -4,77 +4,46 @@ import 'package:mobile_info/module/repository/chat_api.dart';
 import 'package:mobile_info/module/repository/chat_ws_service.dart';
 import 'package:mobile_info/pref/pref.dart';
 
-enum SupportMode { bot, waiting, liveChat }
-
 class ChatNotifier extends ChangeNotifier {
   final BuildContext context;
-  ChatNotifier({required this.context}) {
+  final String noRekening;
+  final String namaProduk;
+
+  ChatNotifier({
+    required this.context,
+    required this.noRekening,
+    required this.namaProduk,
+  }) {
     _init();
   }
 
   final ScrollController scrollController = ScrollController();
 
-  void scrollToBottom({bool animate = true}) {
+  void _scrollToBottom() {
     if (!scrollController.hasClients) return;
-
-    final position = scrollController.position.maxScrollExtent;
-
-    if (animate) {
-      scrollController.animateTo(
-        position,
-        duration: const Duration(milliseconds: 300),
-        curve: Curves.easeOut,
-      );
-    } else {
-      scrollController.jumpTo(position);
-    }
-  }
-
-  int? currentUserId;
-  void _connectWs() {
-    _ws.connect(
-      token: token!,
-      onConnected: () {
-        print("WS connected");
-
-        // 🔥 JOIN ROOM DI SINI
-        _ws.joinRoom(roomId!);
-      },
-      onMessage: (data) {
-        if (data["type"] != "message") return;
-        if (data["room_id"] != roomId) return;
-        if (data["user_id"] == currentUserId) return;
-
-        messages.add({
-          "from": data["role"] == "admin" ? "admin" : "user",
-          "message": data["message"],
-        });
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          scrollToBottom();
-        });
-
-        notifyListeners();
-      },
-      onError: (err) {
-        print("WS error: $err");
-      },
-    );
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (scrollController.hasClients) {
+        scrollController.animateTo(
+          scrollController.position.maxScrollExtent,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeOut,
+        );
+      }
+    });
   }
 
   final ChatApi _api = ChatApi();
   final ChatWsService _ws = ChatWsService();
+
   UsersModel? users;
-  int? roomId;
-
-  bool isLoading = false;
-  bool isOpened = false;
-
-  SupportMode mode = SupportMode.bot;
-
+  String? sessionId;
   String? token;
-  List<Map<String, dynamic>> messages = [];
 
-  // ================= INIT =================
+  bool isLoading = true;
+  bool isConnected = false;
+  List<Map<String, dynamic>> messages = [];
+  final Set<String> _seenIds = {};
+
   bool _initialized = false;
 
   Future<void> _init() async {
@@ -82,89 +51,118 @@ class ChatNotifier extends ChangeNotifier {
     _initialized = true;
 
     users = await Pref().getUsers();
-    if (users == null) return;
 
-    await openSupport(externalUserId: "MOBILE_INFO_${users!.nomorPonsel}");
-  }
+    try {
+      final externalUserId = "MEDFO_${users!.bprId}_${users!.nomorPonsel}";
+      final res = await _api.openSession(
+        externalUserId: externalUserId,
+        customerName: users!.nama,
+        customerPhone: users!.nomorPonsel,
+        bprId: users!.bprId,
+      );
 
-  // ================= OPEN SUPPORT =================
-  Future<void> openSupport({required String externalUserId}) async {
-    isLoading = true;
-    notifyListeners();
+      sessionId = res['sessionId'] as String;
+      token = res['token'] as String;
 
-    final res = await _api.openSupportRoom(externalUserId);
+      final prevMessages = res['messages'] as List<dynamic>? ?? [];
+      for (final m in prevMessages) {
+        final id = m['id'] as String? ?? '';
+        if (id.isNotEmpty) _seenIds.add(id);
+        messages.add({"id": id, "from": m['from'], "message": m['message']});
+      }
 
-    await Pref().saveToken(res["token"]);
-    roomId = res['room_id'];
-    currentUserId = res["user"]["id"];
-    isOpened = true;
-    token = res["token"];
-    print("TOKEN USER : $token");
+      if (messages.isEmpty) {
+        _addSystem("Halo ${users!.nama}! 👋 Silakan sampaikan kendala Anda, CS kami siap membantu.");
+        _connectWs();
+        await Future.delayed(const Duration(milliseconds: 500));
+        await _sendAutoMessage(_buildRekeningMessage());
+      } else {
+        _connectWs();
+      }
+    } catch (e) {
+      _addSystem("Gagal terhubung ke layanan bantuan. Silakan coba lagi.");
+    }
 
-    _addAdmin("Hi Apakabar, apa yang bisa kami bantu?");
-    _connectWs();
     isLoading = false;
     notifyListeners();
   }
 
-  Future<void> send(String text) async {
-    if (text.trim().isEmpty || roomId == null) return;
-
-    _addUser(text);
-
-    notifyListeners();
-    if (mode == SupportMode.bot) {
-      // await _api.sendFirstSupportMessage(roomId!, text);
-      await _api.sendMessage(roomId!, text);
-      _addAdmin(
-        "Baik kami akan mencoba menghubungkan Anda dengan Customer Service Live Agent Kami",
-      );
-      mode = SupportMode.liveChat;
-      // await _assignAgent();
-      return;
-    }
-
-    if (mode == SupportMode.liveChat) {
-      await _api.sendMessage(roomId!, text);
-    }
+  String _buildRekeningMessage() {
+    return "📋 Bantuan terkait rekening berikut:\n"
+        "Produk      : $namaProduk\n"
+        "No. Rekening: $noRekening";
   }
 
-  Future<void> _assignAgent() async {
-    await _api.assignSupportAgent(roomId!);
-
-    mode = SupportMode.liveChat;
-
-    _addSystem(
-      "Customer Service telah bergabung. Silakan lanjutkan percakapan.",
-    );
-
-    notifyListeners();
-  }
-
-  void _addUser(String text) {
+  Future<void> _sendAutoMessage(String text) async {
+    if (sessionId == null || token == null) return;
     messages.add({"from": "user", "message": text});
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      scrollToBottom();
-    });
-
+    _scrollToBottom();
     notifyListeners();
+    try {
+      await _api.sendMessage(sessionId: sessionId!, token: token!, message: text);
+    } catch (_) {}
   }
 
-  void _addAdmin(String text) {
-    messages.add({"from": "admin", "message": text});
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      scrollToBottom();
-    });
+  void _connectWs() {
+    if (sessionId == null || token == null) return;
 
+    _ws.connect(
+      sessionId: sessionId!,
+      token: token!,
+      onConnected: () {
+        isConnected = true;
+        notifyListeners();
+      },
+      onMessage: (data) {
+        final from = data['from'] as String? ?? 'agent';
+        if (from == 'user') return;
+
+        final id = data['id'] as String? ?? '';
+        if (id.isNotEmpty && _seenIds.contains(id)) return;
+        if (id.isNotEmpty) _seenIds.add(id);
+
+        final msg = data['message'] as String? ?? '';
+        if (msg.isEmpty) return;
+
+        messages.add({"id": id, "from": from, "message": msg});
+        _scrollToBottom();
+        notifyListeners();
+      },
+      onError: (err) {
+        isConnected = false;
+        notifyListeners();
+      },
+    );
+  }
+
+  Future<void> send(String text) async {
+    if (text.trim().isEmpty || sessionId == null || token == null) return;
+
+    messages.add({"from": "user", "message": text});
+    _scrollToBottom();
     notifyListeners();
+
+    try {
+      await _api.sendMessage(
+        sessionId: sessionId!,
+        token: token!,
+        message: text,
+      );
+    } catch (_) {
+      _addSystem("Gagal mengirim pesan. Periksa koneksi Anda.");
+    }
   }
 
   void _addSystem(String text) {
     messages.add({"from": "system", "message": text});
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      scrollToBottom();
-    });
-
+    _scrollToBottom();
     notifyListeners();
+  }
+
+  @override
+  void dispose() {
+    _ws.disconnect();
+    scrollController.dispose();
+    super.dispose();
   }
 }

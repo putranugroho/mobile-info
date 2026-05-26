@@ -37,7 +37,7 @@ class DepositoDetailPage extends StatelessWidget {
                         padding: const EdgeInsets.only(right: 12),
                         child: InkWell(
                           borderRadius: BorderRadius.circular(20),
-                          onTap: () => _showBantuanCS(context),
+                          onTap: () => _showBantuanCS(context, noRekening: noRekening),
                           child: Container(
                             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                             decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(20)),
@@ -111,7 +111,7 @@ class DepositoDetailPage extends StatelessWidget {
   }
 }
 
-void _showBantuanCS(BuildContext context) {
+void _showBantuanCS(BuildContext context, {String noRekening = ""}) {
   showModalBottomSheet(
     context: context,
     useRootNavigator: false,
@@ -182,7 +182,7 @@ void _showBantuanCS(BuildContext context) {
                           subtitle: const Text("Chat dengan Customer Service"),
                           onTap: () {
                             Navigator.pop(context);
-                            Navigator.push(context, MaterialPageRoute(builder: (_) => const ChatPage()));
+                            Navigator.push(context, MaterialPageRoute(builder: (_) => ChatPage(noRekening: noRekening, namaProduk: "Deposito")));
                           },
                         ),
                       ],

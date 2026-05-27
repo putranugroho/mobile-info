@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:mobile_info/models/index.dart';
 import 'package:mobile_info/module/repository/chat_api.dart';
@@ -87,6 +88,10 @@ class BantuanNotifier extends ChangeNotifier {
       onConnected: () {
         isConnected = true;
         notifyListeners();
+        _syncMissedMessages();
+      },
+      onReconnected: () {
+        _syncMissedMessages();
       },
       onMessage: (data) {
         final from = data['from'] as String? ?? 'agent';
@@ -107,7 +112,31 @@ class BantuanNotifier extends ChangeNotifier {
         isConnected = false;
         notifyListeners();
       },
+      onSessionClosed: () {
+        _addSystem("Sesi bantuan telah ditutup oleh CS. Terima kasih.");
+        if (context.mounted) Navigator.pop(context);
+      },
     );
+  }
+
+  Future<void> _syncMissedMessages() async {
+    if (sessionId == null || token == null) return;
+    try {
+      final res = await _api.getMessages(sessionId: sessionId!, token: token!);
+      final serverMessages = res['messages'] as List<dynamic>? ?? [];
+      bool hasNew = false;
+      for (final m in serverMessages) {
+        final id = m['id'] as String? ?? '';
+        if (id.isNotEmpty && _seenIds.contains(id)) continue;
+        if (id.isNotEmpty) _seenIds.add(id);
+        messages.add({"id": id, "from": m['from'], "message": m['message']});
+        hasNew = true;
+      }
+      if (hasNew) {
+        _scrollToBottom();
+        notifyListeners();
+      }
+    } catch (_) {}
   }
 
   Future<void> send(String text) async {
@@ -123,6 +152,15 @@ class BantuanNotifier extends ChangeNotifier {
         token: token!,
         message: text,
       );
+    } on DioException catch (e) {
+      final data = e.response?.data;
+      final msg = (data is Map ? data['message'] as String? : null) ?? '';
+      if (msg.toLowerCase().contains('ditutup')) {
+        _addSystem("Sesi bantuan telah ditutup oleh CS.");
+        if (context.mounted) Navigator.pop(context);
+      } else {
+        _addSystem("Gagal mengirim pesan. Periksa koneksi Anda.");
+      }
     } catch (_) {
       _addSystem("Gagal mengirim pesan. Periksa koneksi Anda.");
     }

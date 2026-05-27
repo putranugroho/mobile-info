@@ -43,4 +43,17 @@ class ChatApi {
     final json = res.data as Map<String, dynamic>?;
     return json?["data"]?["id"] as String?;
   }
+
+  Future<Map<String, dynamic>> getMessages({
+    required String sessionId,
+    required String token,
+  }) async {
+    final res = await _dio.get(
+      '/api/chat/messages',
+      queryParameters: {"sessionId": sessionId, "token": token},
+    );
+    final json = res.data as Map<String, dynamic>;
+    if (json["success"] != true) throw Exception("Gagal memuat pesan");
+    return json["data"] as Map<String, dynamic>;
+  }
 }

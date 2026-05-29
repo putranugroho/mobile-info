@@ -75,12 +75,7 @@ class _HomePageState extends State<HomePage> {
 
           _startBannerAutoScroll(value);
 
-          return Listener(
-            behavior: HitTestBehavior.translucent,
-            onPointerDown: value.handleUserInteraction,
-            onPointerMove: value.handleUserInteraction,
-            onPointerUp: value.handleUserInteraction,
-            child: Scaffold(
+          return Scaffold(
               backgroundColor: Color.fromARGB(255, 255, 250, 250),
               body: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -406,7 +401,6 @@ class _HomePageState extends State<HomePage> {
                   ),
                 ],
               ),
-            ),
           );
         },
       ),

@@ -318,7 +318,7 @@ void _showBantuanCS(BuildContext context, String noRek) {
                           subtitle: const Text("Chat dengan Customer Service"),
                           onTap: () {
                             Navigator.pop(context);
-                            Navigator.push(context, MaterialPageRoute(builder: (_) => const ChatPage()));
+                            Navigator.push(context, MaterialPageRoute(builder: (_) => ChatPage(noRekening: noRek, namaProduk: "Pinjaman")));
                           },
                         ),
                       ],

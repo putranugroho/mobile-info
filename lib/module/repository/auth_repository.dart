@@ -389,16 +389,56 @@ class AuthRepository {
     }
   }
 
-  static Future<dynamic> aktivasiMobileInfo(String url, String phone, String userid, String password, {String bprId = ''}) async {
+  static Future<dynamic> lupaSandiMedfo(String token, String url, String noHp, String bprId) async {
+    FormData formData = FormData.fromMap({"token": token, "no_hp": noHp, "bpr_id": bprId});
     Dio dio = Dio();
-
     dio.options.headers['x-username'] = xusername;
     dio.options.headers['x-password'] = xpassword;
-    dio.options.headers['api-key'] = '123';
-    dio.options.headers['Content-Type'] = 'application/json';
+    if (kDebugMode) print("ENDPOINT URL : $url");
+    final response = await dio.post(url, data: formData);
+    if (response.data is String) return jsonDecode(response.data);
+    return response.data;
+  }
 
-    final body = {"phone": phone, "userid": userid, "password": password, "bpr_id": bprId};
+  static Future<dynamic> updateSandiMedfo(String token, String url, String noHp, String sandiBaru) async {
+    FormData formData = FormData.fromMap({"token": token, "no_hp": noHp, "sandi_baru": sandiBaru});
+    Dio dio = Dio();
+    dio.options.headers['x-username'] = xusername;
+    dio.options.headers['x-password'] = xpassword;
+    if (kDebugMode) print("ENDPOINT URL : $url");
+    final response = await dio.post(url, data: formData);
+    if (response.data is String) return jsonDecode(response.data);
+    return response.data;
+  }
 
+  static Future<dynamic> updateProfileMedfo(String token, String url, int idUsers, String nama, String noHp, String tglLahir) async {
+    FormData formData = FormData.fromMap({"token": token, "id_users": idUsers, "nama": nama, "no_hp": noHp, "tgl_lahir": tglLahir});
+    Dio dio = Dio();
+    dio.options.headers['x-username'] = xusername;
+    dio.options.headers['x-password'] = xpassword;
+    if (kDebugMode) print("ENDPOINT URL : $url");
+    final response = await dio.post(url, data: formData);
+    if (response.data is String) return jsonDecode(response.data);
+    return response.data;
+  }
+
+  static Future<dynamic> logoutMedfo(String token, String url, int idUsers) async {
+    FormData formData = FormData.fromMap({"token": token, "id_users": idUsers});
+    Dio dio = Dio();
+    dio.options.headers['x-username'] = xusername;
+    dio.options.headers['x-password'] = xpassword;
+    if (kDebugMode) print("ENDPOINT URL : $url");
+    final response = await dio.post(url, data: formData);
+    if (response.data is String) return jsonDecode(response.data);
+    return response.data;
+  }
+
+  static Future<dynamic> aktivasiMobileInfo(String url, String phone, String userid, String password) async {
+    FormData formData = FormData.fromMap({"phone": phone, "userid": userid, "password": password});
+    print(formData.fields);
+    Dio dio = Dio();
+    dio.options.headers['x-username'] = xusername;
+    dio.options.headers['x-password'] = xpassword;
     if (kDebugMode) {
       print("ENDPOINT URL : $url");
       print("REQUEST AKTIVASI MOBILE INFO BODY : $body");

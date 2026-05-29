@@ -41,29 +41,40 @@ class GantiMPINNotifier extends ChangeNotifier {
 
   final keyForm = GlobalKey<FormState>();
 
-  cek() {
-    if (keyForm.currentState!.validate()) {
-      DialogCustom().showLoading(context);
-      AuthRepository.gantiPassword(
+  Future<void> cek() async {
+    if (!keyForm.currentState!.validate()) return;
+    if (mpinBaru.text.trim() != mpinKonfirmasi.text.trim()) {
+      CustomDialog.messageResponse(context, 'Konfirmasi password tidak cocok');
+      return;
+    }
+    if (!context.mounted) return;
+    DialogCustom().showLoading(context);
+    try {
+      final e = await AuthRepository.gantiPassword(
         token,
         NetworkURL.gantiPassword(),
         users!.usersId,
         mpinlama.text.trim(),
         mpinBaru.text.trim(),
-      ).then((e) {
-        Navigator.pop(context);
-        if (e['value'] == 1) {
-          Pref().remove();
-          Navigator.pushAndRemoveUntil(
-            context,
-            CupertinoPageRoute(builder: (context) => LoginPage()),
-            (route) => false,
-          );
-          CustomDialog.messageResponse(context, e['message']);
-        } else {
-          CustomDialog.messageResponse(context, e['message']);
-        }
-      });
+      );
+      if (!context.mounted) return;
+      Navigator.pop(context);
+      if (e['value'] == 1) {
+        CustomDialog.messageResponse(context, e['message']);
+        await Pref().remove();
+        if (!context.mounted) return;
+        Navigator.pushAndRemoveUntil(
+          context,
+          CupertinoPageRoute(builder: (_) => const LoginPage()),
+          (route) => false,
+        );
+      } else {
+        CustomDialog.messageResponse(context, e['message']);
+      }
+    } catch (_) {
+      if (!context.mounted) return;
+      Navigator.pop(context);
+      CustomDialog.messageResponse(context, 'Terjadi kesalahan, coba lagi');
     }
   }
 }

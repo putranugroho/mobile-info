@@ -1,12 +1,8 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:mobile_info/module/auth/login_page.dart';
 import 'package:mobile_info/module/menu_page/menu_page.dart';
 import 'package:mobile_info/pref/pref.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:go_router/go_router.dart';
-import 'package:http/http.dart' as http;
 
 class SplashScreenNotifier extends ChangeNotifier {
   final BuildContext context;
@@ -15,31 +11,22 @@ class SplashScreenNotifier extends ChangeNotifier {
     checkAuth();
   }
 
-  Future<void> logout() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.clear();
-
-    Navigator.pushAndRemoveUntil(
-      context,
-      CupertinoPageRoute(builder: (context) => LoginPage()),
-      (route) => false,
-    );
-  }
-
   Future<void> checkAuth() async {
-    Pref().getUsers().then((value) {
-      value.id != 0
-          ? Navigator.pushAndRemoveUntil(
-              context,
-              CupertinoPageRoute(builder: (context) => MenuPage()),
-              (route) => false,
-            )
-          : Navigator.pushAndRemoveUntil(
-              context,
-              CupertinoPageRoute(builder: (context) => LoginPage()),
-              (route) => false,
-            );
-      ;
-    });
+    await Future.delayed(const Duration(seconds: 2));
+    final user = await Pref().getUsers();
+    if (!context.mounted) return;
+    if (user.id != 0) {
+      Navigator.pushAndRemoveUntil(
+        context,
+        CupertinoPageRoute(builder: (_) => const MenuPage()),
+        (route) => false,
+      );
+    } else {
+      Navigator.pushAndRemoveUntil(
+        context,
+        CupertinoPageRoute(builder: (_) => const LoginPage()),
+        (route) => false,
+      );
+    }
   }
 }

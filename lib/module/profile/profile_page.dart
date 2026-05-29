@@ -1,12 +1,8 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:mobile_info/module/profile/edit_profile_page.dart';
 import 'package:mobile_info/module/profile/ganti_mpin/ganti_mpin_page.dart';
 import 'package:mobile_info/module/profile/profile_notifier.dart';
-import 'package:mobile_info/utils/colors.dart';
 import 'package:provider/provider.dart';
-
-import '../../network/network.dart';
-import '../../utils/pro_shimmer.dart';
 
 class ProfilePage extends StatelessWidget {
   const ProfilePage({super.key});
@@ -131,13 +127,32 @@ class ProfilePage extends StatelessWidget {
                     InkWell(
                       onTap: () => Navigator.push(
                         context,
+                        MaterialPageRoute(builder: (_) => const EditProfilePage()),
+                      ).then((_) => value.getProfile()),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(vertical: 8),
+                        child: const Row(
+                          children: [
+                            Icon(Icons.edit_outlined, size: 20),
+                            SizedBox(width: 12),
+                            Text("Edit Profil"),
+                            Spacer(),
+                            Icon(Icons.arrow_forward_ios, size: 15),
+                          ],
+                        ),
+                      ),
+                    ),
+                    const Divider(),
+                    InkWell(
+                      onTap: () => Navigator.push(
+                        context,
                         MaterialPageRoute(
                           builder: (context) => const GantiMPINPage(),
                         ),
                       ),
                       child: Container(
-                        padding: EdgeInsets.symmetric(vertical: 8),
-                        child: Row(
+                        padding: const EdgeInsets.symmetric(vertical: 8),
+                        child: const Row(
                           children: [
                             Icon(Icons.lock, size: 20),
                             SizedBox(width: 12),

@@ -1,0 +1,45 @@
+name: Flutter Android CI
+
+on:
+  push:
+    branches:
+      - main
+      - master
+      - develop
+
+jobs:
+  build-apk:
+    runs-on: ubuntu-latest
+
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+     
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+
+      - name: Flutter Doctor
+        run: flutter doctor -v
+
+      - name: Clean
+        run: flutter clean
+
+      - name: Pub Get
+        run: flutter pub get
+
+      - name: Build APK
+        run: |
+          flutter build apk \
+          --release \
+          --split-per-abi \
+          --verbose
+

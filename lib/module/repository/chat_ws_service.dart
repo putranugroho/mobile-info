@@ -1,36 +1,46 @@
-import 'dart:convert';
-import 'package:web_socket_channel/web_socket_channel.dart';
+import 'package:socket_io_client/socket_io_client.dart' as sio;
 
 class ChatWsService {
-  WebSocketChannel? _channel;
+  sio.Socket? _socket;
 
   void connect({
+    required String sessionId,
     required String token,
-    required void Function(Map<String, dynamic>) onMessage,
     required void Function() onConnected,
-    required void Function(dynamic error) onError,
+    required void Function(Map<String, dynamic>) onMessage,
+    required void Function(dynamic) onError,
+    void Function()? onSessionClosed,
+    void Function()? onReconnected,
   }) {
-    final uri = Uri.parse("wss://api-chat.medtrans.id/ws?token=$token");
-    _channel = WebSocketChannel.connect(uri);
+    _socket = sio.io(
+      "https://ticketing.medtrans.id",
+      sio.OptionBuilder()
+          .setTransports(['websocket', 'polling'])
+          .setAuth({'sessionId': sessionId, 'token': token})
+          .disableAutoConnect()
+          .build(),
+    );
 
-    _channel!.stream.listen((data) {
-      final payload = jsonDecode(data);
-
-      if (payload["type"] == "connected") {
-        onConnected();
-        return;
+    _socket!.onConnect((_) => onConnected());
+    _socket!.on('reconnect', (_) {
+      onReconnected?.call();
+    });
+    _socket!.on('new_message', (data) {
+      if (data is Map) {
+        onMessage(Map<String, dynamic>.from(data));
       }
+    });
+    _socket!.on('session_closed', (_) {
+      onSessionClosed?.call();
+    });
+    _socket!.onError((err) => onError(err));
+    _socket!.onConnectError((err) => onError(err));
 
-      onMessage(payload);
-    }, onError: onError);
-  }
-
-  /// 🔥 JOIN ROOM
-  void joinRoom(int roomId) {
-    _channel?.sink.add(jsonEncode({"type": "join_room", "room_id": roomId}));
+    _socket!.connect();
   }
 
   void disconnect() {
-    _channel?.sink.close();
+    _socket?.disconnect();
+    _socket = null;
   }
 }

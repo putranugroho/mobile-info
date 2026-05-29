@@ -34,11 +34,7 @@ class ProfileNotiifer extends ChangeNotifier {
   File? image;
   Uint8List? byts;
   ambilCover() async {
-    final pickedFile = await picker.pickImage(
-      source: ImageSource.gallery,
-      maxHeight: 1280,
-      maxWidth: 720,
-    );
+    final pickedFile = await picker.pickImage(source: ImageSource.gallery, maxHeight: 1280, maxWidth: 720);
     if (pickedFile != null) {
       image = File(pickedFile.path);
       notifyListeners();
@@ -56,12 +52,7 @@ class ProfileNotiifer extends ChangeNotifier {
 
   upload() async {
     DialogCustom().showLoading(context);
-    AuthRepository.gantiPhoto(
-      token,
-      NetworkURL.gantiPhoto(),
-      users!.id,
-      image,
-    ).then((value) {
+    AuthRepository.gantiPhoto(token, NetworkURL.gantiPhoto(), users!.id, image).then((value) {
       Navigator.pop(context);
       if (value['value'] == 1) {
         // Pref().simpanPhoto(value['image']);
@@ -114,12 +105,26 @@ class ProfileNotiifer extends ChangeNotifier {
     );
   }
 
-  keluar() {
-    Pref().remove();
-    Navigator.pushAndRemoveUntil(
-      context,
-      MaterialPageRoute(builder: (context) => const LoginPage()),
-      (route) => false,
-    );
+  Future<void> keluar() async {
+    try {
+      final currentUser = users ?? await Pref().getUsers();
+
+      await AuthRepository.logoutMobileInfo(
+        endpoint: NetworkURL.logout(),
+        userId: currentUser.id,
+        username: currentUser.username,
+        deviceId: currentUser.loginDeviceId,
+        sessionToken: currentUser.sessionToken,
+        bprId: currentUser.bprId,
+      );
+    } catch (e) {
+      debugPrint("ERROR LOGOUT MOBILE INFO: $e");
+    }
+
+    await Pref().remove();
+
+    if (!context.mounted) return;
+
+    Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => const LoginPage()), (route) => false);
   }
 }

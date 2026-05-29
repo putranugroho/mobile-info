@@ -1,4 +1,4 @@
-// import 'package:device_info_plus/device_info_plus.dart';
+import 'package:flutter/foundation.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -70,6 +70,22 @@ class LoginNotifier extends ChangeNotifier {
 
   // var deviceData = <String, dynamic>{};
 
+  String getDeviceId() {
+    if (kIsWeb) {
+      return "web-${Uri.base.host}";
+    }
+
+    return "mobile-${usersId.text.trim()}";
+  }
+
+  String getDeviceName() {
+    if (kIsWeb) {
+      return "Flutter Web";
+    }
+
+    return "Mobile Device";
+  }
+
   TextEditingController usersId = TextEditingController();
   TextEditingController password = TextEditingController();
   final keyForm = GlobalKey<FormState>();
@@ -89,18 +105,35 @@ class LoginNotifier extends ChangeNotifier {
 
   simpan() async {
     DialogCustom().showLoading(context);
-    AuthRepository.login(token, NetworkURL.login(), usersId.text.trim(), password.text.trim(), fcmToken!).then((value) async {
+
+    try {
+      final value = await AuthRepository.login(
+        token,
+        NetworkURL.login(),
+        usersId.text.trim(),
+        password.text.trim(),
+        fcmToken ?? '',
+        deviceId: getDeviceId(),
+        deviceName: getDeviceName(),
+      );
+
       Navigator.pop(context);
-      if (value['value'] == 1) {
-        UsersModel users = UsersModel.fromJson(value);
-        Pref().simpan(users);
+
+      final Map<String, dynamic> body = value is Map ? Map<String, dynamic>.from(value) : <String, dynamic>{};
+
+      if (body['value'] == 1 || body['code'] == '000' || body['status'] == true) {
+        UsersModel users = UsersModel.fromJson(body);
+        await Pref().simpan(users);
         await Pref().setSplashShownAfterLogin(false);
-        // await AuthService.setLoggedIn(true);
+
         Navigator.pushAndRemoveUntil(context, CupertinoPageRoute(builder: (context) => MenuPage()), (route) => false);
       } else {
-        CustomDialog.messageResponse(context, value['message']);
+        CustomDialog.messageResponse(context, '${body['message'] ?? 'Login gagal'}');
       }
-    });
+    } catch (e) {
+      Navigator.pop(context);
+      CustomDialog.messageResponse(context, "Login gagal: $e");
+    }
   }
 
   aktivasiAkun() {

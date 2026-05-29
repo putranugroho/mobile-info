@@ -6,26 +6,53 @@ import 'package:flutter/foundation.dart';
 import 'package:mobile_info/network/network.dart';
 
 class AuthRepository {
-  static Future<dynamic> login(String token, String url, String username, String password, String fcmToken) async {
-    FormData formData = FormData.fromMap({"token": token, "username": username, "password": password, "fcmToken": fcmToken});
+  static dynamic _decodeResponse(dynamic data) {
+    if (data is String) {
+      return jsonDecode(data);
+    }
+
+    return data;
+  }
+
+  static Future<dynamic> login(
+    String token,
+    String url,
+    String username,
+    String password,
+    String fcmToken, {
+    String deviceId = '',
+    String deviceName = '',
+    String bprId = '',
+  }) async {
     Dio dio = Dio();
+
     dio.options.headers['x-username'] = xusername;
     dio.options.headers['x-password'] = xpassword;
+    dio.options.headers['api-key'] = '123';
+    dio.options.headers['Content-Type'] = 'application/json';
+
+    final body = {
+      "username": username,
+      "password": password,
+      "fcmToken": fcmToken,
+      "device_id": deviceId,
+      "device_name": deviceName,
+      "bpr_id": bprId,
+    };
+
     if (kDebugMode) {
       print("ENDPOINT URL : $url");
+      print("REQUEST LOGIN BODY : $body");
     }
-    final response = await dio.post(url, data: formData);
+
+    final response = await dio.post(url, data: body);
+
     if (kDebugMode) {
       print("RESPONSE STATUS CODE : ${response.statusCode}");
+      print("RESPONSE DATA LOGIN : ${response.data}");
     }
-    if (response.statusCode == 200) {
-      if (kDebugMode) {
-        print("RESPONSE DATA LOGIN : ${response.data}");
-      }
-      return jsonDecode(response.data);
-    } else {
-      return jsonDecode(response.data);
-    }
+
+    return _decodeResponse(response.data);
   }
 
   static Future<dynamic> post(String url, Map<String, dynamic> body) async {
@@ -214,47 +241,53 @@ class AuthRepository {
   }
 
   static Future<dynamic> validasiKtp(String token, String url, String ktp, String bprId, String noHp) async {
-    FormData formData = FormData.fromMap({"token": token, "no_id": ktp, "bpr_id": bprId, "no_hp": noHp});
     Dio dio = Dio();
+
     dio.options.headers['x-username'] = xusername;
     dio.options.headers['x-password'] = xpassword;
+    dio.options.headers['api-key'] = '123';
+    dio.options.headers['Content-Type'] = 'application/json';
+
+    final body = {"token": token, "no_id": ktp, "bpr_id": bprId, "no_hp": noHp};
+
     if (kDebugMode) {
       print("ENDPOINT URL : $url");
+      print("REQUEST VALIDASI KTP BODY : $body");
     }
-    final response = await dio.post(url, data: formData);
+
+    final response = await dio.post(url, data: body);
+
     if (kDebugMode) {
       print("RESPONSE STATUS CODE : ${response.statusCode}");
+      print("RESPONSE DATA VALIDASI KTP : ${response.data}");
     }
-    if (response.statusCode == 200) {
-      if (kDebugMode) {
-        print("RESPONSE DATA LOGIN : ${response.data}");
-      }
-      return jsonDecode(response.data);
-    } else {
-      return jsonDecode(response.data);
-    }
+
+    return _decodeResponse(response.data);
   }
 
-  static Future<dynamic> verifyOtp(String token, String url, String phone_number, String otp) async {
-    FormData formData = FormData.fromMap({"token": token, "phone_number": phone_number, "otp": otp});
+  static Future<dynamic> verifyOtp(String token, String url, String phoneNumber, String otp) async {
     Dio dio = Dio();
+
     dio.options.headers['x-username'] = xusername;
     dio.options.headers['x-password'] = xpassword;
+    dio.options.headers['api-key'] = '123';
+    dio.options.headers['Content-Type'] = 'application/json';
+
+    final body = {"token": token, "phone_number": phoneNumber, "otp": otp};
+
     if (kDebugMode) {
       print("ENDPOINT URL : $url");
+      print("REQUEST VERIFY OTP BODY : $body");
     }
-    final response = await dio.post(url, data: formData);
+
+    final response = await dio.post(url, data: body);
+
     if (kDebugMode) {
       print("RESPONSE STATUS CODE : ${response.statusCode}");
+      print("RESPONSE DATA VERIFY OTP : ${response.data}");
     }
-    if (response.statusCode == 200) {
-      if (kDebugMode) {
-        print("RESPONSE DATA LOGIN : ${response.data}");
-      }
-      return jsonDecode(response.data);
-    } else {
-      return jsonDecode(response.data);
-    }
+
+    return _decodeResponse(response.data);
   }
 
   static Future<dynamic> gantimpinIbpr(String token, String url, String bprId, String noHp, String noRek, String mpinLama, String mpinBaru) async {
@@ -356,26 +389,104 @@ class AuthRepository {
     }
   }
 
-  static Future<dynamic> aktivasiMobileInfo(String url, String phone, String userid, String password) async {
-    FormData formData = FormData.fromMap({"phone": phone, "userid": userid, "password": password});
-    print(formData.fields);
+  static Future<dynamic> aktivasiMobileInfo(String url, String phone, String userid, String password, {String bprId = ''}) async {
     Dio dio = Dio();
+
     dio.options.headers['x-username'] = xusername;
     dio.options.headers['x-password'] = xpassword;
+    dio.options.headers['api-key'] = '123';
+    dio.options.headers['Content-Type'] = 'application/json';
+
+    final body = {"phone": phone, "userid": userid, "password": password, "bpr_id": bprId};
+
     if (kDebugMode) {
       print("ENDPOINT URL : $url");
+      print("REQUEST AKTIVASI MOBILE INFO BODY : $body");
     }
-    final response = await dio.post(url, data: formData);
+
+    final response = await dio.post(url, data: body);
+
     if (kDebugMode) {
       print("RESPONSE STATUS CODE : ${response.statusCode}");
+      print("RESPONSE DATA AKTIVASI MOBILE INFO : ${response.data}");
     }
-    if (response.statusCode == 200) {
-      if (kDebugMode) {
-        print("RESPONSE DATA LOGIN : ${response.data}");
-      }
-      return jsonDecode(response.data);
-    } else {
-      return jsonDecode(response.data);
+
+    return _decodeResponse(response.data);
+  }
+
+  static Future<dynamic> logoutMobileInfo({
+    required String endpoint,
+    required dynamic userId,
+    required String username,
+    required String deviceId,
+    required String sessionToken,
+    required String bprId,
+  }) async {
+    Dio dio = Dio();
+
+    dio.options.headers['x-username'] = xusername;
+    dio.options.headers['x-password'] = xpassword;
+    dio.options.headers['api-key'] = '123';
+    dio.options.headers['Content-Type'] = 'application/json';
+
+    final body = {
+      "user_id": int.tryParse('$userId') ?? 0,
+      "username": username,
+      "device_id": deviceId,
+      "session_token": sessionToken,
+      "bpr_id": bprId,
+    };
+
+    if (kDebugMode) {
+      print("ENDPOINT URL : $endpoint");
+      print("REQUEST LOGOUT BODY : $body");
     }
+
+    final response = await dio.post(endpoint, data: body);
+
+    if (kDebugMode) {
+      print("RESPONSE STATUS CODE : ${response.statusCode}");
+      print("RESPONSE DATA LOGOUT : ${response.data}");
+    }
+
+    return _decodeResponse(response.data);
+  }
+
+  static Future<dynamic> sessionPingMobileInfo({
+    required String endpoint,
+    required dynamic userId,
+    required String username,
+    required String deviceId,
+    required String sessionToken,
+    required String bprId,
+  }) async {
+    Dio dio = Dio();
+
+    dio.options.headers['x-username'] = xusername;
+    dio.options.headers['x-password'] = xpassword;
+    dio.options.headers['api-key'] = '123';
+    dio.options.headers['Content-Type'] = 'application/json';
+
+    final body = {
+      "user_id": int.tryParse('$userId') ?? 0,
+      "username": username,
+      "device_id": deviceId,
+      "session_token": sessionToken,
+      "bpr_id": bprId,
+    };
+
+    if (kDebugMode) {
+      print("ENDPOINT URL : $endpoint");
+      print("REQUEST SESSION PING BODY : $body");
+    }
+
+    final response = await dio.post(endpoint, data: body);
+
+    if (kDebugMode) {
+      print("RESPONSE STATUS CODE : ${response.statusCode}");
+      print("RESPONSE DATA SESSION PING : ${response.data}");
+    }
+
+    return _decodeResponse(response.data);
   }
 }

@@ -110,20 +110,73 @@ class HomeNotifier extends ChangeNotifier {
     }
   }
 
-  void logOutUser() async {
-    Pref().remove();
+  Future<void> logOutUser() async {
+    try {
+      final currentUser = users ?? await Pref().getUsers();
+
+      await AuthRepository.logoutMobileInfo(
+        endpoint: NetworkURL.logout(),
+        userId: currentUser.id,
+        username: currentUser.username,
+        deviceId: currentUser.loginDeviceId,
+        sessionToken: currentUser.sessionToken,
+        bprId: currentUser.bprId,
+      );
+    } catch (e) {
+      debugPrint("ERROR TIMEOUT LOGOUT MOBILE INFO: $e");
+    }
+
+    await Pref().remove();
+
+    if (!context.mounted) return;
+
     Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => const LoginPage()), (route) => false);
+
     _rootTimer?.cancel();
+  }
+
+  DateTime? _lastSessionPingAt;
+
+  Future<void> pingSessionIfNeeded() async {
+    final now = DateTime.now();
+
+    if (_lastSessionPingAt != null && now.difference(_lastSessionPingAt!).inSeconds < 120) {
+      return;
+    }
+
+    _lastSessionPingAt = now;
+
+    try {
+      final currentUser = users ?? await Pref().getUsers();
+
+      final value = await AuthRepository.sessionPingMobileInfo(
+        endpoint: NetworkURL.sessionPing(),
+        userId: currentUser.id,
+        username: currentUser.username,
+        deviceId: currentUser.loginDeviceId,
+        sessionToken: currentUser.sessionToken,
+        bprId: currentUser.bprId,
+      );
+
+      final body = value is Map<String, dynamic> ? value : {};
+
+      if (body['status'] == false && body['code'] == '401') {
+        await logOutUser();
+      }
+    } catch (e) {
+      debugPrint("ERROR SESSION PING: $e");
+    }
   }
 
   void handleUserInteraction([_]) {
     if (_rootTimer != null && !_rootTimer!.isActive) {
-      // This means the user has been logged out
       return;
     }
-    _rootTimer?.cancel();
 
+    _rootTimer?.cancel();
     initializeTimer();
+
+    pingSessionIfNeeded();
   }
 
   int page = 0;

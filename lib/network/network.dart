@@ -10,7 +10,7 @@ const photo = "https://infoservices.medtrans.id/photo";
 
 class NetworkURL {
   static String login() {
-    return "$url_biz/user-medfo-login";
+    return "$url_medfo/mobile-info/login";
   }
 
   static String listBpr() {
@@ -18,19 +18,27 @@ class NetworkURL {
   }
 
   static String validasiKtp() {
-    return "$url_biz/user-medfo-aktivasi";
+    return "$url_medfo/mobile-info/aktivasi/check";
   }
 
   static String verifyOtp() {
-    return "$url_biz/user-medfo-verify-otp";
+    return "$url_medfo/mobile-info/aktivasi/verify-otp";
+  }
+
+  static String aktivasiAkun() {
+    return "$url_medfo/mobile-info/aktivasi/submit";
+  }
+
+  static String logout() {
+    return "$url_medfo/mobile-info/logout";
+  }
+
+  static String sessionPing() {
+    return "$url_medfo/mobile-info/session/ping";
   }
 
   static String gantiPassword() {
     return "$url_biz/user-medfo-ganti-password";
-  }
-
-  static String aktivasiAkun() {
-    return "$url_biz/aktivasi-medfo";
   }
 
   static String generatedMpin() {

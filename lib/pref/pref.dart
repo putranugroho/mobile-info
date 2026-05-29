@@ -51,23 +51,33 @@ class Pref {
     pref.setString(Pref.bprLogo, users.bprLogo);
     pref.setString(Pref.bprNama, users.bprNama);
     pref.setString(Pref.createdAt, users.createdAt);
+    await pref.setString('session_token', users.sessionToken);
+    await pref.setString('login_device_id', users.loginDeviceId);
+    await pref.setString('login_device_name', users.loginDeviceName);
+    await pref.setString('login_expired_at', users.loginExpiredAt);
   }
 
   Future<UsersModel> getUsers() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
     UsersModel users = UsersModel(
-      id: pref.getInt(Pref.id) ?? 0,
-      noCif: pref.getString(Pref.noCif) ?? "",
-      usersId: pref.getString(Pref.usersId) ?? "",
-      bprId: pref.getString(Pref.bprId) ?? "",
-      nama: pref.getString(Pref.nama) ?? "",
-      perbarindo: pref.getString(Pref.perbarindo) ?? "",
-      tglLahir: pref.getString(Pref.tglLahir) ?? "",
-      noIdentitas: pref.getString(Pref.noIdentitas) ?? "",
-      nomorPonsel: pref.getString(Pref.nomorPonsel) ?? "",
-      bprLogo: pref.getString(Pref.bprLogo) ?? "",
-      bprNama: pref.getString(Pref.bprNama) ?? "",
-      createdAt: pref.getString(Pref.createdAt) ?? "",
+      id: pref.getInt('id') ?? 0,
+      noCif: pref.getString('no_cif') ?? '',
+      usersId: pref.getString('users_id') ?? '',
+      bprId: pref.getString('bpr_id') ?? '',
+      nama: pref.getString('nama') ?? '',
+      tglLahir: pref.getString('tgl_lahir') ?? '',
+      noIdentitas: pref.getString('no_identitas') ?? '',
+      nomorPonsel: pref.getString('nomor_ponsel') ?? '',
+      bprLogo: pref.getString('bpr_logo') ?? '',
+      bprNama: pref.getString('bpr_nama') ?? '',
+      perbarindo: pref.getString('perbarindo') ?? '',
+      createdAt: pref.getString('created_at') ?? '',
+
+      // tambahan baru
+      sessionToken: pref.getString('session_token') ?? '',
+      loginDeviceId: pref.getString('login_device_id') ?? '',
+      loginDeviceName: pref.getString('login_device_name') ?? '',
+      loginExpiredAt: pref.getString('login_expired_at') ?? '',
     );
     return users;
   }

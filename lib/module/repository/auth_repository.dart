@@ -489,4 +489,59 @@ class AuthRepository {
 
     return _decodeResponse(response.data);
   }
+
+  static Future<dynamic> logoutMedfo(String token, String url, dynamic idUsers) async {
+    final formData = FormData.fromMap({"token": token, "id_users": idUsers, "id": idUsers});
+
+    final dio = Dio();
+    dio.options.headers['x-username'] = xusername;
+    dio.options.headers['x-password'] = xpassword;
+
+    if (kDebugMode) {
+      print("ENDPOINT URL LOGOUT MEDFO : $url");
+      print("REQUEST LOGOUT MEDFO : ${formData.fields}");
+    }
+
+    final response = await dio.post(url, data: formData);
+
+    if (kDebugMode) {
+      print("RESPONSE LOGOUT MEDFO STATUS : ${response.statusCode}");
+      print("RESPONSE LOGOUT MEDFO DATA : ${response.data}");
+    }
+
+    return _decodeResponse(response.data);
+  }
+
+  static Future<dynamic> lupaSandiMedfo(String token, String url, String noHp, String bprId) async {
+    FormData formData = FormData.fromMap({"token": token, "no_hp": noHp, "bpr_id": bprId});
+    Dio dio = Dio();
+    dio.options.headers['x-username'] = xusername;
+    dio.options.headers['x-password'] = xpassword;
+    if (kDebugMode) print("ENDPOINT URL : $url");
+    final response = await dio.post(url, data: formData);
+    if (response.data is String) return jsonDecode(response.data);
+    return response.data;
+  }
+
+  static Future<dynamic> updateSandiMedfo(String token, String url, String noHp, String sandiBaru) async {
+    FormData formData = FormData.fromMap({"token": token, "no_hp": noHp, "sandi_baru": sandiBaru});
+    Dio dio = Dio();
+    dio.options.headers['x-username'] = xusername;
+    dio.options.headers['x-password'] = xpassword;
+    if (kDebugMode) print("ENDPOINT URL : $url");
+    final response = await dio.post(url, data: formData);
+    if (response.data is String) return jsonDecode(response.data);
+    return response.data;
+  }
+
+  static Future<dynamic> updateProfileMedfo(String token, String url, int idUsers, String nama, String noHp, String tglLahir) async {
+    FormData formData = FormData.fromMap({"token": token, "id_users": idUsers, "nama": nama, "no_hp": noHp, "tgl_lahir": tglLahir});
+    Dio dio = Dio();
+    dio.options.headers['x-username'] = xusername;
+    dio.options.headers['x-password'] = xpassword;
+    if (kDebugMode) print("ENDPOINT URL : $url");
+    final response = await dio.post(url, data: formData);
+    if (response.data is String) return jsonDecode(response.data);
+    return response.data;
+  }
 }

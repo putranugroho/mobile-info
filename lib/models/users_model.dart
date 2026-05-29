@@ -15,10 +15,10 @@ class UsersModel {
     required this.bprNama,
     required this.perbarindo,
     required this.createdAt,
-    required this.sessionToken,
-    required this.loginDeviceId,
-    required this.loginDeviceName,
-    required this.loginExpiredAt,
+    this.sessionToken = '',
+    this.loginDeviceId = '',
+    this.loginDeviceName = '',
+    this.loginExpiredAt = '',
   });
 
   final int id;

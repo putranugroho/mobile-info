@@ -51,13 +51,18 @@ class LoanApplicationRepository {
     return data.map((e) => LoanJaminanModel.fromJson(Map<String, dynamic>.from(e))).where((e) => e.status == "A" && e.kdJaminan.isNotEmpty).toList();
   }
 
-  static Future<LoanSimulationResultModel> simulasiTagihan({required int nilaiPinjaman, required int jangkaWaktu, required double rate}) async {
+  static Future<LoanSimulationResultModel> simulasiTagihan({
+    required String bprId,
+    required int nilaiPinjaman,
+    required int jangkaWaktu,
+    required double rate,
+  }) async {
     final dio = Dio();
     dio.options.headers['api-key'] = '123';
 
     final response = await dio.post(
       NetworkURL.simulasiTagihanPinjaman(),
-      data: {"nilai_pinjaman": nilaiPinjaman, "jangka_waktu": jangkaWaktu, "rate": rate, "jenis_rate": "F"},
+      data: {"bpr_id": bprId, "nilai_pinjaman": nilaiPinjaman, "jangka_waktu": jangkaWaktu, "rate": rate, "jenis_rate": "F"},
     );
 
     final res = response.data is String ? jsonDecode(response.data) : response.data;
@@ -157,13 +162,14 @@ class LoanApplicationRepository {
     return LoanNotificationResultModel(totalRecipient: recipients.length, successCount: successCount, failedCount: failedCount);
   }
 
-  static Future<List<LoanApplicationStatusModel>> inquiryStatusPinjaman({required String nama, required String noHp}) async {
+  static Future<List<LoanApplicationStatusModel>> inquiryStatusPinjaman({required String bprId, required String nama, required String noHp}) async {
     final dio = Dio();
     dio.options.headers['api-key'] = '123';
 
     final response = await dio.post(
       NetworkURL.inquiryPermohonanPinjaman(),
       data: {
+        "bpr_id": bprId,
         "filter": {
           "status": "",
           "nama": nama,

@@ -82,7 +82,7 @@ class LupaSandiNotifier extends ChangeNotifier {
     try {
       final value = await AuthRepository.verifyOtp(
         token,
-        NetworkURL.verifyOtpWebService(),
+        NetworkURL.verifyOtp(),
         _phoneNormalized,
         otp,
       );

@@ -45,7 +45,7 @@ class LoanApplicationStatusNotifier extends ChangeNotifier {
     try {
       final users = await Pref().getUsers();
 
-      listStatus = await LoanApplicationRepository.inquiryStatusPinjaman(nama: users.nama, noHp: users.nomorPonsel);
+      listStatus = await LoanApplicationRepository.inquiryStatusPinjaman(bprId: users.bprId, nama: users.nama, noHp: users.nomorPonsel);
     } catch (e) {
       listStatus = [];
       errorMessage = "$e";
@@ -156,7 +156,8 @@ class LoanSimulationNotifier extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final result = await LoanApplicationRepository.simulasiTagihan(nilaiPinjaman: nilai, jangkaWaktu: jk, rate: sukuBunga);
+      final users = await Pref().getUsers();
+      final result = await LoanApplicationRepository.simulasiTagihan(bprId: users.bprId, nilaiPinjaman: nilai, jangkaWaktu: jk, rate: sukuBunga);
 
       cicilanController.text = LoanNominalHelper.format(result.cicilan.toString());
       totalController.text = LoanNominalHelper.format(result.totalCicilan.toString());
@@ -417,6 +418,7 @@ class LoanApplicationNotifier extends ChangeNotifier {
 
     try {
       final result = await LoanApplicationRepository.simulasiTagihan(
+        bprId: (await Pref().getUsers()).bprId,
         nilaiPinjaman: LoanNominalHelper.parseInt(nilaiPinjamanController.text),
         jangkaWaktu: int.tryParse(jkWaktuController.text) ?? 0,
         rate: sukuBunga,

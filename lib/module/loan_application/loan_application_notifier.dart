@@ -193,7 +193,7 @@ class LoanApplicationNotifier extends ChangeNotifier {
   }
 
   final formKey = GlobalKey<FormState>();
-
+  final noCifController = TextEditingController();
   final noIdController = TextEditingController();
   final namaController = TextEditingController();
   final noHpController = TextEditingController();
@@ -244,6 +244,7 @@ class LoanApplicationNotifier extends ChangeNotifier {
 
       if (bprId.isEmpty) throw Exception("BPR ID tidak ditemukan.");
 
+      noCifController.text = users.noCif;
       noIdController.text = users.noIdentitas;
       namaController.text = users.nama;
       noHpController.text = users.nomorPonsel;
@@ -309,6 +310,12 @@ class LoanApplicationNotifier extends ChangeNotifier {
 
   String? requiredValidator(String? value, String label) {
     if (value == null || value.trim().isEmpty) return "$label wajib diisi";
+    return null;
+  }
+
+  String? validateNoCif(String? value) {
+    final text = value?.trim() ?? "";
+    if (text.isEmpty) return "No CIF wajib diisi";
     return null;
   }
 
@@ -439,6 +446,7 @@ class LoanApplicationNotifier extends ChangeNotifier {
   LoanApplicationFormModel buildFormModel() {
     return LoanApplicationFormModel(
       noId: noIdController.text.trim(),
+      noCif: noCifController.text.trim(),
       nama: namaController.text.trim(),
       noHp: noHpController.text.trim(),
       alamat: alamatController.text.trim(),
@@ -486,6 +494,10 @@ class LoanApplicationNotifier extends ChangeNotifier {
 
       if (bprId.isEmpty) throw Exception("BPR ID tidak ditemukan.");
 
+      if (noCifController.text.trim().isEmpty) {
+        throw Exception("No CIF tidak ditemukan.");
+      }
+
       final form = buildFormModel();
 
       await LoanApplicationRepository.submitLoanApplication(bprId: bprId, form: form);
@@ -516,6 +528,7 @@ class LoanApplicationNotifier extends ChangeNotifier {
 
   @override
   void dispose() {
+    noCifController.dispose();
     noIdController.dispose();
     namaController.dispose();
     noHpController.dispose();

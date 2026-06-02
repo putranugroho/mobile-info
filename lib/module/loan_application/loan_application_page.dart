@@ -528,6 +528,7 @@ class LoanApplicationFormPage extends StatelessWidget {
                     ),
 
                     _formSectionTitle("Data Pemohon"),
+                    _formInput("No CIF", value.noCifController, validator: value.validateNoCif, readOnly: true),
                     _formInput(
                       "No Identitas",
                       value.noIdController,

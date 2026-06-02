@@ -63,6 +63,7 @@ class LoanSimulationResultModel {
 class LoanApplicationFormModel {
   final String noId;
   final String nama;
+  final String noCif;
   final String noHp;
   final String alamat;
   final String jaminan;
@@ -76,6 +77,7 @@ class LoanApplicationFormModel {
   LoanApplicationFormModel({
     required this.noId,
     required this.nama,
+    required this.noCif,
     required this.noHp,
     required this.alamat,
     required this.jaminan,
@@ -120,6 +122,7 @@ class LoanApplicationStatusModel {
   final int id;
   final String noId;
   final String nama;
+  final String noCif;
   final String noHp;
   final String alamat;
   final String jaminan;
@@ -137,6 +140,7 @@ class LoanApplicationStatusModel {
   LoanApplicationStatusModel({
     required this.id,
     required this.noId,
+    required this.noCif,
     required this.nama,
     required this.noHp,
     required this.alamat,
@@ -158,6 +162,7 @@ class LoanApplicationStatusModel {
       id: int.tryParse("${json['id'] ?? 0}") ?? 0,
       noId: "${json['no_id'] ?? ''}",
       nama: "${json['nama'] ?? ''}",
+      noCif: "${json['no_cif'] ?? ''}",
       noHp: "${json['no_hp'] ?? ''}",
       alamat: "${json['alamat'] ?? ''}",
       jaminan: "${json['jaminan'] ?? ''}",

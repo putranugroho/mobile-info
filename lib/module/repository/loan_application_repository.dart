@@ -83,6 +83,8 @@ class LoanApplicationRepository {
     final formData = FormData.fromMap({
       "bpr_id": bprId,
       "user_login": "SYSTEM",
+      "no_cif": form.noCif,
+      "cif": form.noCif,
       "term": "web",
       "no_id": form.noId,
       "nama": form.nama,

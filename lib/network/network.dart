@@ -238,7 +238,7 @@ class NetworkURL {
   }
 
   static String pushNotifPinjaman() {
-    return "$url/webServices/push_notif.php";
+    return "$url_biz/webServices/push-notif.php";
   }
 
   static String inquirySetupPinjaman() {

@@ -3,36 +3,51 @@ import 'package:mobile_info/module/bantuan/bantuan_notifier.dart';
 import 'package:mobile_info/utils/colors.dart';
 import 'package:provider/provider.dart';
 
-class BantuanPage extends StatelessWidget {
+class BantuanPage extends StatefulWidget {
   const BantuanPage({super.key});
 
   @override
+  State<BantuanPage> createState() => _BantuanPageState();
+}
+
+class _BantuanPageState extends State<BantuanPage> {
+  int _sessionKey = 0;
+
+  @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (_) => BantuanNotifier(context: context),
-      child: Consumer<BantuanNotifier>(
-        builder: (context, notifier, _) => SafeArea(
-          child: Scaffold(
-            resizeToAvoidBottomInset: true,
-            backgroundColor: Colors.grey[200],
-            body: Center(
-              child: Container(
-                width: MediaQuery.of(context).size.width > 600
-                    ? 400
-                    : MediaQuery.of(context).size.width,
-                color: Colors.white,
-                child: Column(
-                  children: [
-                    _AppBar(notifier: notifier),
-                    const Divider(height: 1),
-                    if (notifier.isLoading)
-                      const Expanded(
-                          child: Center(child: CircularProgressIndicator()))
-                    else ...[
-                      Expanded(child: _ChatList(notifier: notifier)),
-                      _InputBar(notifier: notifier),
+    return KeyedSubtree(
+      key: ValueKey(_sessionKey),
+      child: ChangeNotifierProvider(
+        create: (ctx) => BantuanNotifier(context: ctx),
+        child: Consumer<BantuanNotifier>(
+          builder: (context, notifier, _) => SafeArea(
+            child: Scaffold(
+              resizeToAvoidBottomInset: true,
+              backgroundColor: Colors.grey[200],
+              body: Center(
+                child: Container(
+                  width: MediaQuery.of(context).size.width > 600
+                      ? 400
+                      : MediaQuery.of(context).size.width,
+                  color: Colors.white,
+                  child: Column(
+                    children: [
+                      _AppBar(notifier: notifier),
+                      const Divider(height: 1),
+                      if (notifier.isLoading)
+                        const Expanded(
+                            child: Center(child: CircularProgressIndicator()))
+                      else ...[
+                        Expanded(child: _ChatList(notifier: notifier)),
+                        notifier.isSessionClosed
+                            ? _SessionClosedBar(
+                                onNewSession: () =>
+                                    setState(() => _sessionKey++),
+                              )
+                            : _InputBar(notifier: notifier),
+                      ],
                     ],
-                  ],
+                  ),
                 ),
               ),
             ),
@@ -134,8 +149,7 @@ class _ChatList extends StatelessWidget {
           alignment: isUser ? Alignment.centerRight : Alignment.centerLeft,
           child: Container(
             margin: const EdgeInsets.only(bottom: 8),
-            padding:
-                const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
             constraints: BoxConstraints(
               maxWidth: MediaQuery.of(context).size.width * 0.72,
             ),
@@ -158,6 +172,49 @@ class _ChatList extends StatelessWidget {
           ),
         );
       },
+    );
+  }
+}
+
+class _SessionClosedBar extends StatelessWidget {
+  final VoidCallback onNewSession;
+  const _SessionClosedBar({required this.onNewSession});
+
+  @override
+  Widget build(BuildContext context) {
+    return SafeArea(
+      top: false,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        decoration: BoxDecoration(
+          color: Colors.grey.shade50,
+          border: Border(top: BorderSide(color: Colors.grey.shade200)),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              "Sesi chat telah berakhir",
+              style: TextStyle(color: Colors.grey.shade600, fontSize: 13),
+            ),
+            const SizedBox(height: 8),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: onNewSession,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: colorPrimary,
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(24),
+                  ),
+                ),
+                child: const Text("Mulai Chat Baru"),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

@@ -3,7 +3,7 @@ import 'package:mobile_info/module/chat/chat_notifier.dart';
 import 'package:mobile_info/utils/colors.dart';
 import 'package:provider/provider.dart';
 
-class ChatPage extends StatelessWidget {
+class ChatPage extends StatefulWidget {
   final String noRekening;
   final String namaProduk;
 
@@ -14,64 +14,77 @@ class ChatPage extends StatelessWidget {
   });
 
   @override
+  State<ChatPage> createState() => _ChatPageState();
+}
+
+class _ChatPageState extends State<ChatPage> {
+  int _sessionKey = 0;
+
+  @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (_) => ChatNotifier(
-        context: context,
-        noRekening: noRekening,
-        namaProduk: namaProduk,
-      ),
-      child: Consumer<ChatNotifier>(
-        builder: (context, notifier, _) => Scaffold(
-          backgroundColor: Colors.white,
-          appBar: AppBar(
-            backgroundColor: colorPrimary,
-            foregroundColor: Colors.white,
-            leading: IconButton(
-              icon: const Icon(Icons.arrow_back_ios, size: 18),
-              onPressed: () => Navigator.pop(context),
+    return KeyedSubtree(
+      key: ValueKey(_sessionKey),
+      child: ChangeNotifierProvider(
+        create: (ctx) => ChatNotifier(
+          context: ctx,
+          noRekening: widget.noRekening,
+          namaProduk: widget.namaProduk,
+        ),
+        child: Consumer<ChatNotifier>(
+          builder: (context, notifier, _) => Scaffold(
+            backgroundColor: Colors.white,
+            appBar: AppBar(
+              backgroundColor: colorPrimary,
+              foregroundColor: Colors.white,
+              leading: IconButton(
+                icon: const Icon(Icons.arrow_back_ios, size: 18),
+                onPressed: () => Navigator.pop(context),
+              ),
+              title: const Text(
+                "Bantuan Rekening",
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ),
+              actions: [
+                if (!notifier.isLoading)
+                  Padding(
+                    padding: const EdgeInsets.only(right: 8),
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.circle,
+                          size: 10,
+                          color: notifier.isConnected
+                              ? Colors.greenAccent
+                              : Colors.orangeAccent,
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          notifier.isConnected ? "Online" : "Menghubungkan...",
+                          style: const TextStyle(fontSize: 12),
+                        ),
+                      ],
+                    ),
+                  ),
+              ],
             ),
-            title: const Text(
-              "Bantuan Rekening",
-              style:
-                  TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-            ),
-            actions: [
-              if (!notifier.isLoading)
-                Padding(
-                  padding: const EdgeInsets.only(right: 8),
-                  child: Row(
+            body: notifier.isLoading
+                ? const Center(child: CircularProgressIndicator())
+                : Column(
                     children: [
-                      Icon(
-                        Icons.circle,
-                        size: 10,
-                        color: notifier.isConnected
-                            ? Colors.greenAccent
-                            : Colors.orangeAccent,
-                      ),
-                      const SizedBox(width: 4),
-                      Text(
-                        notifier.isConnected
-                            ? "Online"
-                            : "Menghubungkan...",
-                        style: const TextStyle(fontSize: 12),
-                      ),
+                      _RekeningCard(
+                          noRekening: widget.noRekening,
+                          namaProduk: widget.namaProduk),
+                      const Divider(height: 1),
+                      Expanded(child: _ChatList(notifier: notifier)),
+                      notifier.isSessionClosed
+                          ? _SessionClosedBar(
+                              onNewSession: () =>
+                                  setState(() => _sessionKey++),
+                            )
+                          : _InputBar(notifier: notifier),
                     ],
                   ),
-                ),
-            ],
           ),
-          body: notifier.isLoading
-              ? const Center(child: CircularProgressIndicator())
-              : Column(
-                  children: [
-                    _RekeningCard(
-                        noRekening: noRekening, namaProduk: namaProduk),
-                    const Divider(height: 1),
-                    Expanded(child: _ChatList(notifier: notifier)),
-                    _InputBar(notifier: notifier),
-                  ],
-                ),
         ),
       ),
     );
@@ -200,6 +213,48 @@ class _ChatList extends StatelessWidget {
           ),
         );
       },
+    );
+  }
+}
+
+class _SessionClosedBar extends StatelessWidget {
+  final VoidCallback onNewSession;
+  const _SessionClosedBar({required this.onNewSession});
+
+  @override
+  Widget build(BuildContext context) {
+    return SafeArea(
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        decoration: BoxDecoration(
+          color: Colors.grey.shade50,
+          border: Border(top: BorderSide(color: Colors.grey.shade200)),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              "Sesi chat telah berakhir",
+              style: TextStyle(color: Colors.grey.shade600, fontSize: 13),
+            ),
+            const SizedBox(height: 8),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: onNewSession,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: colorPrimary,
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(24),
+                  ),
+                ),
+                child: const Text("Mulai Chat Baru"),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

@@ -15,13 +15,17 @@ class ChatWsService {
     _socket = sio.io(
       "https://ticketing.medtrans.id",
       sio.OptionBuilder()
-          .setTransports(['websocket', 'polling'])
+          .setTransports(['polling', 'websocket'])
           .setAuth({'sessionId': sessionId, 'token': token})
+          .enableForceNew()
           .disableAutoConnect()
           .build(),
     );
 
-    _socket!.onConnect((_) => onConnected());
+    _socket!.onConnect((_) {
+      _socket!.emit('user_join_session', {'sessionId': sessionId, 'token': token});
+      onConnected();
+    });
     _socket!.on('reconnect', (_) {
       onReconnected?.call();
     });

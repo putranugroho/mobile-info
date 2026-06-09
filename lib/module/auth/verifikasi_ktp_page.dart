@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:mobile_info/module/auth/verifikasi_ktp_notifier.dart';
 import 'package:mobile_info/utils/button_custom.dart';
 import 'package:mobile_info/utils/pro_shimmer.dart';
@@ -17,9 +18,7 @@ class VerifikasiKTPPage extends StatelessWidget {
             backgroundColor: Colors.grey[200],
             body: Center(
               child: Container(
-                width: MediaQuery.of(context).size.width > 600
-                    ? 400
-                    : MediaQuery.of(context).size.width,
+                width: MediaQuery.of(context).size.width > 600 ? 400 : MediaQuery.of(context).size.width,
                 decoration: const BoxDecoration(color: Colors.white),
                 child: Form(
                   key: value.keyForm,
@@ -29,20 +28,10 @@ class VerifikasiKTPPage extends StatelessWidget {
                       Container(
                         height: 50,
                         decoration: BoxDecoration(
-                          border: Border(
-                            bottom: BorderSide(
-                              width: 1,
-                              color: Colors.grey[300] ?? Colors.transparent,
-                            ),
-                          ),
+                          border: Border(bottom: BorderSide(width: 1, color: Colors.grey[300] ?? Colors.transparent)),
                         ),
                         child: Row(
-                          children: [
-                            IconButton(
-                              onPressed: () => Navigator.pop(context),
-                              icon: Icon(Icons.arrow_back_ios, size: 20),
-                            ),
-                          ],
+                          children: [IconButton(onPressed: () => Navigator.pop(context), icon: Icon(Icons.arrow_back_ios, size: 20))],
                         ),
                       ),
                       Expanded(
@@ -53,8 +42,7 @@ class VerifikasiKTPPage extends StatelessWidget {
                                 ? Container(
                                     padding: const EdgeInsets.all(16),
                                     child: const Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
+                                      crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
                                         ProShimmer(height: 10, width: 200),
                                         SizedBox(height: 4),
@@ -67,83 +55,42 @@ class VerifikasiKTPPage extends StatelessWidget {
                                   )
                                 : value.ketmu
                                 ? Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.stretch,
+                                    crossAxisAlignment: CrossAxisAlignment.stretch,
                                     children: [
-                                      Text(
-                                        "Data Ditemukan",
-                                        style: TextStyle(
-                                          fontSize: 18,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
+                                      Text("Data Ditemukan", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                                       SizedBox(height: 4),
-                                      Text(
-                                        "Silahkan cek kembali data Anda",
-                                        style: TextStyle(
-                                          fontSize: 12,
-                                          fontWeight: FontWeight.w300,
-                                        ),
-                                      ),
+                                      Text("Silahkan cek kembali data Anda", style: TextStyle(fontSize: 12, fontWeight: FontWeight.w300)),
                                       SizedBox(height: 16),
-                                      Text(
-                                        "Nama Lengkap",
-                                        style: TextStyle(fontSize: 12),
-                                      ),
+                                      Text("Nama Lengkap", style: TextStyle(fontSize: 12)),
                                       SizedBox(height: 4),
-                                      TextFormField(
-                                        enabled: false,
-                                        controller: value.namaLengkap,
-                                      ),
+                                      TextFormField(enabled: false, controller: value.namaLengkap),
                                       SizedBox(height: 16),
-                                      Text(
-                                        "Nomor Ponsel",
-                                        style: TextStyle(fontSize: 12),
-                                      ),
+                                      Text("Nomor Ponsel", style: TextStyle(fontSize: 12)),
                                       SizedBox(height: 4),
-                                      TextFormField(
-                                        enabled: false,
-                                        controller: value.nomorPonsel,
-                                      ),
+                                      TextFormField(enabled: false, controller: value.nomorPonsel),
                                       SizedBox(height: 16),
-                                      Text(
-                                        "User ID",
-                                        style: TextStyle(fontSize: 12),
-                                      ),
+                                      Text("User ID", style: TextStyle(fontSize: 12)),
                                       SizedBox(height: 4),
                                       TextFormField(controller: value.userId),
                                       SizedBox(height: 16),
-                                      Text(
-                                        "Kata Sandi",
-                                        style: TextStyle(fontSize: 12),
-                                      ),
+                                      Text("Kata Sandi", style: TextStyle(fontSize: 12)),
                                       SizedBox(height: 4),
                                       TextFormField(
                                         obscureText: value.obSecure1,
                                         decoration: InputDecoration(
                                           suffixIcon: InkWell(
                                             onTap: () => value.gantiObsecure1(),
-                                            child: Icon(
-                                              value.obSecure1 == true
-                                                  ? Icons.visibility_off
-                                                  : Icons.visibility,
-                                            ),
+                                            child: Icon(value.obSecure1 == true ? Icons.visibility_off : Icons.visibility),
                                           ),
                                         ),
                                         validator: (e) {
-                                          if (!RegExp(
-                                            ".*[0-9].*",
-                                          ).hasMatch(e ?? '')) {
+                                          if (!RegExp(".*[0-9].*").hasMatch(e ?? '')) {
                                             return 'Harus ada angka, huruf kecil dan huruf besar';
                                           }
-                                          if (!RegExp(
-                                            '.*[a-z].*',
-                                          ).hasMatch(e ?? '')) {
+                                          if (!RegExp('.*[a-z].*').hasMatch(e ?? '')) {
                                             return 'Harus ada angka, huruf kecil dan huruf besar';
                                           }
-                                          if (!RegExp(
-                                            '.*[A-Z].*',
-                                          ).hasMatch(e ?? '')) {
+                                          if (!RegExp('.*[A-Z].*').hasMatch(e ?? '')) {
                                             return 'Harus ada angka, huruf kecil dan huruf besar';
                                           }
                                           return null;
@@ -151,21 +98,14 @@ class VerifikasiKTPPage extends StatelessWidget {
                                         controller: value.kataSandi,
                                       ),
                                       SizedBox(height: 16),
-                                      Text(
-                                        "Ulangi Kata Sandi",
-                                        style: TextStyle(fontSize: 12),
-                                      ),
+                                      Text("Ulangi Kata Sandi", style: TextStyle(fontSize: 12)),
                                       SizedBox(height: 4),
                                       TextFormField(
                                         obscureText: value.obSecure2,
                                         decoration: InputDecoration(
                                           suffixIcon: InkWell(
                                             onTap: () => value.gantiObsecure2(),
-                                            child: Icon(
-                                              value.obSecure2 == true
-                                                  ? Icons.visibility_off
-                                                  : Icons.visibility,
-                                            ),
+                                            child: Icon(value.obSecure2 == true ? Icons.visibility_off : Icons.visibility),
                                           ),
                                         ),
                                         validator: (e) {
@@ -181,29 +121,13 @@ class VerifikasiKTPPage extends StatelessWidget {
                                     ],
                                   )
                                 : Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.stretch,
+                                    crossAxisAlignment: CrossAxisAlignment.stretch,
                                     children: [
-                                      Text(
-                                        "Verifikasi Akun Anda",
-                                        style: TextStyle(
-                                          fontSize: 18,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
+                                      Text("Verifikasi Akun Anda", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                                       SizedBox(height: 4),
-                                      Text(
-                                        "Lengkapi data dibawah ini",
-                                        style: TextStyle(
-                                          fontSize: 12,
-                                          fontWeight: FontWeight.w300,
-                                        ),
-                                      ),
+                                      Text("Lengkapi data dibawah ini", style: TextStyle(fontSize: 12, fontWeight: FontWeight.w300)),
                                       SizedBox(height: 16),
-                                      Text(
-                                        "Pilih BPR",
-                                        style: TextStyle(fontSize: 12),
-                                      ),
+                                      Text("Pilih BPR", style: TextStyle(fontSize: 12)),
                                       SizedBox(height: 4),
                                       DropdownButton(
                                         isExpanded: true,
@@ -213,16 +137,8 @@ class VerifikasiKTPPage extends StatelessWidget {
                                               (e) => DropdownMenuItem(
                                                 value: e,
                                                 child: Container(
-                                                  padding:
-                                                      const EdgeInsets.symmetric(
-                                                        vertical: 12,
-                                                      ),
-                                                  child: Text(
-                                                    e.namaBpr,
-                                                    maxLines: 1,
-                                                    overflow:
-                                                        TextOverflow.ellipsis,
-                                                  ),
+                                                  padding: const EdgeInsets.symmetric(vertical: 12),
+                                                  child: Text(e.namaBpr, maxLines: 1, overflow: TextOverflow.ellipsis),
                                                 ),
                                               ),
                                             )
@@ -232,30 +148,30 @@ class VerifikasiKTPPage extends StatelessWidget {
                                         },
                                       ),
                                       SizedBox(height: 16),
-                                      Text(
-                                        "No KTP",
-                                        style: TextStyle(fontSize: 12),
-                                      ),
+                                      Text("No KTP", style: TextStyle(fontSize: 12)),
                                       SizedBox(height: 4),
                                       TextFormField(
                                         keyboardType: TextInputType.number,
                                         controller: value.noKtp,
+                                        maxLength: 16,
+                                        inputFormatters: [FilteringTextInputFormatter.digitsOnly, LengthLimitingTextInputFormatter(16)],
                                         validator: (e) {
-                                          if (e!.isEmpty) {
+                                          final noKtp = e?.trim() ?? "";
+
+                                          if (noKtp.isEmpty) {
                                             return "Wajib diisi";
-                                          } else {
-                                            return null;
                                           }
+
+                                          if (noKtp.length != 16) {
+                                            return "No KTP harus 16 digit";
+                                          }
+
+                                          return null;
                                         },
-                                        decoration: InputDecoration(
-                                          hintText: "No KTP",
-                                        ),
+                                        decoration: const InputDecoration(hintText: "No KTP", counterText: ""),
                                       ),
                                       SizedBox(height: 16),
-                                      Text(
-                                        "Nomor Ponsel",
-                                        style: TextStyle(fontSize: 12),
-                                      ),
+                                      Text("Nomor Ponsel", style: TextStyle(fontSize: 12)),
                                       SizedBox(height: 4),
                                       TextFormField(
                                         keyboardType: TextInputType.phone,
@@ -267,9 +183,7 @@ class VerifikasiKTPPage extends StatelessWidget {
                                             return null;
                                           }
                                         },
-                                        decoration: InputDecoration(
-                                          hintText: "08xxxx",
-                                        ),
+                                        decoration: InputDecoration(hintText: "08xxxx"),
                                       ),
                                       SizedBox(height: 16),
                                     ],
@@ -283,9 +197,7 @@ class VerifikasiKTPPage extends StatelessWidget {
                           onTap: () {
                             value.ketmu ? value.pin() : value.cek();
                           },
-                          name: value.ketmu
-                              ? "Aktifkan User"
-                              : "Verifikasi Akun",
+                          name: value.ketmu ? "Aktifkan User" : "Verifikasi Akun",
                         ),
                       ),
                     ],

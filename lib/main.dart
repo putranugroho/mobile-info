@@ -163,6 +163,13 @@ class MyApp extends StatelessWidget {
       home: SplashScreenPage(),
       scrollBehavior: MyCustomScrollBehavior(),
       debugShowCheckedModeBanner: false,
+      theme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: const Color(0xFF9B1414),
+          primary: const Color(0xFF9B1414),
+        ),
+        useMaterial3: true,
+      ),
     );
   }
 }

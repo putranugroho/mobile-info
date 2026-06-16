@@ -13,190 +13,206 @@ class LoginPage extends StatelessWidget {
     return ChangeNotifierProvider(
       create: (_) => LoginNotifier(context: context),
       child: Consumer<LoginNotifier>(
-        builder: (context, value, child) => SafeArea(
-          child: Scaffold(
-            resizeToAvoidBottomInset: false,
-            backgroundColor: Colors.grey[200],
-            body: Center(
-              child: Container(
-                width: MediaQuery.of(context).size.width > 600
-                    ? 400
-                    : MediaQuery.of(context).size.width,
-                decoration: BoxDecoration(color: colorBackground),
-                child: Stack(
-                  children: [
-                    Positioned(
-                      top: 0,
-                      left: 20,
-                      right: 20,
-                      bottom: 60,
-                      child: Form(
-                        key: value.keyForm,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: [
-                            SizedBox(height: 64),
-                            Image.asset(ImageAssets.logomedfo, height: 100),
-                            SizedBox(height: 32),
-                            TextFormField(
-                              controller: value.usersId,
-                              validator: (e) {
-                                if (e!.isEmpty) {
-                                  return "Wajib diisi";
-                                } else {
-                                  return null;
-                                }
-                              },
-                              decoration: InputDecoration(
-                                hintText: "Users ID",
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(8),
-                                  borderSide: BorderSide(
-                                    width: 1,
-                                    color:
-                                        Colors.grey[300] ?? Colors.transparent,
-                                  ),
-                                ),
-                              ),
-                            ),
-                            SizedBox(height: 16),
-                            TextFormField(
-                              controller: value.password,
-                              obscureText: value.obSecure,
-                              validator: (e) {
-                                if (e!.isEmpty) {
-                                  return "Wajib diisi";
-                                } else {
-                                  return null;
-                                }
-                              },
-                              decoration: InputDecoration(
-                                hintText: "Kata Sandi",
-                                suffixIcon: InkWell(
-                                  onTap: () => value.gantiObsecure(),
-                                  child: Icon(
-                                    value.obSecure == true
-                                        ? Icons.visibility_off
-                                        : Icons.visibility,
-                                  ),
-                                ),
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(8),
-                                  borderSide: BorderSide(
-                                    width: 1,
-                                    color:
-                                        Colors.grey[300] ?? Colors.transparent,
-                                  ),
-                                ),
-                              ),
-                            ),
-                            SizedBox(height: 16),
-                            ButtonPrimary(
-                              onTap: () {
-                                value.cek();
-                              },
-                              name: "Masuk",
-                            ),
-                            SizedBox(height: 4),
-                            Row(
-                              children: [
-                                TextButton(
-                                  onPressed: () {
-                                    value.lupaPassword();
-                                  },
-                                  child: Text(
-                                    "Lupa Sandi ?",
-                                    style: TextStyle(color: Colors.grey),
-                                  ),
-                                ),
-                                Spacer(),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
+        builder: (context, value, child) => Scaffold(
+          backgroundColor: colorPrimary,
+          resizeToAvoidBottomInset: true,
+          body: Column(
+            children: [
+              // ── Logo section (red background) ──
+              Container(
+                color: colorPrimary,
+                child: SafeArea(
+                  bottom: false,
+                  child: SizedBox(
+                    height: 200,
+                    child: Center(
+                      child: Image.asset(ImageAssets.logomedfo, height: 120),
                     ),
-                    Positioned(
-                      bottom: 60,
-                      left: 0,
-                      right: 0,
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text("Ver 1.0.0", style: TextStyle(fontSize: 10.5, color: Colors.grey)),
-                          SizedBox(height: 4),
-                          ConstrainedBox(
-                            constraints: BoxConstraints(maxWidth: 300),
-                            child: Image.asset(ImageAssets.logomtd, height: 22, fit: BoxFit.contain),
-                          ),
-                        ],
-                      ),
+                  ),
+                ),
+              ),
+
+              // ── Form section (white card) ──
+              Expanded(
+                child: Container(
+                  decoration: const BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.vertical(
+                      top: Radius.circular(32),
                     ),
-                    Positioned(
-                      bottom: 0,
-                      left: 0,
-                      right: 0,
+                  ),
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.fromLTRB(24, 28, 24, 24),
+                    child: Form(
+                      key: value.keyForm,
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
-                          InkWell(
-                            onTap: () => value.aktivasiAkun(),
-                            child: Container(
-                              padding: EdgeInsets.all(20),
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                border: Border(
-                                  top: BorderSide(
-                                    width: 1,
-                                    color:
-                                        Colors.grey[300] ?? Colors.transparent,
-                                  ),
-                                ),
+                          const Text(
+                            "Masuk",
+                            style: TextStyle(
+                              fontSize: 24,
+                              fontWeight: FontWeight.bold,
+                              color: colorPrimary,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          const Text(
+                            "Selamat datang, silahkan masuk ke akun Anda",
+                            style: TextStyle(color: Colors.grey, fontSize: 13),
+                          ),
+                          const SizedBox(height: 24),
+
+                          // Users ID
+                          TextFormField(
+                            controller: value.usersId,
+                            validator: (e) =>
+                                e!.isEmpty ? "Wajib diisi" : null,
+                            decoration: InputDecoration(
+                              labelText: "Users ID",
+                              prefixIcon: const Icon(
+                                Icons.person_outline,
+                                color: colorPrimary,
                               ),
-                              child: Text(
-                                "Aktivasi Akun",
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
+                              labelStyle: const TextStyle(color: Colors.grey),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                                borderSide: const BorderSide(
                                   color: Colors.grey,
                                 ),
-                                textAlign: TextAlign.center,
+                              ),
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                                borderSide: BorderSide(
+                                  color: Colors.grey.shade300,
+                                ),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                                borderSide: const BorderSide(
+                                  color: colorPrimary,
+                                  width: 2,
+                                ),
                               ),
                             ),
                           ),
-                          Container(
-                            padding: EdgeInsets.all(20),
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              border: Border(
-                                top: BorderSide(
-                                  width: 1,
-                                  color: Colors.grey[300]!,
+                          const SizedBox(height: 16),
+
+                          // Password
+                          TextFormField(
+                            controller: value.password,
+                            obscureText: value.obSecure,
+                            validator: (e) =>
+                                e!.isEmpty ? "Wajib diisi" : null,
+                            decoration: InputDecoration(
+                              labelText: "Kata Sandi",
+                              prefixIcon: const Icon(
+                                Icons.lock_outline,
+                                color: colorPrimary,
+                              ),
+                              labelStyle: const TextStyle(color: Colors.grey),
+                              suffixIcon: InkWell(
+                                onTap: () => value.gantiObsecure(),
+                                child: Icon(
+                                  value.obSecure
+                                      ? Icons.visibility_off_outlined
+                                      : Icons.visibility_outlined,
+                                  color: colorPrimary,
+                                ),
+                              ),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                                borderSide: const BorderSide(
+                                  color: Colors.grey,
+                                ),
+                              ),
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                                borderSide: BorderSide(
+                                  color: Colors.grey.shade300,
+                                ),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                                borderSide: const BorderSide(
+                                  color: colorPrimary,
+                                  width: 2,
                                 ),
                               ),
                             ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.stretch,
-                              children: [
-                                Text(
-                                  "Versi 1.0.0",
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                SizedBox(height: 8),
-                                Image.asset(ImageAssets.copyright),
-                              ],
+                          ),
+
+                          // Lupa Sandi
+                          Align(
+                            alignment: Alignment.centerRight,
+                            child: TextButton(
+                              onPressed: () => value.lupaPassword(),
+                              child: const Text(
+                                "Lupa Sandi?",
+                                style: TextStyle(color: colorPrimary),
+                              ),
+                            ),
+                          ),
+
+                          // Masuk button
+                          ButtonPrimary(
+                            onTap: () => value.cek(),
+                            name: "Masuk",
+                          ),
+                          const SizedBox(height: 12),
+
+                          // Aktivasi Akun
+                          OutlinedButton(
+                            onPressed: () => value.aktivasiAkun(),
+                            style: OutlinedButton.styleFrom(
+                              side: const BorderSide(
+                                color: colorPrimary,
+                                width: 1.5,
+                              ),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              padding: const EdgeInsets.symmetric(vertical: 14),
+                            ),
+                            child: const Text(
+                              "Aktivasi Akun",
+                              style: TextStyle(
+                                color: colorPrimary,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+
+                          const SizedBox(height: 32),
+
+                          // Version + MTD logo
+                          const Center(
+                            child: Text(
+                              "Ver 1.0.0",
+                              style: TextStyle(
+                                fontSize: 10.5,
+                                color: Colors.grey,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Center(
+                            child: ConstrainedBox(
+                              constraints: const BoxConstraints(maxWidth: 280),
+                              child: Image.asset(
+                                ImageAssets.logomtd,
+                                height: 22,
+                                fit: BoxFit.contain,
+                              ),
                             ),
                           ),
                         ],
                       ),
                     ),
-                  ],
+                  ),
                 ),
               ),
-            ),
+            ],
           ),
         ),
       ),

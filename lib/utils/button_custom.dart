@@ -34,20 +34,25 @@ class ButtonPrimary extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: () => onTap(),
+      borderRadius: BorderRadius.circular(8),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(8),
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [colorTop, colorBottom],
+          gradient: const LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [colorPrimary, colorPrimaryDark],
           ),
         ),
         child: Text(
           "$name",
           textAlign: TextAlign.center,
-          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+          style: const TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 16,
+            color: Colors.white,
+          ),
         ),
       ),
     );
@@ -93,17 +98,21 @@ class ButtonSecondary extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: () => onTap(),
+      borderRadius: BorderRadius.circular(8),
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(8),
           color: Colors.white,
-          border: Border.all(width: 2, color: Colors.black),
+          border: Border.all(width: 1.5, color: colorPrimary),
         ),
         child: Text(
           "$name",
           textAlign: TextAlign.center,
-          style: const TextStyle(color: Colors.black),
+          style: const TextStyle(
+            color: colorPrimary,
+            fontWeight: FontWeight.w600,
+          ),
         ),
       ),
     );

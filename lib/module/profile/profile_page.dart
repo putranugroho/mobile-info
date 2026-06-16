@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:mobile_info/module/profile/edit_profile_page.dart';
 import 'package:mobile_info/module/profile/ganti_mpin/ganti_mpin_page.dart';
 import 'package:mobile_info/module/profile/profile_notifier.dart';
+import 'package:mobile_info/utils/colors.dart';
 import 'package:provider/provider.dart';
 
 class ProfilePage extends StatelessWidget {
@@ -13,179 +14,190 @@ class ProfilePage extends StatelessWidget {
       create: (_) => ProfileNotiifer(context: context),
       child: Consumer<ProfileNotiifer>(
         builder: (context, value, child) => Scaffold(
+          backgroundColor: colorBackground,
           body: ListView(
             children: [
+              // ── Header merah dengan avatar ──
               Container(
-                padding: EdgeInsets.all(20),
+                width: double.infinity,
+                padding: const EdgeInsets.fromLTRB(20, 24, 20, 28),
+                decoration: const BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [colorPrimary, colorPrimaryDark],
+                  ),
+                ),
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    Text(
+                    const Text(
                       "Profil",
                       style: TextStyle(
-                        fontSize: 20,
+                        fontSize: 18,
                         fontWeight: FontWeight.bold,
+                        color: Colors.white,
                       ),
                     ),
-                    SizedBox(height: 24),
+                    const SizedBox(height: 20),
+                    CircleAvatar(
+                      radius: 36,
+                      backgroundColor: Colors.white.withValues(alpha: 0.2),
+                      child: Text(
+                        value.users?.nama.isNotEmpty == true
+                            ? value.users!.nama[0].toUpperCase()
+                            : 'U',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 30,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    Text(
+                      value.users?.nama ?? '',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 6),
                     Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        // InkWell(
-                        //   onTap: () => value.ambilCover(),
-                        //   child: CachedNetworkImage(
-                        //     placeholder: (context, url) =>
-                        //         ProShimmer(height: 50, width: 50, radius: 360),
-                        //     fit: BoxFit.cover,
-                        //     imageBuilder: (context, imageProvider) => Container(
-                        //       decoration: BoxDecoration(
-                        //         borderRadius: BorderRadius.circular(360),
-                        //         border: Border.all(
-                        //           width: 1,
-                        //           color: Colors.grey,
-                        //         ),
-                        //         image: DecorationImage(
-                        //           image: imageProvider,
-                        //           fit: BoxFit.cover,
-                        //         ),
-                        //       ),
-                        //     ),
-                        //     height: 50,
-                        //     width: 50,
-                        //     imageUrl:
-                        //         "https://infoservices.medtrans.id/webServices/image-proxy.php?url=$photo/${value.users!.photo}",
-                        //     errorWidget: (context, url, error) =>
-                        //         const Icon(Icons.error),
-                        //   ),
-                        // ),
-                        SizedBox(width: 12),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
-                            children: [
-                              Text(
-                                "${value.users!.nama}",
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              SizedBox(height: 4),
-                              Row(
-                                children: [
-                                  Text(
-                                    value.hide
-                                        ? "${value.users!.nomorPonsel.substring(0, 4)}xxxx${value.users!.nomorPonsel.substring(value.users!.nomorPonsel.length - 4, value.users!.nomorPonsel.length)}"
-                                        : value.users!.nomorPonsel,
-                                    style: TextStyle(),
-                                  ),
-                                  SizedBox(width: 12),
-                                  InkWell(
-                                    onTap: () {
-                                      value.gantihide();
-                                    },
-                                    child: Icon(
-                                      value.hide
-                                          ? Icons.visibility_off
-                                          : Icons.visibility,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ],
+                        Text(
+                          value.users != null
+                              ? (value.hide
+                                  ? "${value.users!.nomorPonsel.substring(0, 4)}xxxx${value.users!.nomorPonsel.substring(value.users!.nomorPonsel.length - 4)}"
+                                  : value.users!.nomorPonsel)
+                              : '',
+                          style: TextStyle(
+                            color: Colors.white.withValues(alpha: 0.85),
+                            fontSize: 14,
                           ),
                         ),
-                        // IconButton(
-                        //     onPressed: () {},
-                        //     icon: Icon(
-                        //       Icons.notifications,
-                        //       color: colorSecondary,
-                        //       size: 36,
-                        //     ))
+                        const SizedBox(width: 8),
+                        GestureDetector(
+                          onTap: () => value.gantihide(),
+                          child: Icon(
+                            value.hide
+                                ? Icons.visibility_off_outlined
+                                : Icons.visibility_outlined,
+                            color: Colors.white.withValues(alpha: 0.85),
+                            size: 18,
+                          ),
+                        ),
                       ],
                     ),
                   ],
                 ),
               ),
-              SizedBox(height: 16),
+
+              const SizedBox(height: 16),
+
+              // ── Menu card ──
               Container(
-                margin: EdgeInsets.symmetric(horizontal: 20),
-                padding: EdgeInsets.all(16),
+                margin: const EdgeInsets.symmetric(horizontal: 16),
                 decoration: BoxDecoration(
                   color: Colors.white,
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(16),
                   boxShadow: [
                     BoxShadow(
-                      offset: Offset(2, 2),
-                      color: Colors.grey,
-                      blurRadius: 5,
+                      offset: const Offset(0, 2),
+                      color: Colors.grey.shade200,
+                      blurRadius: 8,
                     ),
                   ],
                 ),
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    InkWell(
+                    _menuItem(
+                      icon: Icons.edit_outlined,
+                      label: "Edit Profil",
                       onTap: () => Navigator.push(
                         context,
                         MaterialPageRoute(builder: (_) => const EditProfilePage()),
                       ).then((_) => value.getProfile()),
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(vertical: 8),
-                        child: const Row(
-                          children: [
-                            Icon(Icons.edit_outlined, size: 20),
-                            SizedBox(width: 12),
-                            Text("Edit Profil"),
-                            Spacer(),
-                            Icon(Icons.arrow_forward_ios, size: 15),
-                          ],
-                        ),
-                      ),
                     ),
-                    const Divider(),
-                    InkWell(
+                    _divider(),
+                    _menuItem(
+                      icon: Icons.lock_outline,
+                      label: "Ganti Password",
                       onTap: () => Navigator.push(
                         context,
-                        MaterialPageRoute(
-                          builder: (context) => const GantiMPINPage(),
-                        ),
-                      ),
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(vertical: 8),
-                        child: const Row(
-                          children: [
-                            Icon(Icons.lock, size: 20),
-                            SizedBox(width: 12),
-                            Text("Ganti Password"),
-                            Spacer(),
-                            Icon(Icons.arrow_forward_ios, size: 15),
-                          ],
-                        ),
+                        MaterialPageRoute(builder: (_) => const GantiMPINPage()),
                       ),
                     ),
-                    SizedBox(height: 16),
-                    InkWell(
+                    _divider(),
+                    _menuItem(
+                      icon: Icons.logout,
+                      label: "Keluar",
                       onTap: () => value.confirm(),
-                      child: Container(
-                        padding: EdgeInsets.symmetric(vertical: 8),
-                        child: Row(
-                          children: [
-                            Icon(Icons.exit_to_app, size: 20),
-                            SizedBox(width: 12),
-                            Text("Keluar"),
-                            Spacer(),
-                            Icon(Icons.arrow_forward_ios, size: 15),
-                          ],
-                        ),
-                      ),
+                      isDestructive: true,
                     ),
                   ],
                 ),
               ),
+
+              const SizedBox(height: 24),
             ],
           ),
         ),
       ),
     );
   }
+
+  Widget _menuItem({
+    required IconData icon,
+    required String label,
+    required VoidCallback onTap,
+    bool isDestructive = false,
+  }) {
+    final color = isDestructive ? Colors.red.shade700 : Colors.black87;
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(16),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        child: Row(
+          children: [
+            Container(
+              width: 36,
+              height: 36,
+              decoration: BoxDecoration(
+                color: isDestructive
+                    ? Colors.red.shade50
+                    : colorPrimary.withValues(alpha: 0.08),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Icon(
+                icon,
+                size: 18,
+                color: isDestructive ? Colors.red.shade700 : colorPrimary,
+              ),
+            ),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Text(
+                label,
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                  color: color,
+                ),
+              ),
+            ),
+            Icon(Icons.arrow_forward_ios, size: 14, color: Colors.grey.shade400),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _divider() => Padding(
+        padding: const EdgeInsets.only(left: 66),
+        child: Divider(height: 1, color: Colors.grey.shade100),
+      );
 }

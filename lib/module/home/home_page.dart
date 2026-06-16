@@ -76,7 +76,7 @@ class _HomePageState extends State<HomePage> {
           _startBannerAutoScroll(value);
 
           return Scaffold(
-              backgroundColor: Color.fromARGB(255, 255, 250, 250),
+              backgroundColor: colorBackground,
               body: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
@@ -115,7 +115,7 @@ class _HomePageState extends State<HomePage> {
                   Expanded(
                     child: RefreshIndicator(
                       onRefresh: () => value.getHome(),
-                      color: const Color.fromARGB(255, 0, 95, 0),
+                      color: colorPrimary,
                       child: ListView(
                         children: [
                           value.isLoading
@@ -136,80 +136,73 @@ class _HomePageState extends State<HomePage> {
                               : Column(
                                   crossAxisAlignment: CrossAxisAlignment.stretch,
                                   children: [
-                                    ClipRRect(
-                                      borderRadius: BorderRadius.circular(16),
-                                      child: Container(
-                                        height: 82,
-                                        margin: EdgeInsets.symmetric(horizontal: 16),
-                                        child: Stack(
-                                          children: [
-                                            Positioned(
-                                              top: 0,
-                                              left: 0,
-                                              right: 0,
-                                              bottom: 10,
-                                              child: Container(
-                                                padding: EdgeInsets.all(20),
-                                                decoration: BoxDecoration(
-                                                  gradient: LinearGradient(
-                                                    begin: Alignment.topCenter,
-                                                    end: Alignment.bottomCenter,
-                                                    colors: [colorTop, colorBottom],
+                                    Container(
+                                      margin: const EdgeInsets.symmetric(horizontal: 16),
+                                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(16),
+                                        gradient: const LinearGradient(
+                                          begin: Alignment.topLeft,
+                                          end: Alignment.bottomRight,
+                                          colors: [colorPrimary, colorPrimaryDark],
+                                        ),
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: colorPrimary.withValues(alpha: 0.35),
+                                            blurRadius: 12,
+                                            offset: const Offset(0, 6),
+                                          ),
+                                        ],
+                                      ),
+                                      child: Row(
+                                        children: [
+                                          CircleAvatar(
+                                            radius: 24,
+                                            backgroundColor: Colors.white.withValues(alpha: 0.2),
+                                            child: Text(
+                                              value.users!.nama.isNotEmpty ? value.users!.nama[0].toUpperCase() : 'U',
+                                              style: const TextStyle(
+                                                color: Colors.white,
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 22,
+                                              ),
+                                            ),
+                                          ),
+                                          const SizedBox(width: 12),
+                                          Expanded(
+                                            child: Column(
+                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  value.users!.nama,
+                                                  style: const TextStyle(
+                                                    color: Colors.white,
+                                                    fontWeight: FontWeight.bold,
+                                                    fontSize: 15,
+                                                  ),
+                                                  maxLines: 1,
+                                                  overflow: TextOverflow.ellipsis,
+                                                ),
+                                                const SizedBox(height: 3),
+                                                Text(
+                                                  "No CIF: ${value.users!.noCif}",
+                                                  style: TextStyle(
+                                                    color: Colors.white.withValues(alpha: 0.75),
+                                                    fontSize: 12,
                                                   ),
                                                 ),
-                                              ),
+                                              ],
                                             ),
-                                            Positioned(
-                                              top: -270,
-                                              left: -100,
-                                              child: Container(
-                                                height: 300,
-                                                width: 300,
-                                                decoration: BoxDecoration(color: const Color.fromARGB(255, 1, 140, 1), shape: BoxShape.circle),
-                                              ),
-                                            ),
-
-                                            Positioned(
-                                              top: 0,
-                                              left: 0,
-                                              right: 0,
-                                              bottom: 0,
-                                              child: Container(
-                                                padding: EdgeInsets.all(16),
-                                                child: Column(
-                                                  crossAxisAlignment: CrossAxisAlignment.end,
-                                                  children: [
-                                                    Spacer(),
-                                                    Row(
-                                                      crossAxisAlignment: CrossAxisAlignment.end,
-                                                      children: [
-                                                        Expanded(
-                                                          child: Column(
-                                                            crossAxisAlignment: CrossAxisAlignment.end,
-                                                            children: [
-                                                              Text("No CIF: ${value.users!.noCif}", style: TextStyle(fontSize: 12)),
-                                                              Text(
-                                                                "${value.users!.nama}",
-                                                                textAlign: TextAlign.end,
-                                                                maxLines: 2,
-                                                                overflow: TextOverflow.ellipsis,
-                                                                style: TextStyle(fontWeight: FontWeight.bold),
-                                                              ),
-                                                            ],
-                                                          ),
-                                                        ),
-                                                      ],
-                                                    ),
-                                                    SizedBox(height: 8),
-                                                  ],
-                                                ),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
+                                          ),
+                                          Icon(
+                                            Icons.account_circle_outlined,
+                                            color: Colors.white.withValues(alpha: 0.25),
+                                            size: 52,
+                                          ),
+                                        ],
                                       ),
                                     ),
-                                    // SizedBox(height: 8),
+                                    const SizedBox(height: 12),
                                     value.list.isNotEmpty
                                         ? Column(
                                             crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -252,84 +245,53 @@ class _HomePageState extends State<HomePage> {
                                           )
                                         : SizedBox(),
                                     Container(
-                                      margin: EdgeInsets.all(16),
-                                      padding: EdgeInsets.all(16),
+                                      margin: const EdgeInsets.all(16),
+                                      padding: const EdgeInsets.all(16),
                                       decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(8),
-                                        color: const Color.fromARGB(255, 137, 206, 252),
-                                        boxShadow: [BoxShadow(offset: Offset(2, 2), color: Colors.grey[300] ?? Colors.transparent, blurRadius: 5)],
+                                        borderRadius: BorderRadius.circular(16),
+                                        color: Colors.white,
+                                        boxShadow: [
+                                          BoxShadow(
+                                            offset: const Offset(0, 2),
+                                            color: Colors.grey.shade200,
+                                            blurRadius: 8,
+                                          ),
+                                        ],
                                       ),
                                       child: Column(
                                         crossAxisAlignment: CrossAxisAlignment.stretch,
                                         children: [
-                                          Row(
-                                            children: [
-                                              Expanded(
-                                                child: InkWell(
-                                                  onTap: () => value.gantiPage(0),
-                                                  child: Container(
-                                                    padding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-                                                    decoration: BoxDecoration(
-                                                      borderRadius: BorderRadius.circular(8),
-                                                      color: value.page == 0 ? const Color.fromARGB(255, 0, 95, 0) : Colors.white,
-                                                      border: Border.all(
-                                                        color: value.page == 0 ? const Color.fromARGB(255, 0, 95, 0) : Colors.grey.shade400,
-                                                        width: 2,
-                                                      ),
-                                                    ),
-                                                    child: Text(
-                                                      "Tabungan",
-                                                      textAlign: TextAlign.center,
-                                                      style: TextStyle(fontSize: 12, color: value.page == 0 ? Colors.white : Colors.black),
-                                                    ),
+                                          Container(
+                                            padding: const EdgeInsets.all(4),
+                                            decoration: BoxDecoration(
+                                              borderRadius: BorderRadius.circular(10),
+                                              color: Colors.grey.shade100,
+                                            ),
+                                            child: Row(
+                                              children: [
+                                                Expanded(
+                                                  child: _tabButton(
+                                                    label: "Tabungan",
+                                                    isSelected: value.page == 0,
+                                                    onTap: () => value.gantiPage(0),
                                                   ),
                                                 ),
-                                              ),
-                                              SizedBox(width: 12),
-                                              Expanded(
-                                                child: InkWell(
-                                                  onTap: () => value.gantiPage(1),
-                                                  child: Container(
-                                                    padding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-                                                    decoration: BoxDecoration(
-                                                      borderRadius: BorderRadius.circular(8),
-                                                      color: value.page == 1 ? const Color.fromARGB(255, 0, 95, 0) : Colors.white,
-                                                      border: Border.all(
-                                                        color: value.page == 1 ? const Color.fromARGB(255, 0, 95, 0) : Colors.grey.shade400,
-                                                        width: 2,
-                                                      ),
-                                                    ),
-                                                    child: Text(
-                                                      "Deposito",
-                                                      textAlign: TextAlign.center,
-                                                      style: TextStyle(fontSize: 12, color: value.page == 1 ? Colors.white : Colors.black),
-                                                    ),
+                                                Expanded(
+                                                  child: _tabButton(
+                                                    label: "Deposito",
+                                                    isSelected: value.page == 1,
+                                                    onTap: () => value.gantiPage(1),
                                                   ),
                                                 ),
-                                              ),
-                                              SizedBox(width: 12),
-                                              Expanded(
-                                                child: InkWell(
-                                                  onTap: () => value.gantiPage(2),
-                                                  child: Container(
-                                                    padding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-                                                    decoration: BoxDecoration(
-                                                      borderRadius: BorderRadius.circular(8),
-                                                      color: value.page == 2 ? const Color.fromARGB(255, 0, 95, 0) : Colors.white,
-                                                      border: Border.all(
-                                                        color: value.page == 2 ? const Color.fromARGB(255, 0, 95, 0) : Colors.grey.shade400,
-                                                        width: 2,
-                                                      ),
-                                                    ),
-                                                    child: Text(
-                                                      "Pinjaman",
-                                                      textAlign: TextAlign.center,
-                                                      style: TextStyle(fontSize: 12, color: value.page == 2 ? Colors.white : Colors.black),
-                                                    ),
+                                                Expanded(
+                                                  child: _tabButton(
+                                                    label: "Pinjaman",
+                                                    isSelected: value.page == 2,
+                                                    onTap: () => value.gantiPage(2),
                                                   ),
                                                 ),
-                                              ),
-                                            ],
+                                              ],
+                                            ),
                                           ),
                                           SizedBox(height: 16),
                                           value.page == 0
@@ -403,6 +365,32 @@ class _HomePageState extends State<HomePage> {
               ),
           );
         },
+      ),
+    );
+  }
+
+  Widget _tabButton({required String label, required bool isSelected, required VoidCallback onTap}) {
+    return GestureDetector(
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: const EdgeInsets.symmetric(vertical: 10),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(8),
+          color: isSelected ? colorPrimary : Colors.transparent,
+          boxShadow: isSelected
+              ? [BoxShadow(color: colorPrimary.withValues(alpha: 0.3), blurRadius: 6, offset: const Offset(0, 3))]
+              : [],
+        ),
+        child: Text(
+          label,
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            fontSize: 12,
+            fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+            color: isSelected ? Colors.white : Colors.grey.shade600,
+          ),
+        ),
       ),
     );
   }
@@ -738,12 +726,11 @@ Widget mobileDialogWrapper(BuildContext context, {required Widget child, DialogM
   final screenWidth = MediaQuery.of(context).size.width;
   final screenHeight = MediaQuery.of(context).size.height;
 
-  final width = screenWidth > 600 ? 400.0 : screenWidth * 0.95;
-  final video_width = screenWidth > 900 ? 800.0 : screenWidth * 0.95;
+  final videoWidth = screenWidth > 900 ? 800.0 : screenWidth * 0.95;
 
   double? height;
   if (mode == DialogMode.video) {
-    height = video_width / aspectRatio;
+    height = videoWidth / aspectRatio;
   } else if (mode == DialogMode.image) {
     height = screenHeight * 0.7;
   }
@@ -792,7 +779,7 @@ void _onBannerTap(BuildContext context, BannersModel banner) {
 void _showVideoBanner(BuildContext context, String videoUrl) {
   showDialog(
     context: context,
-    barrierDismissible: false,
+    barrierDismissible: true,
     builder: (context) {
       final size = MediaQuery.of(context).size;
 
@@ -847,25 +834,47 @@ void _showImageBanner(BuildContext context, {String? bannerUrl, String? bannerFi
 
   showDialog(
     context: context,
+    barrierDismissible: true,
     builder: (context) {
       return Dialog(
         backgroundColor: Colors.transparent,
-        child: mobileDialogWrapper(
-          context,
-          mode: DialogMode.image,
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(16),
-            child: InteractiveViewer(
-              minScale: 0.8,
-              maxScale: 4,
-              child: CachedNetworkImage(
-                imageUrl: imageUrl,
-                fit: BoxFit.contain,
-                placeholder: (_, __) => const Center(child: CircularProgressIndicator()),
-                errorWidget: (_, __, ___) => const Icon(Icons.broken_image, size: 48),
+        child: Stack(
+          clipBehavior: Clip.none,
+          children: [
+            mobileDialogWrapper(
+              context,
+              mode: DialogMode.image,
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(16),
+                child: InteractiveViewer(
+                  minScale: 0.8,
+                  maxScale: 4,
+                  child: CachedNetworkImage(
+                    imageUrl: imageUrl,
+                    fit: BoxFit.contain,
+                    placeholder: (ctx, url) => const Center(child: CircularProgressIndicator()),
+                    errorWidget: (ctx, url, err) => const Icon(Icons.broken_image, size: 48),
+                  ),
+                ),
               ),
             ),
-          ),
+            Positioned(
+              top: -12,
+              right: -12,
+              child: GestureDetector(
+                onTap: () => Navigator.pop(context),
+                child: Container(
+                  width: 34,
+                  height: 34,
+                  decoration: const BoxDecoration(
+                    color: Colors.black54,
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(Icons.close, color: Colors.white, size: 18),
+                ),
+              ),
+            ),
+          ],
         ),
       );
     },
@@ -875,23 +884,42 @@ void _showImageBanner(BuildContext context, {String? bannerUrl, String? bannerFi
 void _showTextBanner(BuildContext context, {required String title, required String description}) {
   showDialog(
     context: context,
+    barrierDismissible: true,
     builder: (context) {
       return Dialog(
         backgroundColor: Colors.transparent,
         child: mobileDialogWrapper(
           context,
           mode: DialogMode.text,
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(title, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                const SizedBox(height: 12),
-                Text(description),
-              ],
-            ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              // Header with close button
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 16, 8, 0),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        title,
+                        style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                    IconButton(
+                      onPressed: () => Navigator.pop(context),
+                      icon: const Icon(Icons.close),
+                      visualDensity: VisualDensity.compact,
+                    ),
+                  ],
+                ),
+              ),
+              const Divider(height: 1),
+              Padding(
+                padding: const EdgeInsets.all(16),
+                child: Text(description),
+              ),
+            ],
           ),
         ),
       );

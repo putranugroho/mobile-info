@@ -36,7 +36,8 @@ class LoginPage extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
                             SizedBox(height: 64),
-                            Image.asset(ImageAssets.logomedfo, height: 140),
+                            Image.asset(ImageAssets.logomedfo, height: 100),
+                            SizedBox(height: 32),
                             TextFormField(
                               controller: value.usersId,
                               validator: (e) {

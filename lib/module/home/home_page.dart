@@ -785,26 +785,30 @@ void _showVideoBanner(BuildContext context, String videoUrl) {
 
       return Dialog(
         backgroundColor: Colors.transparent,
-        insetPadding: const EdgeInsets.all(16),
+        insetPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 32),
         child: Center(
           child: ConstrainedBox(
             constraints: BoxConstraints(
-              maxWidth: 380,
-              maxHeight: size.height * 0.75, // 🔥 batasi tinggi
+              maxWidth: size.width > 500 ? 420 : size.width - 40,
+              maxHeight: size.height * 0.8,
             ),
             child: Stack(
+              clipBehavior: Clip.none,
               children: [
                 AspectRatio(
                   aspectRatio: 9 / 16, // 🔥 portrait
                   child: ClipRRect(
-                    borderRadius: BorderRadius.circular(16),
-                    child: VideoPlayerWidget(url: videoUrl),
+                    borderRadius: BorderRadius.circular(20),
+                    child: Container(
+                      color: Colors.black,
+                      child: VideoPlayerWidget(url: videoUrl),
+                    ),
                   ),
                 ),
 
                 Positioned(
-                  top: 8,
-                  right: 8,
+                  top: -14,
+                  right: -14,
                   child: GestureDetector(
                     onTap: () => Navigator.pop(context),
                     child: Container(
@@ -813,6 +817,9 @@ void _showVideoBanner(BuildContext context, String videoUrl) {
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [colorTop, colorBottom]),
+                        boxShadow: [
+                          BoxShadow(color: Colors.black.withValues(alpha: 0.3), blurRadius: 6, offset: const Offset(0, 2)),
+                        ],
                       ),
                       child: const Icon(Icons.close, size: 18, color: Colors.black),
                     ),
@@ -1034,11 +1041,9 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
       return const Center(child: CircularProgressIndicator(color: Colors.white));
     }
 
-    return Center(
-      child: FittedBox(
-        fit: BoxFit.contain,
-        child: SizedBox(width: 380, height: _controller.value.size.height, child: VideoPlayer(_controller)),
-      ),
+    return AspectRatio(
+      aspectRatio: _controller.value.aspectRatio,
+      child: VideoPlayer(_controller),
     );
   }
 }

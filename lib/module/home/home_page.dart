@@ -785,18 +785,20 @@ void _showVideoBanner(BuildContext context, String videoUrl) {
 
       return Dialog(
         backgroundColor: Colors.transparent,
-        insetPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 32),
+        insetPadding: const EdgeInsets.symmetric(horizontal: 32, vertical: 48),
         child: Center(
           child: ConstrainedBox(
             constraints: BoxConstraints(
-              maxWidth: size.width > 500 ? 420 : size.width - 40,
-              maxHeight: size.height * 0.8,
+              maxWidth: (size.width * 0.75).clamp(220.0, 300.0),
+              maxHeight: size.height * 0.6,
             ),
             child: Stack(
               clipBehavior: Clip.none,
               children: [
-                AspectRatio(
-                  aspectRatio: 9 / 16, // 🔥 portrait
+                AnimatedSize(
+                  duration: const Duration(milliseconds: 250),
+                  curve: Curves.easeOut,
+                  alignment: Alignment.center,
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(20),
                     child: Container(
@@ -1038,9 +1040,14 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
   @override
   Widget build(BuildContext context) {
     if (!_controller.value.isInitialized) {
-      return const Center(child: CircularProgressIndicator(color: Colors.white));
+      // 🔥 placeholder portrait sambil loading, ukuran final menyesuaikan video asli setelah init
+      return const AspectRatio(
+        aspectRatio: 9 / 16,
+        child: Center(child: CircularProgressIndicator(color: Colors.white)),
+      );
     }
 
+    // 🔥 otomatis landscape atau portrait sesuai rasio asli video
     return AspectRatio(
       aspectRatio: _controller.value.aspectRatio,
       child: VideoPlayer(_controller),

@@ -6,6 +6,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:mobile_info/module/splash_screen_page.dart';
 import 'package:mobile_info/utils/custom_scroll.dart';
+import 'package:mobile_info/utils/inactivity_service.dart';
 // import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:firebase_core/firebase_core.dart';
@@ -169,6 +170,14 @@ class MyApp extends StatelessWidget {
           primary: const Color(0xFF9B1414),
         ),
         useMaterial3: true,
+      ),
+      // 🔥 listener global: reset idle-timer di semua halaman, termasuk route yang di-push
+      builder: (context, child) => Listener(
+        behavior: HitTestBehavior.translucent,
+        onPointerDown: (_) => InactivityService.instance.bump(),
+        onPointerMove: (_) => InactivityService.instance.bump(),
+        onPointerUp: (_) => InactivityService.instance.bump(),
+        child: child,
       ),
     );
   }

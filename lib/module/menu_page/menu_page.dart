@@ -23,38 +23,32 @@ class MenuPage extends StatelessWidget {
                     ? 400
                     : MediaQuery.of(context).size.width,
                 decoration: const BoxDecoration(color: Colors.white),
-                child: Listener(
-                  behavior: HitTestBehavior.translucent,
-                  onPointerDown: value.handleUserInteraction,
-                  onPointerMove: value.handleUserInteraction,
-                  onPointerUp: value.handleUserInteraction,
-                  child: PopScope(
-                    canPop: false,
-                    onPopInvokedWithResult: (_, result) => value.back(),
-                    child: Stack(
-                      children: [
-                        Positioned(
-                          top: 0,
-                          left: 0,
-                          right: 0,
-                          bottom: 64,
-                          child: value.page == 0
-                              ? const HomePage()
-                              : value.page == 1
-                                  ? const BantuanPage()
-                                  : const ProfilePage(),
+                child: PopScope(
+                  canPop: false,
+                  onPopInvokedWithResult: (_, result) => value.back(),
+                  child: Stack(
+                    children: [
+                      Positioned(
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        bottom: 64,
+                        child: value.page == 0
+                            ? const HomePage()
+                            : value.page == 1
+                                ? const BantuanPage()
+                                : const ProfilePage(),
+                      ),
+                      Positioned(
+                        bottom: 0,
+                        left: 0,
+                        right: 0,
+                        child: _BottomNav(
+                          current: value.page,
+                          onTap: value.gantiPage,
                         ),
-                        Positioned(
-                          bottom: 0,
-                          left: 0,
-                          right: 0,
-                          child: _BottomNav(
-                            current: value.page,
-                            onTap: value.gantiPage,
-                          ),
-                        ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                 ),
               ),

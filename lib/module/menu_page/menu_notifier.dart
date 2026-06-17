@@ -1,32 +1,18 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:mobile_info/module/auth/login_page.dart';
 import 'package:mobile_info/module/repository/auth_repository.dart';
 import 'package:mobile_info/network/network.dart';
 import 'package:mobile_info/pref/pref.dart';
+import 'package:mobile_info/utils/inactivity_service.dart';
 
 class MenuNotifier extends ChangeNotifier {
   final BuildContext context;
 
   MenuNotifier({required this.context}) {
-    _initTimer();
+    InactivityService.instance.start(_logOut);
   }
 
   int page = 0;
-
-  Timer? _inactivityTimer;
-
-  void _initTimer() {
-    _inactivityTimer?.cancel();
-    _inactivityTimer = Timer(const Duration(minutes: 5), _logOut);
-  }
-
-  void handleUserInteraction([dynamic _]) {
-    if (_inactivityTimer == null || !_inactivityTimer!.isActive) return;
-    _inactivityTimer?.cancel();
-    _initTimer();
-  }
 
   void _logOut() async {
     final users = await Pref().getUsers();
@@ -46,7 +32,7 @@ class MenuNotifier extends ChangeNotifier {
 
   @override
   void dispose() {
-    _inactivityTimer?.cancel();
+    InactivityService.instance.stop();
     super.dispose();
   }
 
@@ -59,15 +45,16 @@ class MenuNotifier extends ChangeNotifier {
   Future<bool> back() {
     if (page == 0) {
       final now = DateTime.now();
-      const snackBar = SnackBar(content: Text('Klik Kembali untuk tutup akun'));
-      if (currentBackPressTime == null || now.difference(currentBackPressTime!) > const Duration(seconds: 1)) {
+      const snackBar = SnackBar(content: Text('Tekan Kembali sekali lagi untuk keluar akun'));
+      if (currentBackPressTime == null || now.difference(currentBackPressTime!) > const Duration(seconds: 2)) {
         currentBackPressTime = now;
         notifyListeners();
         ScaffoldMessenger.of(context).showSnackBar(snackBar);
         return Future.value(false);
       }
-      notifyListeners();
-      return Future.value(true);
+      // 🔥 back kedua kali: logout otomatis
+      _logOut();
+      return Future.value(false);
     } else {
       page = 0;
       notifyListeners();

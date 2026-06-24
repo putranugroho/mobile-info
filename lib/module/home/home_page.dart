@@ -9,6 +9,7 @@ import 'package:mobile_info/module/home/home_notifier.dart';
 import 'package:mobile_info/module/loan/loan_detail_page.dart';
 import 'package:mobile_info/module/mutasi/mutasi_tabungan_page.dart';
 import 'package:mobile_info/module/deposito/deposito_detail_page.dart';
+import 'package:mobile_info/module/deposit_opening/deposit_opening_page.dart';
 import 'package:mobile_info/module/loan_application/loan_application_page.dart';
 
 import 'package:mobile_info/utils/colors.dart';
@@ -76,321 +77,333 @@ class _HomePageState extends State<HomePage> {
           _startBannerAutoScroll(value);
 
           return Scaffold(
-              backgroundColor: colorBackground,
-              body: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Container(
-                    padding: EdgeInsets.all(16),
-                    child: Row(
-                      children: [
-                        value.users!.bprId == "609999"
-                            ? Image.asset(ImageAssets.logomedfo, height: 70, fit: BoxFit.contain)
-                            : Container(
-                                height: 80,
-                                width: 100,
-                                child: Column(
-                                  children: [
-                                    Image.asset(ImageAssets.perbarindo, height: 60, fit: BoxFit.contain),
+            backgroundColor: Color.fromARGB(255, 255, 250, 250),
+            body: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Container(
+                  padding: EdgeInsets.all(16),
+                  child: Row(
+                    children: [
+                      value.users!.bprId == "609999"
+                          ? Image.asset(ImageAssets.logomedfo, height: 70, fit: BoxFit.contain)
+                          : Container(
+                              height: 80,
+                              width: 100,
+                              child: Column(
+                                children: [
+                                  Image.asset(ImageAssets.perbarindo, height: 60, fit: BoxFit.contain),
 
-                                    Text(
-                                      "${value.users!.perbarindo}",
-                                      style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: titlePerbarindo),
-                                    ),
+                                  Text(
+                                    "${value.users!.perbarindo}",
+                                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: titlePerbarindo),
+                                  ),
+                                ],
+                              ),
+                            ),
+                      Spacer(),
+                      CachedNetworkImage(
+                        imageUrl: value.logoBprFile.isNotEmpty ? NetworkURL.logoBprView(value.logoBprFile) : value.users!.bprLogo,
+                        height: 70,
+                        fit: BoxFit.contain,
+                        placeholder: (_, __) =>
+                            const SizedBox(height: 70, width: 70, child: Center(child: CircularProgressIndicator(strokeWidth: 2))),
+                        errorWidget: (_, __, ___) => const Icon(Icons.broken_image, color: Colors.red),
+                      ),
+                    ],
+                  ),
+                ),
+                Expanded(
+                  child: RefreshIndicator(
+                    onRefresh: () => value.getHome(),
+                    color: const Color.fromARGB(255, 0, 95, 0),
+                    child: ListView(
+                      children: [
+                        value.isLoading
+                            ? Container(
+                                padding: const EdgeInsets.all(16),
+                                child: const Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    ProShimmer(height: 10, width: 200),
+                                    SizedBox(height: 4),
+                                    ProShimmer(height: 10, width: 120),
+                                    SizedBox(height: 4),
+                                    ProShimmer(height: 10, width: 100),
+                                    SizedBox(height: 4),
                                   ],
                                 ),
-                              ),
-                        Spacer(),
-                        CachedNetworkImage(
-                          imageUrl: value.logoBprFile.isNotEmpty ? NetworkURL.logoBprView(value.logoBprFile) : value.users!.bprLogo,
-                          height: 70,
-                          fit: BoxFit.contain,
-                          placeholder: (_, __) =>
-                              const SizedBox(height: 70, width: 70, child: Center(child: CircularProgressIndicator(strokeWidth: 2))),
-                          errorWidget: (_, __, ___) => const Icon(Icons.broken_image, color: Colors.red),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Expanded(
-                    child: RefreshIndicator(
-                      onRefresh: () => value.getHome(),
-                      color: colorPrimary,
-                      child: ListView(
-                        children: [
-                          value.isLoading
-                              ? Container(
-                                  padding: const EdgeInsets.all(16),
-                                  child: const Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      ProShimmer(height: 10, width: 200),
-                                      SizedBox(height: 4),
-                                      ProShimmer(height: 10, width: 120),
-                                      SizedBox(height: 4),
-                                      ProShimmer(height: 10, width: 100),
-                                      SizedBox(height: 4),
-                                    ],
-                                  ),
-                                )
-                              : Column(
-                                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                                  children: [
-                                    Container(
-                                      margin: const EdgeInsets.symmetric(horizontal: 16),
-                                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(16),
-                                        gradient: const LinearGradient(
-                                          begin: Alignment.topLeft,
-                                          end: Alignment.bottomRight,
-                                          colors: [colorPrimary, colorPrimaryDark],
-                                        ),
-                                        boxShadow: [
-                                          BoxShadow(
-                                            color: colorPrimary.withValues(alpha: 0.35),
-                                            blurRadius: 12,
-                                            offset: const Offset(0, 6),
-                                          ),
-                                        ],
-                                      ),
-                                      child: Row(
+                              )
+                            : Column(
+                                crossAxisAlignment: CrossAxisAlignment.stretch,
+                                children: [
+                                  ClipRRect(
+                                    borderRadius: BorderRadius.circular(16),
+                                    child: Container(
+                                      height: 82,
+                                      margin: EdgeInsets.symmetric(horizontal: 16),
+                                      child: Stack(
                                         children: [
-                                          CircleAvatar(
-                                            radius: 24,
-                                            backgroundColor: Colors.white.withValues(alpha: 0.2),
-                                            child: Text(
-                                              value.users!.nama.isNotEmpty ? value.users!.nama[0].toUpperCase() : 'U',
-                                              style: const TextStyle(
-                                                color: Colors.white,
-                                                fontWeight: FontWeight.bold,
-                                                fontSize: 22,
+                                          Positioned(
+                                            top: 0,
+                                            left: 0,
+                                            right: 0,
+                                            bottom: 10,
+                                            child: Container(
+                                              padding: EdgeInsets.all(20),
+                                              decoration: BoxDecoration(
+                                                gradient: LinearGradient(
+                                                  begin: Alignment.topCenter,
+                                                  end: Alignment.bottomCenter,
+                                                  colors: [colorTop, colorBottom],
+                                                ),
                                               ),
                                             ),
                                           ),
-                                          const SizedBox(width: 12),
-                                          Expanded(
-                                            child: Column(
-                                              crossAxisAlignment: CrossAxisAlignment.start,
-                                              children: [
-                                                Text(
-                                                  value.users!.nama,
-                                                  style: const TextStyle(
-                                                    color: Colors.white,
-                                                    fontWeight: FontWeight.bold,
-                                                    fontSize: 15,
-                                                  ),
-                                                  maxLines: 1,
-                                                  overflow: TextOverflow.ellipsis,
-                                                ),
-                                                const SizedBox(height: 3),
-                                                Text(
-                                                  "No CIF: ${value.users!.noCif}",
-                                                  style: TextStyle(
-                                                    color: Colors.white.withValues(alpha: 0.75),
-                                                    fontSize: 12,
-                                                  ),
-                                                ),
-                                              ],
+                                          Positioned(
+                                            top: -270,
+                                            left: -100,
+                                            child: Container(
+                                              height: 300,
+                                              width: 300,
+                                              decoration: BoxDecoration(color: const Color.fromARGB(255, 1, 140, 1), shape: BoxShape.circle),
                                             ),
                                           ),
-                                          Icon(
-                                            Icons.account_circle_outlined,
-                                            color: Colors.white.withValues(alpha: 0.25),
-                                            size: 52,
+
+                                          Positioned(
+                                            top: 0,
+                                            left: 0,
+                                            right: 0,
+                                            bottom: 0,
+                                            child: Container(
+                                              padding: EdgeInsets.all(16),
+                                              child: Column(
+                                                crossAxisAlignment: CrossAxisAlignment.end,
+                                                children: [
+                                                  Spacer(),
+                                                  Row(
+                                                    crossAxisAlignment: CrossAxisAlignment.end,
+                                                    children: [
+                                                      Expanded(
+                                                        child: Column(
+                                                          crossAxisAlignment: CrossAxisAlignment.end,
+                                                          children: [
+                                                            Text("No CIF: ${value.users!.noCif}", style: TextStyle(fontSize: 12)),
+                                                            Text(
+                                                              "${value.users!.nama}",
+                                                              textAlign: TextAlign.end,
+                                                              maxLines: 2,
+                                                              overflow: TextOverflow.ellipsis,
+                                                              style: TextStyle(fontWeight: FontWeight.bold),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                  SizedBox(height: 8),
+                                                ],
+                                              ),
+                                            ),
                                           ),
                                         ],
                                       ),
                                     ),
-                                    const SizedBox(height: 12),
-                                    value.list.isNotEmpty
-                                        ? Column(
-                                            crossAxisAlignment: CrossAxisAlignment.stretch,
-                                            children: [
-                                              SizedBox(
-                                                height: 170,
-                                                child: PageView.builder(
-                                                  itemCount: value.listBanner.length,
-                                                  controller: _bannerController,
-                                                  onPageChanged: (index) {
-                                                    _bannerIndex = index;
-                                                  },
-                                                  physics: ClampingScrollPhysics(),
-                                                  itemBuilder: (context, i) {
-                                                    final data = value.listBanner[i];
-                                                    return GestureDetector(
-                                                      onTap: () => _onBannerTap(context, data),
-                                                      child: Container(
-                                                        margin: const EdgeInsets.only(right: 16),
-                                                        child: CachedNetworkImage(
-                                                          imageUrl: NetworkURL.bannerViewImage(
-                                                            data.imageFile.isNotEmpty ? data.imageFile : data.banners,
-                                                          ),
-                                                          placeholder: (context, url) => ProShimmer(height: 140, width: 220, radius: 8),
-                                                          imageBuilder: (context, imageProvider) => Container(
-                                                            decoration: BoxDecoration(
-                                                              borderRadius: BorderRadius.circular(8),
-                                                              image: DecorationImage(image: imageProvider, fit: BoxFit.cover),
-                                                            ),
-                                                          ),
-                                                          errorWidget: (_, __, ___) => const Icon(Icons.broken_image, color: Colors.red),
+                                  ),
+                                  // SizedBox(height: 8),
+                                  value.list.isNotEmpty
+                                      ? Column(
+                                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                                          children: [
+                                            SizedBox(
+                                              height: 170,
+                                              child: PageView.builder(
+                                                itemCount: value.listBanner.length,
+                                                controller: _bannerController,
+                                                onPageChanged: (index) {
+                                                  _bannerIndex = index;
+                                                },
+                                                physics: ClampingScrollPhysics(),
+                                                itemBuilder: (context, i) {
+                                                  final data = value.listBanner[i];
+                                                  return GestureDetector(
+                                                    onTap: () => _onBannerTap(context, data),
+                                                    child: Container(
+                                                      margin: const EdgeInsets.only(right: 16),
+                                                      child: CachedNetworkImage(
+                                                        imageUrl: NetworkURL.bannerViewImage(
+                                                          data.imageFile.isNotEmpty ? data.imageFile : data.banners,
                                                         ),
+                                                        placeholder: (context, url) => ProShimmer(height: 140, width: 220, radius: 8),
+                                                        imageBuilder: (context, imageProvider) => Container(
+                                                          decoration: BoxDecoration(
+                                                            borderRadius: BorderRadius.circular(8),
+                                                            image: DecorationImage(image: imageProvider, fit: BoxFit.cover),
+                                                          ),
+                                                        ),
+                                                        errorWidget: (_, __, ___) => const Icon(Icons.broken_image, color: Colors.red),
                                                       ),
-                                                    );
-                                                  },
+                                                    ),
+                                                  );
+                                                },
+                                              ),
+                                            ),
+                                            SizedBox(height: 8),
+                                          ],
+                                        )
+                                      : SizedBox(),
+                                  Container(
+                                    margin: EdgeInsets.all(16),
+                                    padding: EdgeInsets.all(16),
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(8),
+                                      color: const Color.fromARGB(255, 137, 206, 252),
+                                      boxShadow: [BoxShadow(offset: Offset(2, 2), color: Colors.grey[300] ?? Colors.transparent, blurRadius: 5)],
+                                    ),
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                                      children: [
+                                        Row(
+                                          children: [
+                                            Expanded(
+                                              child: InkWell(
+                                                onTap: () => value.gantiPage(0),
+                                                child: Container(
+                                                  padding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                                                  decoration: BoxDecoration(
+                                                    borderRadius: BorderRadius.circular(8),
+                                                    color: value.page == 0 ? const Color.fromARGB(255, 0, 95, 0) : Colors.white,
+                                                    border: Border.all(
+                                                      color: value.page == 0 ? const Color.fromARGB(255, 0, 95, 0) : Colors.grey.shade400,
+                                                      width: 2,
+                                                    ),
+                                                  ),
+                                                  child: Text(
+                                                    "Tabungan",
+                                                    textAlign: TextAlign.center,
+                                                    style: TextStyle(fontSize: 12, color: value.page == 0 ? Colors.white : Colors.black),
+                                                  ),
                                                 ),
                                               ),
-                                              SizedBox(height: 8),
-                                            ],
-                                          )
-                                        : SizedBox(),
-                                    Container(
-                                      margin: const EdgeInsets.all(16),
-                                      padding: const EdgeInsets.all(16),
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(16),
-                                        color: Colors.white,
-                                        boxShadow: [
-                                          BoxShadow(
-                                            offset: const Offset(0, 2),
-                                            color: Colors.grey.shade200,
-                                            blurRadius: 8,
-                                          ),
-                                        ],
-                                      ),
-                                      child: Column(
+                                            ),
+                                            SizedBox(width: 12),
+                                            Expanded(
+                                              child: InkWell(
+                                                onTap: () => value.gantiPage(1),
+                                                child: Container(
+                                                  padding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                                                  decoration: BoxDecoration(
+                                                    borderRadius: BorderRadius.circular(8),
+                                                    color: value.page == 1 ? const Color.fromARGB(255, 0, 95, 0) : Colors.white,
+                                                    border: Border.all(
+                                                      color: value.page == 1 ? const Color.fromARGB(255, 0, 95, 0) : Colors.grey.shade400,
+                                                      width: 2,
+                                                    ),
+                                                  ),
+                                                  child: Text(
+                                                    "Deposito",
+                                                    textAlign: TextAlign.center,
+                                                    style: TextStyle(fontSize: 12, color: value.page == 1 ? Colors.white : Colors.black),
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                            SizedBox(width: 12),
+                                            Expanded(
+                                              child: InkWell(
+                                                onTap: () => value.gantiPage(2),
+                                                child: Container(
+                                                  padding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                                                  decoration: BoxDecoration(
+                                                    borderRadius: BorderRadius.circular(8),
+                                                    color: value.page == 2 ? const Color.fromARGB(255, 0, 95, 0) : Colors.white,
+                                                    border: Border.all(
+                                                      color: value.page == 2 ? const Color.fromARGB(255, 0, 95, 0) : Colors.grey.shade400,
+                                                      width: 2,
+                                                    ),
+                                                  ),
+                                                  child: Text(
+                                                    "Pinjaman",
+                                                    textAlign: TextAlign.center,
+                                                    style: TextStyle(fontSize: 12, color: value.page == 2 ? Colors.white : Colors.black),
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        SizedBox(height: 16),
+                                        value.page == 0
+                                            ? _produkTabungan(value, context)
+                                            : value.page == 1
+                                            ? _produkDeposito(value, context)
+                                            : _produkPinjaman(value, context),
+                                      ],
+                                    ),
+                                  ),
+                                  // SizedBox(height: 8),
+                                  _loanMenuSection(context, value),
+                                  // SizedBox(height: 8),
+                                  _sukuBungaSection(value.listtabungan, value.listdeposito),
+                                  // SizedBox(height: 8),
+                                  Container(
+                                    padding: EdgeInsets.symmetric(horizontal: 20),
+                                    child: Text("Kenal lebih dekat Produk Kami", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                                  ),
+                                  SizedBox(height: 16),
+                                  ListView.builder(
+                                    itemCount: value.listProduk.length,
+                                    shrinkWrap: true,
+                                    physics: ClampingScrollPhysics(),
+                                    itemBuilder: (context, i) {
+                                      final data = value.listProduk[i];
+                                      return Column(
                                         crossAxisAlignment: CrossAxisAlignment.stretch,
                                         children: [
                                           Container(
-                                            padding: const EdgeInsets.all(4),
+                                            margin: EdgeInsets.symmetric(horizontal: 20),
+                                            padding: EdgeInsets.all(16),
                                             decoration: BoxDecoration(
-                                              borderRadius: BorderRadius.circular(10),
-                                              color: Colors.grey.shade100,
+                                              borderRadius: BorderRadius.circular(8),
+                                              color: Colors.white,
+                                              boxShadow: [
+                                                BoxShadow(offset: Offset(2, 2), blurRadius: 5, color: Colors.grey[300] ?? Colors.transparent),
+                                              ],
                                             ),
                                             child: Row(
+                                              crossAxisAlignment: CrossAxisAlignment.start,
                                               children: [
+                                                _buildProdukImage(data),
+                                                SizedBox(width: 16),
                                                 Expanded(
-                                                  child: _tabButton(
-                                                    label: "Tabungan",
-                                                    isSelected: value.page == 0,
-                                                    onTap: () => value.gantiPage(0),
-                                                  ),
-                                                ),
-                                                Expanded(
-                                                  child: _tabButton(
-                                                    label: "Deposito",
-                                                    isSelected: value.page == 1,
-                                                    onTap: () => value.gantiPage(1),
-                                                  ),
-                                                ),
-                                                Expanded(
-                                                  child: _tabButton(
-                                                    label: "Pinjaman",
-                                                    isSelected: value.page == 2,
-                                                    onTap: () => value.gantiPage(2),
+                                                  child: Column(
+                                                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                                                    children: [
+                                                      Text("${data.namaProduk}", style: TextStyle(fontWeight: FontWeight.bold)),
+                                                      SizedBox(height: 4),
+                                                      Text("${data.keterangan}", style: TextStyle(fontSize: 12, fontWeight: FontWeight.w300)),
+                                                    ],
                                                   ),
                                                 ),
                                               ],
                                             ),
                                           ),
                                           SizedBox(height: 16),
-                                          value.page == 0
-                                              ? _produkTabungan(value, context)
-                                              : value.page == 1
-                                              ? _produkDeposito(value, context)
-                                              : _produkPinjaman(value, context),
                                         ],
-                                      ),
-                                    ),
-                                    // SizedBox(height: 8),
-                                    _loanMenuSection(context),
-                                    // SizedBox(height: 8),
-                                    _sukuBungaSection(value.listtabungan, value.listdeposito),
-                                    // SizedBox(height: 8),
-                                    Container(
-                                      padding: EdgeInsets.symmetric(horizontal: 20),
-                                      child: Text("Kenal lebih dekat Produk Kami", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                                    ),
-                                    SizedBox(height: 16),
-                                    ListView.builder(
-                                      itemCount: value.listProduk.length,
-                                      shrinkWrap: true,
-                                      physics: ClampingScrollPhysics(),
-                                      itemBuilder: (context, i) {
-                                        final data = value.listProduk[i];
-                                        return Column(
-                                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                                          children: [
-                                            Container(
-                                              margin: EdgeInsets.symmetric(horizontal: 20),
-                                              padding: EdgeInsets.all(16),
-                                              decoration: BoxDecoration(
-                                                borderRadius: BorderRadius.circular(8),
-                                                color: Colors.white,
-                                                boxShadow: [
-                                                  BoxShadow(offset: Offset(2, 2), blurRadius: 5, color: Colors.grey[300] ?? Colors.transparent),
-                                                ],
-                                              ),
-                                              child: Row(
-                                                crossAxisAlignment: CrossAxisAlignment.start,
-                                                children: [
-                                                  _buildProdukImage(data),
-                                                  SizedBox(width: 16),
-                                                  Expanded(
-                                                    child: Column(
-                                                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                                                      children: [
-                                                        Text("${data.namaProduk}", style: TextStyle(fontWeight: FontWeight.bold)),
-                                                        SizedBox(height: 4),
-                                                        Text("${data.keterangan}", style: TextStyle(fontSize: 12, fontWeight: FontWeight.w300)),
-                                                      ],
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                            SizedBox(height: 16),
-                                          ],
-                                        );
-                                      },
-                                    ),
-                                  ],
-                                ),
-                          SizedBox(height: 64),
-                        ],
-                      ),
+                                      );
+                                    },
+                                  ),
+                                ],
+                              ),
+                        SizedBox(height: 64),
+                      ],
                     ),
                   ),
-                ],
-              ),
+                ),
+              ],
+            ),
           );
         },
-      ),
-    );
-  }
-
-  Widget _tabButton({required String label, required bool isSelected, required VoidCallback onTap}) {
-    return GestureDetector(
-      onTap: onTap,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.symmetric(vertical: 10),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(8),
-          color: isSelected ? colorPrimary : Colors.transparent,
-          boxShadow: isSelected
-              ? [BoxShadow(color: colorPrimary.withValues(alpha: 0.3), blurRadius: 6, offset: const Offset(0, 3))]
-              : [],
-        ),
-        child: Text(
-          label,
-          textAlign: TextAlign.center,
-          style: TextStyle(
-            fontSize: 12,
-            fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-            color: isSelected ? Colors.white : Colors.grey.shade600,
-          ),
-        ),
       ),
     );
   }
@@ -420,27 +433,15 @@ Widget _produkTabungan(HomeNotifier value, BuildContext context) {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    tabungan.namaProduk,
-                    style: const TextStyle(fontWeight: FontWeight.bold),
-                  ),
+                  Text(tabungan.namaProduk, style: const TextStyle(fontWeight: FontWeight.bold)),
                   const SizedBox(height: 4),
-                  Text(
-                    tabungan.noAcc,
-                    style: const TextStyle(fontSize: 12, color: Colors.grey),
-                  ),
+                  Text(tabungan.noAcc, style: const TextStyle(fontSize: 12, color: Colors.grey)),
                 ],
               ),
             ),
 
             // KANAN (saldo)
-            Text(
-              "Rp ${FormatCurrency.oCcy.format(tabungan.saldo)}",
-              style: const TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 13,
-              ),
-            ),
+            Text("Rp ${FormatCurrency.oCcy.format(tabungan.saldo)}", style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
           ],
         ),
       );
@@ -540,7 +541,9 @@ Widget _buildProdukImage(ProdukModel data) {
   );
 }
 
-Widget _loanMenuSection(BuildContext context) {
+Widget _loanMenuSection(BuildContext context, HomeNotifier value) {
+  final showDepositOpening = value.showPembukaanDepositoMenu;
+
   return Container(
     margin: const EdgeInsets.symmetric(horizontal: 16),
     child: Row(
@@ -549,12 +552,25 @@ Widget _loanMenuSection(BuildContext context) {
           child: _loanMenuButton(
             icon: Icons.assignment,
             title: "Permohonan Pinjaman",
-            subtitle: "Simulasi Pinjaman / Pengajuan Pinjaman",
+            subtitle: "Simulasi / Pengajuan",
             onTap: () {
               Navigator.push(context, MaterialPageRoute(builder: (_) => const LoanApplicationPage()));
             },
           ),
         ),
+        if (showDepositOpening) ...[
+          const SizedBox(width: 12),
+          Expanded(
+            child: _loanMenuButton(
+              icon: Icons.savings,
+              title: "Pembukaan Deposito",
+              subtitle: "Buka deposito baru",
+              onTap: () {
+                Navigator.push(context, MaterialPageRoute(builder: (_) => const DepositOpeningPage()));
+              },
+            ),
+          ),
+        ],
       ],
     ),
   );
@@ -565,35 +581,34 @@ Widget _loanMenuButton({required IconData icon, required String title, required 
     borderRadius: BorderRadius.circular(14),
     onTap: onTap,
     child: Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
         color: Colors.grey.shade100,
         borderRadius: BorderRadius.circular(14),
         boxShadow: [BoxShadow(offset: const Offset(2, 2), blurRadius: 6, color: Colors.grey[300] ?? Colors.transparent)],
       ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // ICON
           Container(
             width: 42,
             height: 42,
             decoration: BoxDecoration(color: Colors.green.withOpacity(0.15), borderRadius: BorderRadius.circular(10)),
-            child: const Icon(Icons.assignment, color: Color.fromARGB(255, 0, 95, 0), size: 22),
+            child: Icon(icon, color: const Color.fromARGB(255, 0, 95, 0), size: 22),
           ),
-
-          const SizedBox(width: 12),
-
-          // TEXT
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
-                const SizedBox(height: 4),
-                Text(subtitle, style: TextStyle(fontSize: 11, color: Colors.grey.shade600)),
-              ],
-            ),
+          const SizedBox(height: 10),
+          Text(
+            title,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            subtitle,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(fontSize: 10.5, color: Colors.grey.shade600),
           ),
         ],
       ),
@@ -726,11 +741,12 @@ Widget mobileDialogWrapper(BuildContext context, {required Widget child, DialogM
   final screenWidth = MediaQuery.of(context).size.width;
   final screenHeight = MediaQuery.of(context).size.height;
 
-  final videoWidth = screenWidth > 900 ? 800.0 : screenWidth * 0.95;
+  final width = screenWidth > 600 ? 400.0 : screenWidth * 0.95;
+  final video_width = screenWidth > 900 ? 800.0 : screenWidth * 0.95;
 
   double? height;
   if (mode == DialogMode.video) {
-    height = videoWidth / aspectRatio;
+    height = video_width / aspectRatio;
   } else if (mode == DialogMode.image) {
     height = screenHeight * 0.7;
   }
@@ -779,38 +795,32 @@ void _onBannerTap(BuildContext context, BannersModel banner) {
 void _showVideoBanner(BuildContext context, String videoUrl) {
   showDialog(
     context: context,
-    barrierDismissible: true,
+    barrierDismissible: false,
     builder: (context) {
       final size = MediaQuery.of(context).size;
 
       return Dialog(
         backgroundColor: Colors.transparent,
-        insetPadding: const EdgeInsets.symmetric(horizontal: 32, vertical: 48),
+        insetPadding: const EdgeInsets.all(16),
         child: Center(
           child: ConstrainedBox(
             constraints: BoxConstraints(
-              maxWidth: (size.width * 0.75).clamp(220.0, 300.0),
-              maxHeight: size.height * 0.6,
+              maxWidth: 380,
+              maxHeight: size.height * 0.75, // 🔥 batasi tinggi
             ),
             child: Stack(
-              clipBehavior: Clip.none,
               children: [
-                AnimatedSize(
-                  duration: const Duration(milliseconds: 250),
-                  curve: Curves.easeOut,
-                  alignment: Alignment.center,
+                AspectRatio(
+                  aspectRatio: 9 / 16, // 🔥 portrait
                   child: ClipRRect(
-                    borderRadius: BorderRadius.circular(20),
-                    child: Container(
-                      color: Colors.black,
-                      child: VideoPlayerWidget(url: videoUrl),
-                    ),
+                    borderRadius: BorderRadius.circular(16),
+                    child: VideoPlayerWidget(url: videoUrl),
                   ),
                 ),
 
                 Positioned(
-                  top: -14,
-                  right: -14,
+                  top: 8,
+                  right: 8,
                   child: GestureDetector(
                     onTap: () => Navigator.pop(context),
                     child: Container(
@@ -819,9 +829,6 @@ void _showVideoBanner(BuildContext context, String videoUrl) {
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [colorTop, colorBottom]),
-                        boxShadow: [
-                          BoxShadow(color: Colors.black.withValues(alpha: 0.3), blurRadius: 6, offset: const Offset(0, 2)),
-                        ],
                       ),
                       child: const Icon(Icons.close, size: 18, color: Colors.black),
                     ),
@@ -843,47 +850,25 @@ void _showImageBanner(BuildContext context, {String? bannerUrl, String? bannerFi
 
   showDialog(
     context: context,
-    barrierDismissible: true,
     builder: (context) {
       return Dialog(
         backgroundColor: Colors.transparent,
-        child: Stack(
-          clipBehavior: Clip.none,
-          children: [
-            mobileDialogWrapper(
-              context,
-              mode: DialogMode.image,
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(16),
-                child: InteractiveViewer(
-                  minScale: 0.8,
-                  maxScale: 4,
-                  child: CachedNetworkImage(
-                    imageUrl: imageUrl,
-                    fit: BoxFit.contain,
-                    placeholder: (ctx, url) => const Center(child: CircularProgressIndicator()),
-                    errorWidget: (ctx, url, err) => const Icon(Icons.broken_image, size: 48),
-                  ),
-                ),
+        child: mobileDialogWrapper(
+          context,
+          mode: DialogMode.image,
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(16),
+            child: InteractiveViewer(
+              minScale: 0.8,
+              maxScale: 4,
+              child: CachedNetworkImage(
+                imageUrl: imageUrl,
+                fit: BoxFit.contain,
+                placeholder: (_, __) => const Center(child: CircularProgressIndicator()),
+                errorWidget: (_, __, ___) => const Icon(Icons.broken_image, size: 48),
               ),
             ),
-            Positioned(
-              top: -12,
-              right: -12,
-              child: GestureDetector(
-                onTap: () => Navigator.pop(context),
-                child: Container(
-                  width: 34,
-                  height: 34,
-                  decoration: const BoxDecoration(
-                    color: Colors.black54,
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(Icons.close, color: Colors.white, size: 18),
-                ),
-              ),
-            ),
-          ],
+          ),
         ),
       );
     },
@@ -893,42 +878,23 @@ void _showImageBanner(BuildContext context, {String? bannerUrl, String? bannerFi
 void _showTextBanner(BuildContext context, {required String title, required String description}) {
   showDialog(
     context: context,
-    barrierDismissible: true,
     builder: (context) {
       return Dialog(
         backgroundColor: Colors.transparent,
         child: mobileDialogWrapper(
           context,
           mode: DialogMode.text,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              // Header with close button
-              Padding(
-                padding: const EdgeInsets.fromLTRB(16, 16, 8, 0),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: Text(
-                        title,
-                        style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                      ),
-                    ),
-                    IconButton(
-                      onPressed: () => Navigator.pop(context),
-                      icon: const Icon(Icons.close),
-                      visualDensity: VisualDensity.compact,
-                    ),
-                  ],
-                ),
-              ),
-              const Divider(height: 1),
-              Padding(
-                padding: const EdgeInsets.all(16),
-                child: Text(description),
-              ),
-            ],
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(title, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                const SizedBox(height: 12),
+                Text(description),
+              ],
+            ),
           ),
         ),
       );
@@ -1040,17 +1006,14 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
   @override
   Widget build(BuildContext context) {
     if (!_controller.value.isInitialized) {
-      // 🔥 placeholder portrait sambil loading, ukuran final menyesuaikan video asli setelah init
-      return const AspectRatio(
-        aspectRatio: 9 / 16,
-        child: Center(child: CircularProgressIndicator(color: Colors.white)),
-      );
+      return const Center(child: CircularProgressIndicator(color: Colors.white));
     }
 
-    // 🔥 otomatis landscape atau portrait sesuai rasio asli video
-    return AspectRatio(
-      aspectRatio: _controller.value.aspectRatio,
-      child: VideoPlayer(_controller),
+    return Center(
+      child: FittedBox(
+        fit: BoxFit.contain,
+        child: SizedBox(width: 380, height: _controller.value.size.height, child: VideoPlayer(_controller)),
+      ),
     );
   }
 }

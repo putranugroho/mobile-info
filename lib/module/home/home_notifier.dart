@@ -31,6 +31,14 @@ class HomeNotifier extends ChangeNotifier {
   }
 
   UsersModel? users;
+
+  /// Sementara dibuat TRUE agar menu Pembukaan Deposito bisa dites tampilannya.
+  /// Nanti setelah backend Setup CMS tersedia, isi nilai ini dari response setup CMS.
+  /// Ketentuan: menu tampil hanya jika status setup CMS = "Y".
+  String pembukaanDepositoSetupStatus = "Y";
+
+  bool get showPembukaanDepositoMenu => pembukaanDepositoSetupStatus.toUpperCase() == "Y";
+
   getProfile() async {
     users = await Pref().getUsers();
     print("BPR ID HOME: ${users!.bprId}");

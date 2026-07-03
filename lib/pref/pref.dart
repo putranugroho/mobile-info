@@ -17,6 +17,11 @@ class Pref {
   static String token = "token";
   static String splashShownAfterLogin = "splash_shown_after_login";
 
+  static String sessionToken = "session_token";
+  static String loginDeviceId = "login_device_id";
+  static String loginDeviceName = "login_device_name";
+  static String loginExpiredAt = "login_expired_at";
+
   saveToken(String token) async {
     SharedPreferences pref = await SharedPreferences.getInstance();
     pref.setString(Pref.token, token);
@@ -51,10 +56,10 @@ class Pref {
     pref.setString(Pref.bprLogo, users.bprLogo);
     pref.setString(Pref.bprNama, users.bprNama);
     pref.setString(Pref.createdAt, users.createdAt);
-    await pref.setString('session_token', users.sessionToken);
-    await pref.setString('login_device_id', users.loginDeviceId);
-    await pref.setString('login_device_name', users.loginDeviceName);
-    await pref.setString('login_expired_at', users.loginExpiredAt);
+    await pref.setString(Pref.sessionToken, users.sessionToken);
+    await pref.setString(Pref.loginDeviceId, users.loginDeviceId);
+    await pref.setString(Pref.loginDeviceName, users.loginDeviceName);
+    await pref.setString(Pref.loginExpiredAt, users.loginExpiredAt);
   }
 
   Future<UsersModel> getUsers() async {
@@ -74,12 +79,29 @@ class Pref {
       createdAt: pref.getString('created_at') ?? '',
 
       // tambahan baru
-      sessionToken: pref.getString('session_token') ?? '',
-      loginDeviceId: pref.getString('login_device_id') ?? '',
-      loginDeviceName: pref.getString('login_device_name') ?? '',
-      loginExpiredAt: pref.getString('login_expired_at') ?? '',
+      sessionToken: pref.getString(Pref.sessionToken) ?? '',
+      loginDeviceId: pref.getString(Pref.loginDeviceId) ?? '',
+      loginDeviceName: pref.getString(Pref.loginDeviceName) ?? '',
+      loginExpiredAt: pref.getString(Pref.loginExpiredAt) ?? '',
     );
     return users;
+  }
+
+  Future<void> updateLoginSession({String? sessionToken, String? loginDeviceId, String? loginDeviceName, String? loginExpiredAt}) async {
+    final pref = await SharedPreferences.getInstance();
+
+    if (sessionToken != null) {
+      await pref.setString(Pref.sessionToken, sessionToken);
+    }
+    if (loginDeviceId != null) {
+      await pref.setString(Pref.loginDeviceId, loginDeviceId);
+    }
+    if (loginDeviceName != null) {
+      await pref.setString(Pref.loginDeviceName, loginDeviceName);
+    }
+    if (loginExpiredAt != null) {
+      await pref.setString(Pref.loginExpiredAt, loginExpiredAt);
+    }
   }
 
   remove() async {
@@ -97,5 +119,10 @@ class Pref {
     pref.remove(Pref.bprNama);
     pref.remove(Pref.createdAt);
     pref.remove(Pref.splashShownAfterLogin);
+    pref.remove(Pref.token);
+    pref.remove(Pref.sessionToken);
+    pref.remove(Pref.loginDeviceId);
+    pref.remove(Pref.loginDeviceName);
+    pref.remove(Pref.loginExpiredAt);
   }
 }

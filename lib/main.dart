@@ -13,8 +13,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 // import 'app_router.dart';
 
-final FlutterLocalNotificationsPlugin localNotif =
-    FlutterLocalNotificationsPlugin();
+final FlutterLocalNotificationsPlugin localNotif = FlutterLocalNotificationsPlugin();
 
 Future<void> initLocalNotif() async {
   const androidInit = AndroidInitializationSettings('@mipmap/launcher_icon');
@@ -42,17 +41,10 @@ Future<void> initWebPush() async {
   try {
     final messaging = FirebaseMessaging.instance;
 
-    final settings = await messaging.requestPermission(
-      alert: true,
-      badge: true,
-      sound: true,
-    );
+    final settings = await messaging.requestPermission(alert: true, badge: true, sound: true);
 
     if (settings.authorizationStatus == AuthorizationStatus.authorized) {
-      final token = await messaging.getToken(
-        vapidKey:
-            'BLTB29Uy3GxtzvXpg7XdMJmCx_8v0hT-3mRRc_DxydjTb6erLTwwJlflthGZF9TFDi_ef7SU42W5MqGLCUCdzIM',
-      );
+      final token = await messaging.getToken(vapidKey: 'BLTB29Uy3GxtzvXpg7XdMJmCx_8v0hT-3mRRc_DxydjTb6erLTwwJlflthGZF9TFDi_ef7SU42W5MqGLCUCdzIM');
       debugPrint('✅ FCM WEB TOKEN: $token');
     } else {
       debugPrint('❌ Web notification permission denied');
@@ -91,8 +83,7 @@ void setupFCMListeners() {
   FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
     debugPrint('🔔 FOREGROUND NOTIF');
 
-    final title =
-        message.notification?.title ?? message.data['title'] ?? 'IBPR';
+    final title = message.notification?.title ?? message.data['title'] ?? 'IBPR';
     final body = message.notification?.body ?? message.data['body'] ?? '';
 
     const androidDetails = AndroidNotificationDetails(
@@ -102,12 +93,7 @@ void setupFCMListeners() {
       priority: Priority.high,
     );
 
-    await localNotif.show(
-      DateTime.now().millisecondsSinceEpoch ~/ 1000,
-      title,
-      body,
-      const NotificationDetails(android: androidDetails),
-    );
+    await localNotif.show(DateTime.now().millisecondsSinceEpoch ~/ 1000, title, body, const NotificationDetails(android: androidDetails));
   });
 
   FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
@@ -123,9 +109,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
 
-  await Firebase.initializeApp(
-    options: kIsWeb ? DefaultFirebaseOptions.currentPlatform : null,
-  );
+  await Firebase.initializeApp(options: kIsWeb ? DefaultFirebaseOptions.currentPlatform : null);
 
   await initLocalNotif(); // ⬅️ WAJIB
   setupFCMListeners();
@@ -165,10 +149,7 @@ class MyApp extends StatelessWidget {
       scrollBehavior: MyCustomScrollBehavior(),
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color(0xFF9B1414),
-          primary: const Color(0xFF9B1414),
-        ),
+        colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF9B1414), primary: const Color(0xFF9B1414)),
         useMaterial3: true,
       ),
       // 🔥 listener global: reset idle-timer di semua halaman, termasuk route yang di-push

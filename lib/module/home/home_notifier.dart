@@ -5,7 +5,6 @@ import 'package:mobile_info/models/index.dart';
 import 'package:mobile_info/models/deposito_model.dart';
 import 'package:mobile_info/models/tabungan_model.dart';
 import 'package:mobile_info/models/kredit_model.dart';
-import 'package:mobile_info/module/auth/login_page.dart';
 import 'package:mobile_info/module/repository/auth_repository.dart';
 import 'package:mobile_info/module/repository/home_repository.dart';
 import 'package:mobile_info/module/repository/rekening_repository.dart';
@@ -53,7 +52,6 @@ class HomeNotifier extends ChangeNotifier {
     loadTabungan();
     loadDeposito();
     loadKredit();
-    initializeTimer();
     getRateProduk();
 
     notifyListeners();
@@ -94,17 +92,6 @@ class HomeNotifier extends ChangeNotifier {
     notifyListeners();
   }
 
-  Timer? _rootTimer;
-
-  void initializeTimer() {
-    if (_rootTimer != null) _rootTimer!.cancel();
-    const time = const Duration(minutes: 5);
-    print(time);
-    _rootTimer = Timer(time, () {
-      logOutUser();
-    });
-  }
-
   String get logoByBprId {
     final bprId = users?.bprId;
 
@@ -116,75 +103,6 @@ class HomeNotifier extends ChangeNotifier {
       default:
         return ImageAssets.logomedfo; // medfo_logo.jpeg
     }
-  }
-
-  Future<void> logOutUser() async {
-    try {
-      final currentUser = users ?? await Pref().getUsers();
-
-      await AuthRepository.logoutMobileInfo(
-        endpoint: NetworkURL.logout(),
-        userId: currentUser.id,
-        username: currentUser.username,
-        deviceId: currentUser.loginDeviceId,
-        sessionToken: currentUser.sessionToken,
-        bprId: currentUser.bprId,
-      );
-    } catch (e) {
-      debugPrint("ERROR TIMEOUT LOGOUT MOBILE INFO: $e");
-    }
-
-    await Pref().remove();
-
-    if (!context.mounted) return;
-
-    Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => const LoginPage()), (route) => false);
-
-    _rootTimer?.cancel();
-  }
-
-  DateTime? _lastSessionPingAt;
-
-  Future<void> pingSessionIfNeeded() async {
-    final now = DateTime.now();
-
-    if (_lastSessionPingAt != null && now.difference(_lastSessionPingAt!).inSeconds < 120) {
-      return;
-    }
-
-    _lastSessionPingAt = now;
-
-    try {
-      final currentUser = users ?? await Pref().getUsers();
-
-      final value = await AuthRepository.sessionPingMobileInfo(
-        endpoint: NetworkURL.sessionPing(),
-        userId: currentUser.id,
-        username: currentUser.username,
-        deviceId: currentUser.loginDeviceId,
-        sessionToken: currentUser.sessionToken,
-        bprId: currentUser.bprId,
-      );
-
-      final body = value is Map<String, dynamic> ? value : {};
-
-      if (body['status'] == false && body['code'] == '401') {
-        await logOutUser();
-      }
-    } catch (e) {
-      debugPrint("ERROR SESSION PING: $e");
-    }
-  }
-
-  void handleUserInteraction([_]) {
-    if (_rootTimer != null && !_rootTimer!.isActive) {
-      return;
-    }
-
-    _rootTimer?.cancel();
-    initializeTimer();
-
-    pingSessionIfNeeded();
   }
 
   int page = 0;

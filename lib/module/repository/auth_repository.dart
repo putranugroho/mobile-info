@@ -265,7 +265,7 @@ class AuthRepository {
     return _decodeResponse(response.data);
   }
 
-  static Future<dynamic> verifyOtp(String token, String url, String phoneNumber, String otp) async {
+  static Future<dynamic> verifyOtp(String token, String url, String phoneNumber, String otp, {String bprId = ''}) async {
     Dio dio = Dio();
 
     dio.options.headers['x-username'] = xusername;
@@ -274,6 +274,10 @@ class AuthRepository {
     dio.options.headers['Content-Type'] = 'application/json';
 
     final body = {"token": token, "phone_number": phoneNumber, "otp": otp};
+
+    if (bprId.trim().isNotEmpty) {
+      body["bpr_id"] = bprId.trim();
+    }
 
     if (kDebugMode) {
       print("ENDPOINT URL : $url");

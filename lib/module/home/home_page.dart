@@ -82,35 +82,17 @@ class _HomePageState extends State<HomePage> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 Container(
-                  padding: EdgeInsets.all(16),
-                  child: Row(
-                    children: [
-                      value.users!.bprId == "609999"
-                          ? Image.asset(ImageAssets.logomedfo, height: 70, fit: BoxFit.contain)
-                          : Container(
-                              height: 80,
-                              width: 100,
-                              child: Column(
-                                children: [
-                                  Image.asset(ImageAssets.perbarindo, height: 60, fit: BoxFit.contain),
-
-                                  Text(
-                                    "${value.users!.perbarindo}",
-                                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: titlePerbarindo),
-                                  ),
-                                ],
-                              ),
-                            ),
-                      Spacer(),
-                      CachedNetworkImage(
-                        imageUrl: value.logoBprFile.isNotEmpty ? NetworkURL.logoBprView(value.logoBprFile) : value.users!.bprLogo,
-                        height: 70,
-                        fit: BoxFit.contain,
-                        placeholder: (_, __) =>
-                            const SizedBox(height: 70, width: 70, child: Center(child: CircularProgressIndicator(strokeWidth: 2))),
-                        errorWidget: (_, __, ___) => const Icon(Icons.broken_image, color: Colors.red),
-                      ),
-                    ],
+                  padding: const EdgeInsets.fromLTRB(16, 10, 16, 8),
+                  child: SizedBox(
+                    height: 76,
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        _buildHeaderLeftLogo(value),
+                        const SizedBox(width: 12),
+                        Expanded(child: _buildHeaderBprLogo(value)),
+                      ],
+                    ),
                   ),
                 ),
                 Expanded(
@@ -407,6 +389,73 @@ class _HomePageState extends State<HomePage> {
       ),
     );
   }
+}
+
+Widget _buildHeaderLeftLogo(HomeNotifier value) {
+  final isMedfo = value.users!.bprId == "609999";
+
+  if (isMedfo) {
+    return SizedBox(
+      width: 105,
+      height: 70,
+      child: Align(
+        alignment: Alignment.centerLeft,
+        child: Image.asset(ImageAssets.logomedfo, width: 105, height: 64, fit: BoxFit.contain),
+      ),
+    );
+  }
+
+  return SizedBox(
+    width: 105,
+    height: 70,
+    child: Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Expanded(child: Image.asset(ImageAssets.perbarindo, fit: BoxFit.contain)),
+        const SizedBox(height: 2),
+        Text(
+          "${value.users!.perbarindo}",
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          textAlign: TextAlign.center,
+          style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: titlePerbarindo),
+        ),
+      ],
+    ),
+  );
+}
+
+Widget _buildHeaderBprLogo(HomeNotifier value) {
+  final imageUrl = value.logoBprFile.isNotEmpty ? NetworkURL.logoBprView(value.logoBprFile) : value.users!.bprLogo;
+
+  if (imageUrl.trim().isEmpty) {
+    return const SizedBox(
+      height: 64,
+      child: Align(
+        alignment: Alignment.centerRight,
+        child: Icon(Icons.account_balance, size: 34, color: Colors.grey),
+      ),
+    );
+  }
+
+  return ClipRect(
+    child: SizedBox(
+      height: 64,
+      width: double.infinity,
+      child: Align(
+        alignment: Alignment.centerRight,
+        child: CachedNetworkImage(
+          imageUrl: imageUrl,
+          height: 64,
+          width: double.infinity,
+          fit: BoxFit.contain,
+          alignment: Alignment.centerRight,
+          placeholder: (_, __) => const SizedBox(height: 64, width: 64, child: Center(child: CircularProgressIndicator(strokeWidth: 2))),
+          errorWidget: (_, __, ___) => const Icon(Icons.broken_image, color: Colors.red),
+        ),
+      ),
+    ),
+  );
 }
 
 Widget _produkTabungan(HomeNotifier value, BuildContext context) {

@@ -269,6 +269,18 @@ class NetworkURL {
     return "$url_medfo/inquiry/permohonan-pinjaman";
   }
 
+  static String inquiryPembukaanDep() {
+    return "$url_medfo/inquiry/pembukaan-dep";
+  }
+
+  static String daftarPembukaanDeposito() {
+    return "$url_medfo/permohonan-pembukaan-deposito/daftar";
+  }
+
+  static String inquiryPermohonanPembukaanDeposito() {
+    return "$url_medfo/inquiry/permohonan-pembukaan-deposito";
+  }
+
   static String logoutMedfo() {
     return "$url_biz/webServices/logout_medfo.php";
   }

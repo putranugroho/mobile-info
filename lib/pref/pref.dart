@@ -18,12 +18,27 @@ class Pref {
   static String createdAt = "created_at";
   static String token = "token";
   static String splashShownAfterLogin = "splash_shown_after_login";
-  static String appDeviceId = "app_device_id";
 
   static String sessionToken = "session_token";
   static String loginDeviceId = "login_device_id";
   static String loginDeviceName = "login_device_name";
   static String loginExpiredAt = "login_expired_at";
+  static String appDeviceId = "app_device_id";
+
+  Future<String> getOrCreateAppDeviceId({required String prefix}) async {
+    final pref = await SharedPreferences.getInstance();
+    final existing = pref.getString(Pref.appDeviceId) ?? "";
+
+    if (existing.isNotEmpty) {
+      return existing;
+    }
+
+    final random = Random.secure().nextInt(999999999).toString().padLeft(9, '0');
+    final safePrefix = prefix.trim().isNotEmpty ? prefix.trim() : "mobile-info";
+    final newDeviceId = "$safePrefix-${DateTime.now().microsecondsSinceEpoch}-$random";
+    await pref.setString(Pref.appDeviceId, newDeviceId);
+    return newDeviceId;
+  }
 
   saveToken(String token) async {
     SharedPreferences pref = await SharedPreferences.getInstance();
@@ -43,27 +58,6 @@ class Pref {
   Future<bool> getSplashShownAfterLogin() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
     return pref.getBool(Pref.splashShownAfterLogin) ?? false;
-  }
-
-  Future<String> getOrCreateAppDeviceId({required String prefix}) async {
-    final pref = await SharedPreferences.getInstance();
-
-    final current = pref.getString(Pref.appDeviceId) ?? "";
-    if (current.trim().isNotEmpty) {
-      return current.trim();
-    }
-
-    final cleanPrefix = prefix.trim().isNotEmpty ? prefix.trim() : "app";
-    final random = Random().nextInt(999999999).toString().padLeft(9, "0");
-    final generated = "$cleanPrefix-${DateTime.now().millisecondsSinceEpoch}-$random";
-
-    await pref.setString(Pref.appDeviceId, generated);
-    return generated;
-  }
-
-  Future<String> getAppDeviceId() async {
-    SharedPreferences pref = await SharedPreferences.getInstance();
-    return pref.getString(Pref.appDeviceId) ?? "";
   }
 
   simpan(UsersModel users) async {

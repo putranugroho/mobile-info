@@ -155,7 +155,9 @@ class DepositOpeningHistoryModel {
     );
   }
 
-  bool get masihDiproses => status == '0' || status == '1';
+  bool get statusFinal => status == '2' || status == '3';
+
+  bool get masihDiproses => !statusFinal;
 }
 
 class DepositOpeningNotifier extends ChangeNotifier {
@@ -177,6 +179,7 @@ class DepositOpeningNotifier extends ChangeNotifier {
   String setupMessage = "";
   String rateMessage = "";
   String historyMessage = "";
+  String notificationMessage = "";
   String otpPhoneNumber = "";
 
   final nominalController = TextEditingController();
@@ -440,13 +443,14 @@ class DepositOpeningNotifier extends ChangeNotifier {
     otpSent = false;
     requestSuccess = false;
     errorMessage = "";
+    notificationMessage = "";
     otpController.clear();
   }
 
   String? validateForm() {
     if (setupLoading || rateLoading || historyLoading) return "Data masih dimuat. Silakan tunggu.";
     if (!setupActive) return setupMessage.isNotEmpty ? setupMessage : "Layanan permohonan buka deposito belum aktif.";
-    if (hasOngoingApplication) return "Masih ada permohonan deposito yang sedang diproses. Pengajuan baru belum bisa dibuat.";
+    if (hasOngoingApplication) return "Masih ada permohonan deposito yang belum selesai. Pengajuan baru bisa dibuat setelah status Selesai atau Dibatalkan.";
     if (productOptions.isEmpty || selectedProduct == null) return "Produk deposito belum tersedia dari rate produk.";
 
     final nominal = nominalValue;
@@ -472,6 +476,7 @@ class DepositOpeningNotifier extends ChangeNotifier {
 
   Future<String> process() async {
     errorMessage = "";
+    notificationMessage = "";
     requestSuccess = false;
 
     final validation = validateForm();
@@ -558,7 +563,17 @@ class DepositOpeningNotifier extends ChangeNotifier {
       }
 
       final submitResponse = await _submitPermohonan();
-      final message = '${submitResponse['message'] ?? 'Sukses, permintaan pembukaan deposito.'}';
+      final submitMessage = '${submitResponse['message'] ?? 'Sukses, permintaan pembukaan deposito.'}';
+
+      final notifResult = await DepositOpeningRepository.notifyDepositStaff(
+        bprId: currentUser.bprId,
+        nama: currentUser.nama,
+        nominal: nominalValue,
+        jangkaWaktu: selectedProduct?.tenorBulan ?? 0,
+      );
+
+      notificationMessage = "Notifikasi terkirim ke ${notifResult.successCount}/${notifResult.totalRecipient} staff.";
+      final message = "$submitMessage $notificationMessage";
 
       requestSuccess = true;
       loading = false;
@@ -611,6 +626,7 @@ class DepositOpeningNotifier extends ChangeNotifier {
     otpSent = false;
     requestSuccess = false;
     errorMessage = "";
+    notificationMessage = "";
     otpPhoneNumber = "";
     notifyListeners();
   }

@@ -22,10 +22,7 @@ class RupiahThousandsInputFormatter extends TextInputFormatter {
     }
 
     final formatted = buffer.toString().split('').reversed.join();
-    return TextEditingValue(
-      text: formatted,
-      selection: TextSelection.collapsed(offset: formatted.length),
-    );
+    return TextEditingValue(text: formatted, selection: TextSelection.collapsed(offset: formatted.length));
   }
 }
 
@@ -92,19 +89,9 @@ class _DepositOpeningPageState extends State<DepositOpeningPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  "Ajukan dan pantau deposito",
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
-                ),
+                Text("Ajukan dan pantau deposito", maxLines: 2, overflow: TextOverflow.ellipsis, style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
                 SizedBox(height: 4),
-                Text(
-                  "Pantau status permohonan buka deposito",
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(color: Colors.white70, fontSize: 12),
-                ),
+                Text("Pantau status permohonan buka deposito", maxLines: 2, overflow: TextOverflow.ellipsis, style: TextStyle(color: Colors.white70, fontSize: 12)),
               ],
             ),
           ),
@@ -152,11 +139,7 @@ class _DepositOpeningPageState extends State<DepositOpeningPage> {
                 child: Text(
                   tabs[index],
                   textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 12,
-                    fontWeight: active ? FontWeight.bold : FontWeight.normal,
-                    color: active ? const Color.fromARGB(255, 0, 95, 0) : Colors.grey.shade700,
-                  ),
+                  style: TextStyle(fontSize: 12, fontWeight: active ? FontWeight.bold : FontWeight.normal, color: active ? const Color.fromARGB(255, 0, 95, 0) : Colors.grey.shade700),
                 ),
               ),
             ),
@@ -202,24 +185,18 @@ class _DepositOpeningPageState extends State<DepositOpeningPage> {
             tenor: "${item.jangkaWaktu} bulan • ${item.sukuBunga}%",
             status: _depositStatusLabel(item.status),
             statusColor: _depositStatusColor(item.status),
-            desc:
-                "Rek. Debet ${item.rekeningDebet}"
+            desc: "Status MIS: ${_depositStatusMis(item.status)}"
+                "\nKeterangan: ${_depositStatusKeterangan(item.status)}"
+                "\nRek. Debet ${item.rekeningDebet}"
                 "${item.pencairanBunga.isNotEmpty ? "\nBunga: ${item.pencairanBunga}" : ""}"
-                "${item.alasan.isNotEmpty ? "\n${item.alasan}" : ""}",
+                "${item.alasan.isNotEmpty ? "\nAlasan: ${item.alasan}" : ""}",
           );
         },
       ),
     );
   }
 
-  Widget _historyCard({
-    required String title,
-    required String amount,
-    required String tenor,
-    required String status,
-    required Color statusColor,
-    required String desc,
-  }) {
+  Widget _historyCard({required String title, required String amount, required String tenor, required String status, required Color statusColor, required String desc}) {
     return Container(
       margin: const EdgeInsets.only(bottom: 14),
       padding: const EdgeInsets.all(16),
@@ -229,16 +206,11 @@ class _DepositOpeningPageState extends State<DepositOpeningPage> {
         children: [
           Row(
             children: [
-              Expanded(
-                child: Text(title, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
-              ),
+              Expanded(child: Text(title, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold))),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                 decoration: BoxDecoration(color: statusColor.withOpacity(0.12), borderRadius: BorderRadius.circular(20)),
-                child: Text(
-                  status,
-                  style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: statusColor),
-                ),
+                child: Text(status, style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: statusColor)),
               ),
             ],
           ),
@@ -258,13 +230,53 @@ class _DepositOpeningPageState extends State<DepositOpeningPage> {
       case "0":
         return "Diajukan";
       case "1":
-        return "Dalam Peninjauan";
+      case "4":
+      case "5":
+        return "Proses";
       case "2":
-        return "Dapat Diproses";
+        return "Selesai";
       case "3":
-        return "Belum Dapat Diproses";
+        return "Dibatalkan";
       default:
         return "Diajukan";
+    }
+  }
+
+  String _depositStatusMis(String status) {
+    switch (status) {
+      case "0":
+        return "Belum Proses";
+      case "1":
+        return "Proses";
+      case "2":
+        return "Selesai";
+      case "3":
+        return "Dibatalkan";
+      case "4":
+        return "Konfirmasi Lanjutan";
+      case "5":
+        return "Konfirmasi Dibatalkan";
+      default:
+        return "Diajukan";
+    }
+  }
+
+  String _depositStatusKeterangan(String status) {
+    switch (status) {
+      case "0":
+        return "Pertama kali diajukan.";
+      case "1":
+        return "Sudah cetak bilyet.";
+      case "2":
+        return "Permohonan selesai.";
+      case "3":
+        return "Permohonan dibatalkan.";
+      case "4":
+        return "Pejabat konfirmasi untuk lanjut.";
+      case "5":
+        return "Pejabat konfirmasi untuk dibatalkan.";
+      default:
+        return "Permohonan diajukan.";
     }
   }
 
@@ -273,7 +285,9 @@ class _DepositOpeningPageState extends State<DepositOpeningPage> {
       case "0":
         return Colors.blueGrey;
       case "1":
-        return Colors.blue;
+      case "4":
+      case "5":
+        return Colors.orange;
       case "2":
         return Colors.green;
       case "3":
@@ -334,7 +348,7 @@ class _DepositOpeningPageState extends State<DepositOpeningPage> {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      "Form detail data deposito disembunyikan sampai permohonan yang sedang berjalan selesai diproses.",
+                      "Form detail data deposito disembunyikan sampai permohonan berstatus Selesai atau Dibatalkan.",
                       style: TextStyle(fontSize: 12, color: Colors.orange.shade900),
                     ),
                   ],
@@ -346,7 +360,9 @@ class _DepositOpeningPageState extends State<DepositOpeningPage> {
             const SizedBox(height: 12),
             Divider(color: Colors.orange.shade200),
             const SizedBox(height: 8),
-            _infoRow("Status", _depositStatusLabel(item.status)),
+            _infoRow("Status Mobile", _depositStatusLabel(item.status)),
+            _infoRow("Status MIS", _depositStatusMis(item.status)),
+            _infoRow("Keterangan", _depositStatusKeterangan(item.status)),
             _infoRow("Nominal", "Rp ${DepositNominalHelper.format(item.nominal)}"),
             _infoRow("Jangka Waktu", "${item.jangkaWaktu} bulan"),
             _infoRow("Rekening Debet", item.rekeningDebet.isNotEmpty ? item.rekeningDebet : "-"),
@@ -377,42 +393,24 @@ class _DepositOpeningPageState extends State<DepositOpeningPage> {
   Widget _infoCard(DepositOpeningNotifier value) {
     final isActive = value.setupActive;
     final isLoading = value.setupLoading || value.rateLoading;
-    final bgColor = isLoading
-        ? Colors.blue.shade50
-        : isActive
-        ? Colors.green.shade50
-        : Colors.orange.shade50;
-    final borderColor = isLoading
-        ? Colors.blue.shade200
-        : isActive
-        ? Colors.green.shade200
-        : Colors.orange.shade200;
-    final iconColor = isLoading
-        ? Colors.blue.shade800
-        : isActive
-        ? Colors.green.shade800
-        : Colors.orange.shade800;
+    final bgColor = isLoading ? Colors.blue.shade50 : isActive ? Colors.green.shade50 : Colors.orange.shade50;
+    final borderColor = isLoading ? Colors.blue.shade200 : isActive ? Colors.green.shade200 : Colors.orange.shade200;
+    final iconColor = isLoading ? Colors.blue.shade800 : isActive ? Colors.green.shade800 : Colors.orange.shade800;
     final message = isLoading
         ? "Sedang mengecek layanan dan rate produk deposito."
         : value.setupMessage.isNotEmpty
-        ? value.setupMessage
-        : "Lengkapi detail deposito, kirim OTP, lalu permohonan akan diteruskan untuk proses persetujuan.";
+            ? value.setupMessage
+            : "Lengkapi detail deposito, kirim OTP, lalu permohonan akan diteruskan untuk proses persetujuan.";
 
     return Container(
       padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: bgColor,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: borderColor),
-      ),
+      decoration: BoxDecoration(color: bgColor, borderRadius: BorderRadius.circular(12), border: Border.all(color: borderColor)),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Icon(isActive ? Icons.check_circle_outline : Icons.info_outline, color: iconColor, size: 20),
           const SizedBox(width: 8),
-          Expanded(
-            child: Text(message, style: TextStyle(fontSize: 12, color: iconColor)),
-          ),
+          Expanded(child: Text(message, style: TextStyle(fontSize: 12, color: iconColor))),
         ],
       ),
     );
@@ -433,11 +431,7 @@ class _DepositOpeningPageState extends State<DepositOpeningPage> {
           const SizedBox(height: 12),
           _nominalField(value),
           const SizedBox(height: 12),
-          value.loading
-              ? const Center(
-                  child: Padding(padding: EdgeInsets.all(12), child: CircularProgressIndicator()),
-                )
-              : _debetDropdown(value),
+          value.loading ? const Center(child: Padding(padding: EdgeInsets.all(12), child: CircularProgressIndicator())) : _debetDropdown(value),
           const SizedBox(height: 12),
           _readonlyField(label: "Nama Rek", value: value.namaRekening),
           const SizedBox(height: 12),
@@ -458,10 +452,7 @@ class _DepositOpeningPageState extends State<DepositOpeningPage> {
   }
 
   Widget _productDropdown(DepositOpeningNotifier value) {
-    if (value.rateLoading)
-      return const Center(
-        child: Padding(padding: EdgeInsets.all(12), child: CircularProgressIndicator()),
-      );
+    if (value.rateLoading) return const Center(child: Padding(padding: EdgeInsets.all(12), child: CircularProgressIndicator()));
     if (value.productOptions.isEmpty) return _emptyAccountBox(value.rateMessage.isNotEmpty ? value.rateMessage : "Produk deposito belum tersedia.");
 
     return DropdownButtonFormField<DepositProductOption>(
@@ -530,15 +521,7 @@ class _DepositOpeningPageState extends State<DepositOpeningPage> {
   }
 
   Widget _accountSelectedItem(TabunganModel item) {
-    return Align(
-      alignment: Alignment.centerLeft,
-      child: Text(
-        item.noAcc,
-        maxLines: 1,
-        overflow: TextOverflow.ellipsis,
-        style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
-      ),
-    );
+    return Align(alignment: Alignment.centerLeft, child: Text(item.noAcc, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600)));
   }
 
   DropdownMenuItem<String> _accountDropdownItem(TabunganModel item) {
@@ -553,19 +536,9 @@ class _DepositOpeningPageState extends State<DepositOpeningPage> {
             mainAxisAlignment: MainAxisAlignment.center,
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(
-                item.noAcc,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
-              ),
+              Text(item.noAcc, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
               const SizedBox(height: 3),
-              Text(
-                "${item.namaProduk} • Saldo Rp ${FormatCurrency.oCcy.format(item.saldo)}",
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(fontSize: 11, color: Colors.grey.shade600),
-              ),
+              Text("${item.namaProduk} • Saldo Rp ${FormatCurrency.oCcy.format(item.saldo)}", maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 11, color: Colors.grey.shade600)),
             ],
           ),
         ),
@@ -574,27 +547,15 @@ class _DepositOpeningPageState extends State<DepositOpeningPage> {
   }
 
   Widget _rollOverSelector(DepositOpeningNotifier value) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          "Roll Over",
-          style: TextStyle(fontSize: 12, color: Colors.grey.shade700, fontWeight: FontWeight.w600),
-        ),
-        const SizedBox(height: 8),
-        Row(
-          children: [
-            Expanded(
-              child: _toggleButton(label: "Y", active: value.rollOver, onTap: () => value.setRollOver(true)),
-            ),
-            const SizedBox(width: 10),
-            Expanded(
-              child: _toggleButton(label: "N", active: !value.rollOver, onTap: () => value.setRollOver(false)),
-            ),
-          ],
-        ),
-      ],
-    );
+    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      Text("Roll Over", style: TextStyle(fontSize: 12, color: Colors.grey.shade700, fontWeight: FontWeight.w600)),
+      const SizedBox(height: 8),
+      Row(children: [
+        Expanded(child: _toggleButton(label: "Y", active: value.rollOver, onTap: () => value.setRollOver(true))),
+        const SizedBox(width: 10),
+        Expanded(child: _toggleButton(label: "N", active: !value.rollOver, onTap: () => value.setRollOver(false))),
+      ]),
+    ]);
   }
 
   Widget _toggleButton({required String label, required bool active, required VoidCallback onTap}) {
@@ -603,16 +564,8 @@ class _DepositOpeningPageState extends State<DepositOpeningPage> {
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 12),
-        decoration: BoxDecoration(
-          color: active ? const Color.fromARGB(255, 0, 95, 0) : Colors.white,
-          borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: active ? const Color.fromARGB(255, 0, 95, 0) : Colors.grey.shade300),
-        ),
-        child: Text(
-          label,
-          textAlign: TextAlign.center,
-          style: TextStyle(color: active ? Colors.white : Colors.black87, fontWeight: FontWeight.bold),
-        ),
+        decoration: BoxDecoration(color: active ? const Color.fromARGB(255, 0, 95, 0) : Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: active ? const Color.fromARGB(255, 0, 95, 0) : Colors.grey.shade300)),
+        child: Text(label, textAlign: TextAlign.center, style: TextStyle(color: active ? Colors.white : Colors.black87, fontWeight: FontWeight.bold)),
       ),
     );
   }
@@ -620,27 +573,14 @@ class _DepositOpeningPageState extends State<DepositOpeningPage> {
   Widget _otpCard(DepositOpeningNotifier value) {
     return Container(
       padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: Colors.green.shade50,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.green.shade200),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          const Text("Input OTP", style: TextStyle(fontWeight: FontWeight.bold)),
-          const SizedBox(height: 6),
-          Text("Masukkan kode OTP yang dikirim ke nomor ${value.maskedPhone}.", style: TextStyle(fontSize: 12, color: Colors.green.shade900)),
-          const SizedBox(height: 8),
-          TextField(
-            controller: value.otpController,
-            keyboardType: TextInputType.number,
-            maxLength: 6,
-            inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-            decoration: _inputDecoration("OTP", counterText: ""),
-          ),
-        ],
-      ),
+      decoration: BoxDecoration(color: Colors.green.shade50, borderRadius: BorderRadius.circular(12), border: Border.all(color: Colors.green.shade200)),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+        const Text("Input OTP", style: TextStyle(fontWeight: FontWeight.bold)),
+        const SizedBox(height: 6),
+        Text("Masukkan kode OTP yang dikirim ke nomor ${value.maskedPhone}.", style: TextStyle(fontSize: 12, color: Colors.green.shade900)),
+        const SizedBox(height: 8),
+        TextField(controller: value.otpController, keyboardType: TextInputType.number, maxLength: 6, inputFormatters: [FilteringTextInputFormatter.digitsOnly], decoration: _inputDecoration("OTP", counterText: "")),
+      ]),
     );
   }
 
@@ -650,11 +590,7 @@ class _DepositOpeningPageState extends State<DepositOpeningPage> {
     return SizedBox(
       height: 48,
       child: ElevatedButton(
-        style: ElevatedButton.styleFrom(
-          backgroundColor: const Color.fromARGB(255, 0, 95, 0),
-          foregroundColor: Colors.white,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        ),
+        style: ElevatedButton.styleFrom(backgroundColor: const Color.fromARGB(255, 0, 95, 0), foregroundColor: Colors.white, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
         onPressed: isBusy
             ? null
             : () async {
@@ -663,14 +599,7 @@ class _DepositOpeningPageState extends State<DepositOpeningPage> {
                 ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
                 if (value.requestSuccess) _showSuccessDialog(context, value);
               },
-        child: Text(
-          isBusy
-              ? "Memproses..."
-              : value.otpSent
-              ? "Verifikasi OTP"
-              : "Proses",
-          style: const TextStyle(fontWeight: FontWeight.bold),
-        ),
+        child: Text(isBusy ? "Memproses..." : value.otpSent ? "Verifikasi OTP" : "Proses", style: const TextStyle(fontWeight: FontWeight.bold)),
       ),
     );
   }
@@ -682,7 +611,7 @@ class _DepositOpeningPageState extends State<DepositOpeningPage> {
       builder: (dialogContext) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: const Text("Berhasil"),
-        content: const Text("Sukses, permintaan pembukaan deposito berhasil didaftarkan."),
+        content: Text("Sukses, permintaan pembukaan deposito berhasil didaftarkan. ${value.notificationMessage}"),
         actions: [
           ElevatedButton(
             style: ElevatedButton.styleFrom(backgroundColor: const Color.fromARGB(255, 0, 95, 0), foregroundColor: Colors.white),
@@ -701,42 +630,22 @@ class _DepositOpeningPageState extends State<DepositOpeningPage> {
   }
 
   Widget _readonlyField({required String label, required String value}) {
-    return InputDecorator(
-      decoration: _inputDecoration(label),
-      child: Text(value.isNotEmpty ? value : "-", style: const TextStyle(fontSize: 14)),
-    );
+    return InputDecorator(decoration: _inputDecoration(label), child: Text(value.isNotEmpty ? value : "-", style: const TextStyle(fontSize: 14)));
   }
 
   Widget _emptyAccountBox(String message) {
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: Colors.red.shade50,
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: Colors.red.shade100),
-      ),
-      child: Text(message, style: TextStyle(fontSize: 12, color: Colors.red.shade800)),
-    );
+    return Container(padding: const EdgeInsets.all(12), decoration: BoxDecoration(color: Colors.red.shade50, borderRadius: BorderRadius.circular(10), border: Border.all(color: Colors.red.shade100)), child: Text(message, style: TextStyle(fontSize: 12, color: Colors.red.shade800)));
   }
 
   Widget _errorCard(String message) {
     return Container(
       padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: Colors.red.shade50,
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: Colors.red.shade100),
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Icon(Icons.warning_amber_rounded, color: Colors.red.shade800, size: 18),
-          const SizedBox(width: 8),
-          Expanded(
-            child: Text(message, style: TextStyle(fontSize: 12, color: Colors.red.shade800)),
-          ),
-        ],
-      ),
+      decoration: BoxDecoration(color: Colors.red.shade50, borderRadius: BorderRadius.circular(10), border: Border.all(color: Colors.red.shade100)),
+      child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Icon(Icons.warning_amber_rounded, color: Colors.red.shade800, size: 18),
+        const SizedBox(width: 8),
+        Expanded(child: Text(message, style: TextStyle(fontSize: 12, color: Colors.red.shade800))),
+      ]),
     );
   }
 
@@ -750,22 +659,12 @@ class _DepositOpeningPageState extends State<DepositOpeningPage> {
       fillColor: Colors.white,
       contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
       border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
-      enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(10),
-        borderSide: BorderSide(color: Colors.grey.shade300),
-      ),
-      focusedBorder: const OutlineInputBorder(
-        borderRadius: BorderRadius.all(Radius.circular(10)),
-        borderSide: BorderSide(color: Color.fromARGB(255, 0, 95, 0)),
-      ),
+      enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide(color: Colors.grey.shade300)),
+      focusedBorder: const OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(10)), borderSide: BorderSide(color: Color.fromARGB(255, 0, 95, 0))),
     );
   }
 
   BoxDecoration _cardDecoration() {
-    return BoxDecoration(
-      color: Colors.white,
-      borderRadius: BorderRadius.circular(16),
-      boxShadow: [BoxShadow(offset: const Offset(2, 2), blurRadius: 6, color: Colors.grey[300] ?? Colors.transparent)],
-    );
+    return BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16), boxShadow: [BoxShadow(offset: const Offset(2, 2), blurRadius: 6, color: Colors.grey[300] ?? Colors.transparent)]);
   }
 }

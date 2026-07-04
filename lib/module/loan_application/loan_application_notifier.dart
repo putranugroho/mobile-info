@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
@@ -357,24 +358,116 @@ class LoanApplicationNotifier extends ChangeNotifier {
     return null;
   }
 
-  Future<void> pickFotoJaminan() async {
-    final picker = ImagePicker();
-    final result = await picker.pickImage(source: ImageSource.camera, imageQuality: 80);
-    if (result == null) return;
+  static const double _jaminanMaxWidth = 1600;
+  static const double _jaminanMaxHeight = 1600;
+  static const int _jaminanImageQuality = 75;
+  static const int _maxFotoJaminanBytes = 5 * 1024 * 1024;
 
-    fotoJaminanBytes = await result.readAsBytes();
-    fotoJaminanName = "jaminan_${DateTime.now().millisecondsSinceEpoch}.jpg";
-    notifyListeners();
+  Future<XFile?> _pickImage(ImageSource source) async {
+    final picker = ImagePicker();
+
+    return picker.pickImage(
+      source: source,
+      imageQuality: _jaminanImageQuality,
+      maxWidth: _jaminanMaxWidth,
+      maxHeight: _jaminanMaxHeight,
+      preferredCameraDevice: CameraDevice.rear,
+    );
+  }
+
+  Future<void> pickFotoJaminan() async {
+    await _pickFotoJaminan(source: ImageSource.camera);
   }
 
   Future<void> pickFotoJaminanFromGallery() async {
-    final picker = ImagePicker();
-    final result = await picker.pickImage(source: ImageSource.gallery, imageQuality: 80);
-    if (result == null) return;
+    await _pickFotoJaminan(source: ImageSource.gallery);
+  }
 
-    fotoJaminanBytes = await result.readAsBytes();
-    fotoJaminanName = result.name.isNotEmpty ? result.name : "jaminan_${DateTime.now().millisecondsSinceEpoch}.jpg";
+  Future<void> _pickFotoJaminan({required ImageSource source}) async {
+    try {
+      final result = await _pickImage(source);
+      if (result == null) return;
+
+      await _setFotoJaminan(result, source: source);
+    } catch (e) {
+      debugPrint("ERROR PICK FOTO JAMINAN ${source.name}: $e");
+
+      if (kIsWeb && source == ImageSource.camera) {
+        _showSnack("Kamera tidak tersedia di browser ini. Silakan pilih gambar dari galeri/file.");
+        await _fallbackPickFotoJaminanFromGallery();
+        return;
+      }
+
+      _showSnack(
+        source == ImageSource.camera ? "Gagal membuka kamera. Pastikan izin kamera sudah diberikan." : "Gagal memilih gambar. Silakan coba lagi.",
+      );
+    }
+  }
+
+  Future<void> _fallbackPickFotoJaminanFromGallery() async {
+    try {
+      final result = await _pickImage(ImageSource.gallery);
+      if (result == null) return;
+
+      await _setFotoJaminan(result, source: ImageSource.gallery);
+    } catch (e) {
+      debugPrint("ERROR FALLBACK FOTO JAMINAN GALLERY: $e");
+      _showSnack("Gagal memilih gambar dari galeri/file. Silakan coba lagi.");
+    }
+  }
+
+  Future<void> _setFotoJaminan(XFile result, {required ImageSource source}) async {
+    final bytes = await result.readAsBytes();
+
+    if (bytes.isEmpty) {
+      _showSnack("File foto jaminan kosong. Silakan pilih ulang gambar.");
+      return;
+    }
+
+    if (bytes.length > _maxFotoJaminanBytes) {
+      _showSnack("Ukuran foto jaminan terlalu besar. Maksimal 5 MB.");
+      return;
+    }
+
+    fotoJaminanBytes = bytes;
+    fotoJaminanName = _safeFotoJaminanName(result, source: source);
+
+    debugPrint("FOTO JAMINAN DIPILIH: $fotoJaminanName (${bytes.length} bytes), source=${source.name}, web=$kIsWeb");
+
     notifyListeners();
+  }
+
+  String _safeFotoJaminanName(XFile result, {required ImageSource source}) {
+    final rawName = result.name.trim();
+    final ext = _safeImageExtension(rawName);
+    final generatedName = "jaminan_${DateTime.now().millisecondsSinceEpoch}.$ext";
+
+    if (source == ImageSource.gallery && rawName.isNotEmpty && rawName.contains('.')) {
+      return _sanitizeFileName(rawName);
+    }
+
+    if (kIsWeb && rawName.isNotEmpty && rawName.contains('.')) {
+      return _sanitizeFileName(rawName);
+    }
+
+    return generatedName;
+  }
+
+  String _safeImageExtension(String fileName) {
+    final lower = fileName.toLowerCase();
+
+    if (lower.endsWith('.png')) return 'png';
+    if (lower.endsWith('.webp')) return 'webp';
+    if (lower.endsWith('.jpeg')) return 'jpg';
+    if (lower.endsWith('.jpg')) return 'jpg';
+
+    return 'jpg';
+  }
+
+  String _sanitizeFileName(String fileName) {
+    final clean = fileName.replaceAll(RegExp(r'[^a-zA-Z0-9._-]'), '_');
+    if (clean.trim().isEmpty) return "jaminan_${DateTime.now().millisecondsSinceEpoch}.jpg";
+    return clean;
   }
 
   Future<void> pilihSumberFotoJaminan() async {

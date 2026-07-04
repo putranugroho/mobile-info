@@ -2,10 +2,15 @@ import 'dart:convert';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
+import 'package:http_parser/http_parser.dart';
 import 'package:mobile_info/models/loan_application_model.dart';
 import 'package:mobile_info/network/network.dart';
 
 class LoanApplicationRepository {
+  /// Untuk produksi harus false agar data benar-benar dikirim ke endpoint.
+  /// Ubah sementara ke true hanya saat debug payload multipart tanpa menyimpan data.
+  static const bool debugDryRunSubmit = false;
+
   static Future<LoanSetupPinjamanModel> inquirySetupPinjaman({required String bprId, required String flag}) async {
     final dio = Dio();
     dio.options.headers['api-key'] = '123';
@@ -99,11 +104,53 @@ class LoanApplicationRepository {
 
     if (form.fotoJaminanBytes != null && form.fotoJaminanBytes!.isNotEmpty) {
       formData.files.add(
-        MapEntry("fhoto_jaminan", MultipartFile.fromBytes(form.fotoJaminanBytes!, filename: form.fotoJaminanName ?? "foto_jaminan.jpg")),
+        MapEntry(
+          "fhoto_jaminan",
+          MultipartFile.fromBytes(
+            form.fotoJaminanBytes!,
+            filename: form.fotoJaminanName ?? "foto_jaminan.jpg",
+            contentType: _fotoJaminanContentType(form.fotoJaminanMimeType),
+          ),
+        ),
       );
     }
 
-    final response = await dio.post(NetworkURL.daftarPermohonanPinjaman(), data: formData);
+    _debugSubmitLoanMultipart(formData, form);
+
+    if (debugDryRunSubmit) {
+      if (kDebugMode) {
+        print("========== DRY RUN SUBMIT PINJAMAN ==========");
+        print("Submit ke endpoint DIBATALKAN karena debugDryRunSubmit = true.");
+        print("Data TIDAK dikirim dan TIDAK tersimpan di backend.");
+        print("Untuk submit asli, ubah debugDryRunSubmit menjadi false.");
+        print("=============================================");
+      }
+
+      return {
+        "code": "000",
+        "status": "debug_dry_run",
+        "message": "DEBUG ONLY: payload berhasil dibentuk, tetapi tidak dikirim ke endpoint.",
+        "data": {
+          "dry_run": true,
+          "endpoint": NetworkURL.daftarPermohonanPinjaman(),
+          "file_field": "fhoto_jaminan",
+          "foto_source": form.fotoJaminanSource,
+          "foto_filename": form.fotoJaminanName,
+          "foto_mime_type": form.fotoJaminanMimeType,
+          "foto_size_bytes": form.fotoJaminanSizeBytes ?? form.fotoJaminanBytes?.length ?? 0,
+        },
+      };
+    }
+
+    final response = await dio.post(
+      NetworkURL.daftarPermohonanPinjaman(),
+      data: formData,
+      onSendProgress: (sent, total) {
+        if (kDebugMode) {
+          print("SUBMIT LOAN UPLOAD PROGRESS: $sent / $total");
+        }
+      },
+    );
     final res = response.data is String ? jsonDecode(response.data) : response.data;
 
     if (kDebugMode) {
@@ -116,6 +163,40 @@ class LoanApplicationRepository {
     if (res['code'] != '000') throw Exception(res['message'] ?? "Gagal mendaftarkan permohonan pinjaman.");
 
     return res;
+  }
+
+
+  static MediaType _fotoJaminanContentType(String? mimeType) {
+    final mime = (mimeType ?? '').toLowerCase().trim();
+
+    if (mime == 'image/png') return MediaType('image', 'png');
+    if (mime == 'image/webp') return MediaType('image', 'webp');
+
+    // Hasil dari notifier sudah dinormalisasi menjadi JPEG.
+    return MediaType('image', 'jpeg');
+  }
+
+  static void _debugSubmitLoanMultipart(FormData formData, LoanApplicationFormModel form) {
+    if (!kDebugMode) return;
+
+    print("========== DEBUG SUBMIT PINJAMAN MULTIPART ==========");
+    print("endpoint              : ${NetworkURL.daftarPermohonanPinjaman()}");
+    print("field_file_name       : fhoto_jaminan");
+    print("foto_source           : ${form.fotoJaminanSource}");
+    print("foto_filename         : ${form.fotoJaminanName}");
+    print("foto_mime_type        : ${form.fotoJaminanMimeType}");
+    print("foto_size_bytes       : ${form.fotoJaminanSizeBytes ?? form.fotoJaminanBytes?.length ?? 0}");
+    print("foto_bytes_null       : ${form.fotoJaminanBytes == null}");
+    print("foto_bytes_empty      : ${form.fotoJaminanBytes?.isEmpty ?? true}");
+    print("fields:");
+    for (final field in formData.fields) {
+      print("  ${field.key}: ${field.value}");
+    }
+    print("files:");
+    for (final file in formData.files) {
+      print("  field=${file.key}, filename=${file.value.filename}, length=${file.value.length}, contentType=${file.value.contentType}");
+    }
+    print("=====================================================");
   }
 
   static Future<List<LoanNotificationRecipientModel>> inquiryNotificationRecipients({required String bprId}) async {

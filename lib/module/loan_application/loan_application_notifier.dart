@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:image/image.dart' as img;
 import 'package:intl/intl.dart';
 import 'package:mobile_info/models/loan_application_model.dart';
 import 'package:mobile_info/module/repository/loan_application_repository.dart';
@@ -186,6 +187,25 @@ class LoanSimulationNotifier extends ChangeNotifier {
   }
 }
 
+
+class _NormalizedJaminanImage {
+  final Uint8List bytes;
+  final int originalWidth;
+  final int originalHeight;
+  final int width;
+  final int height;
+  final int quality;
+
+  const _NormalizedJaminanImage({
+    required this.bytes,
+    required this.originalWidth,
+    required this.originalHeight,
+    required this.width,
+    required this.height,
+    required this.quality,
+  });
+}
+
 class LoanApplicationNotifier extends ChangeNotifier {
   final BuildContext context;
 
@@ -207,6 +227,16 @@ class LoanApplicationNotifier extends ChangeNotifier {
 
   Uint8List? fotoJaminanBytes;
   String? fotoJaminanName;
+  String? fotoJaminanMimeType;
+  String? fotoJaminanSource;
+  int fotoJaminanSizeBytes = 0;
+
+  int fotoJaminanOriginalSizeBytes = 0;
+  int fotoJaminanOriginalWidth = 0;
+  int fotoJaminanOriginalHeight = 0;
+  int fotoJaminanNormalizedWidth = 0;
+  int fotoJaminanNormalizedHeight = 0;
+  int fotoJaminanCompressQuality = 0;
 
   bool loadingSetup = true;
   bool setupAvailable = false;
@@ -358,19 +388,26 @@ class LoanApplicationNotifier extends ChangeNotifier {
     return null;
   }
 
-  static const double _jaminanMaxWidth = 1600;
-  static const double _jaminanMaxHeight = 1600;
-  static const int _jaminanImageQuality = 75;
-  static const int _maxFotoJaminanBytes = 5 * 1024 * 1024;
+  static const double _pickerMaxWidth = 2200;
+  static const double _pickerMaxHeight = 2200;
+  static const int _pickerImageQuality = 85;
+
+  /// Ukuran final yang dikirim ke backend/CMS.
+  /// Dibuat lebih kecil dan konsisten agar file kamera HP tidak terlalu besar,
+  /// EXIF kamera dibuang, dan CMS lebih aman membuka preview.
+  static const int _jaminanNormalizedMaxSide = 1280;
+  static const int _jaminanInitialJpegQuality = 72;
+  static const int _jaminanMinJpegQuality = 45;
+  static const int _maxFotoJaminanBytes = 1500 * 1024;
 
   Future<XFile?> _pickImage(ImageSource source) async {
     final picker = ImagePicker();
 
     return picker.pickImage(
       source: source,
-      imageQuality: _jaminanImageQuality,
-      maxWidth: _jaminanMaxWidth,
-      maxHeight: _jaminanMaxHeight,
+      imageQuality: _pickerImageQuality,
+      maxWidth: _pickerMaxWidth,
+      maxHeight: _pickerMaxHeight,
       preferredCameraDevice: CameraDevice.rear,
     );
   }
@@ -386,88 +423,179 @@ class LoanApplicationNotifier extends ChangeNotifier {
   Future<void> _pickFotoJaminan({required ImageSource source}) async {
     try {
       final result = await _pickImage(source);
-      if (result == null) return;
+      if (result == null) {
+        _debugFotoJaminan('USER_CANCEL_PICK', source: source);
+        return;
+      }
 
       await _setFotoJaminan(result, source: source);
-    } catch (e) {
-      debugPrint("ERROR PICK FOTO JAMINAN ${source.name}: $e");
+    } catch (e, st) {
+      debugPrint('ERROR PICK FOTO JAMINAN ${_sourceName(source)}: $e');
+      debugPrint('$st');
 
       if (kIsWeb && source == ImageSource.camera) {
-        _showSnack("Kamera tidak tersedia di browser ini. Silakan pilih gambar dari galeri/file.");
+        _showSnack('Kamera tidak tersedia di browser ini. Silakan pilih gambar dari galeri/file.');
         await _fallbackPickFotoJaminanFromGallery();
         return;
       }
 
-      _showSnack(
-        source == ImageSource.camera ? "Gagal membuka kamera. Pastikan izin kamera sudah diberikan." : "Gagal memilih gambar. Silakan coba lagi.",
-      );
+      _showSnack(source == ImageSource.camera
+          ? 'Gagal membuka kamera. Pastikan izin kamera sudah diberikan.'
+          : 'Gagal memilih gambar. Silakan coba lagi.');
     }
   }
 
   Future<void> _fallbackPickFotoJaminanFromGallery() async {
     try {
       final result = await _pickImage(ImageSource.gallery);
-      if (result == null) return;
+      if (result == null) {
+        _debugFotoJaminan('USER_CANCEL_FALLBACK_GALLERY', source: ImageSource.gallery);
+        return;
+      }
 
-      await _setFotoJaminan(result, source: ImageSource.gallery);
-    } catch (e) {
-      debugPrint("ERROR FALLBACK FOTO JAMINAN GALLERY: $e");
-      _showSnack("Gagal memilih gambar dari galeri/file. Silakan coba lagi.");
+      await _setFotoJaminan(result, source: ImageSource.gallery, fallbackFromCamera: true);
+    } catch (e, st) {
+      debugPrint('ERROR FALLBACK FOTO JAMINAN GALLERY: $e');
+      debugPrint('$st');
+      _showSnack('Gagal memilih gambar dari galeri/file. Silakan coba lagi.');
     }
   }
 
-  Future<void> _setFotoJaminan(XFile result, {required ImageSource source}) async {
-    final bytes = await result.readAsBytes();
+  Future<void> _setFotoJaminan(
+    XFile result, {
+    required ImageSource source,
+    bool fallbackFromCamera = false,
+  }) async {
+    final originalBytes = await result.readAsBytes();
 
-    if (bytes.isEmpty) {
-      _showSnack("File foto jaminan kosong. Silakan pilih ulang gambar.");
+    if (originalBytes.isEmpty) {
+      _showSnack('File foto jaminan kosong. Silakan pilih ulang gambar.');
       return;
     }
 
-    if (bytes.length > _maxFotoJaminanBytes) {
-      _showSnack("Ukuran foto jaminan terlalu besar. Maksimal 5 MB.");
+    final normalized = _normalizeFotoJaminan(originalBytes);
+    if (normalized == null) {
+      _showSnack('Format gambar tidak dapat diproses. Gunakan JPG atau PNG.');
       return;
     }
 
-    fotoJaminanBytes = bytes;
-    fotoJaminanName = _safeFotoJaminanName(result, source: source);
+    if (normalized.bytes.length > _maxFotoJaminanBytes) {
+      _showSnack('Ukuran foto jaminan masih terlalu besar setelah kompres. Silakan ambil ulang foto dengan jarak lebih dekat/pilih gambar lain.');
+      return;
+    }
 
-    debugPrint("FOTO JAMINAN DIPILIH: $fotoJaminanName (${bytes.length} bytes), source=${source.name}, web=$kIsWeb");
+    final timestamp = DateTime.now().millisecondsSinceEpoch;
+
+    fotoJaminanBytes = normalized.bytes;
+    fotoJaminanName = 'jaminan_${_sourceName(source)}_$timestamp.jpg';
+    fotoJaminanMimeType = 'image/jpeg';
+    fotoJaminanSource = fallbackFromCamera ? 'camera_fallback_gallery' : _sourceName(source);
+    fotoJaminanSizeBytes = normalized.bytes.length;
+    fotoJaminanOriginalSizeBytes = originalBytes.length;
+    fotoJaminanOriginalWidth = normalized.originalWidth;
+    fotoJaminanOriginalHeight = normalized.originalHeight;
+    fotoJaminanNormalizedWidth = normalized.width;
+    fotoJaminanNormalizedHeight = normalized.height;
+    fotoJaminanCompressQuality = normalized.quality;
+
+    _debugFotoJaminan(
+      'FOTO_JAMINAN_SELECTED_AND_NORMALIZED',
+      source: source,
+      file: result,
+      fallbackFromCamera: fallbackFromCamera,
+    );
 
     notifyListeners();
   }
 
-  String _safeFotoJaminanName(XFile result, {required ImageSource source}) {
-    final rawName = result.name.trim();
-    final ext = _safeImageExtension(rawName);
-    final generatedName = "jaminan_${DateTime.now().millisecondsSinceEpoch}.$ext";
+  _NormalizedJaminanImage? _normalizeFotoJaminan(Uint8List originalBytes) {
+    final decoded = img.decodeImage(originalBytes);
+    if (decoded == null) return null;
 
-    if (source == ImageSource.gallery && rawName.isNotEmpty && rawName.contains('.')) {
-      return _sanitizeFileName(rawName);
+    // Membaca orientation dari EXIF lalu membuang EXIF saat encode ulang JPEG.
+    final oriented = img.bakeOrientation(decoded);
+    final originalWidth = oriented.width;
+    final originalHeight = oriented.height;
+
+    img.Image output = oriented;
+    final maxSide = originalWidth > originalHeight ? originalWidth : originalHeight;
+    if (maxSide > _jaminanNormalizedMaxSide) {
+      final scale = _jaminanNormalizedMaxSide / maxSide;
+      final targetWidth = (originalWidth * scale).round().clamp(1, _jaminanNormalizedMaxSide).toInt();
+      final targetHeight = (originalHeight * scale).round().clamp(1, _jaminanNormalizedMaxSide).toInt();
+
+      output = img.copyResize(
+        oriented,
+        width: targetWidth,
+        height: targetHeight,
+        interpolation: img.Interpolation.average,
+      );
     }
 
-    if (kIsWeb && rawName.isNotEmpty && rawName.contains('.')) {
-      return _sanitizeFileName(rawName);
+    var quality = _jaminanInitialJpegQuality;
+    List<int> encoded = img.encodeJpg(output, quality: quality);
+
+    while (encoded.length > _maxFotoJaminanBytes && quality > _jaminanMinJpegQuality) {
+      quality -= 5;
+      encoded = img.encodeJpg(output, quality: quality);
     }
 
-    return generatedName;
+    // Kalau masih besar, resize sekali lagi ke 1024px agar CMS aman membuka preview.
+    if (encoded.length > _maxFotoJaminanBytes) {
+      final secondMaxSide = 1024;
+      final currentMaxSide = output.width > output.height ? output.width : output.height;
+      if (currentMaxSide > secondMaxSide) {
+        final scale = secondMaxSide / currentMaxSide;
+        output = img.copyResize(
+          output,
+          width: (output.width * scale).round().clamp(1, secondMaxSide).toInt(),
+          height: (output.height * scale).round().clamp(1, secondMaxSide).toInt(),
+          interpolation: img.Interpolation.average,
+        );
+      }
+      quality = _jaminanMinJpegQuality;
+      encoded = img.encodeJpg(output, quality: quality);
+    }
+
+    return _NormalizedJaminanImage(
+      bytes: Uint8List.fromList(encoded),
+      originalWidth: originalWidth,
+      originalHeight: originalHeight,
+      width: output.width,
+      height: output.height,
+      quality: quality,
+    );
   }
 
-  String _safeImageExtension(String fileName) {
-    final lower = fileName.toLowerCase();
-
-    if (lower.endsWith('.png')) return 'png';
-    if (lower.endsWith('.webp')) return 'webp';
-    if (lower.endsWith('.jpeg')) return 'jpg';
-    if (lower.endsWith('.jpg')) return 'jpg';
-
-    return 'jpg';
+  String _sourceName(ImageSource source) {
+    return source == ImageSource.camera ? 'camera' : 'gallery';
   }
 
-  String _sanitizeFileName(String fileName) {
-    final clean = fileName.replaceAll(RegExp(r'[^a-zA-Z0-9._-]'), '_');
-    if (clean.trim().isEmpty) return "jaminan_${DateTime.now().millisecondsSinceEpoch}.jpg";
-    return clean;
+  void _debugFotoJaminan(
+    String tag, {
+    required ImageSource source,
+    XFile? file,
+    bool fallbackFromCamera = false,
+  }) {
+    if (!kDebugMode) return;
+
+    debugPrint('========== $tag ==========');
+    debugPrint('platform_web          : $kIsWeb');
+    debugPrint('requested_source      : ${_sourceName(source)}');
+    debugPrint('fallback_from_camera  : $fallbackFromCamera');
+    debugPrint('xfile.name            : ${file?.name}');
+    debugPrint('xfile.path            : ${file?.path}');
+    debugPrint('xfile.mimeType        : ${file?.mimeType}');
+    debugPrint('original.sizeBytes    : $fotoJaminanOriginalSizeBytes');
+    debugPrint('original.dimension    : ${fotoJaminanOriginalWidth}x$fotoJaminanOriginalHeight');
+    debugPrint('normalized.filename   : $fotoJaminanName');
+    debugPrint('normalized.mimeType   : $fotoJaminanMimeType');
+    debugPrint('normalized.source     : $fotoJaminanSource');
+    debugPrint('normalized.sizeBytes  : $fotoJaminanSizeBytes');
+    debugPrint('normalized.dimension  : ${fotoJaminanNormalizedWidth}x$fotoJaminanNormalizedHeight');
+    debugPrint('normalized.quality    : $fotoJaminanCompressQuality');
+    debugPrint('multipart.field       : fhoto_jaminan');
+    debugPrint('==============================');
   }
 
   Future<void> pilihSumberFotoJaminan() async {
@@ -550,6 +678,9 @@ class LoanApplicationNotifier extends ChangeNotifier {
       cicilan: hideRateAndCicilan ? "" : LoanNominalHelper.onlyDigits(cicilanController.text),
       fotoJaminanBytes: fotoJaminanBytes,
       fotoJaminanName: fotoJaminanName,
+      fotoJaminanMimeType: fotoJaminanMimeType,
+      fotoJaminanSource: fotoJaminanSource,
+      fotoJaminanSizeBytes: fotoJaminanSizeBytes,
     );
   }
 
@@ -593,7 +724,20 @@ class LoanApplicationNotifier extends ChangeNotifier {
 
       final form = buildFormModel();
 
-      await LoanApplicationRepository.submitLoanApplication(bprId: bprId, form: form);
+      final submitResult = await LoanApplicationRepository.submitLoanApplication(bprId: bprId, form: form);
+
+      if (LoanApplicationRepository.debugDryRunSubmit) {
+        if (!context.mounted) return;
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text("DEBUG ONLY: payload berhasil dibentuk, tetapi tidak dikirim ke endpoint. Data tidak tersimpan."),
+          ),
+        );
+
+        debugPrint("DRY RUN SUBMIT RESULT: $submitResult");
+        return;
+      }
 
       final notifResult = await LoanApplicationRepository.notifyLoanStaff(bprId: bprId, form: form);
 

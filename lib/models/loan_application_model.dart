@@ -73,6 +73,9 @@ class LoanApplicationFormModel {
   final String cicilan;
   final Uint8List? fotoJaminanBytes;
   final String? fotoJaminanName;
+  final String? fotoJaminanMimeType;
+  final String? fotoJaminanSource;
+  final int? fotoJaminanSizeBytes;
 
   LoanApplicationFormModel({
     required this.noId,
@@ -87,6 +90,9 @@ class LoanApplicationFormModel {
     required this.cicilan,
     this.fotoJaminanBytes,
     this.fotoJaminanName,
+    this.fotoJaminanMimeType,
+    this.fotoJaminanSource,
+    this.fotoJaminanSizeBytes,
   });
 }
 

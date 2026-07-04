@@ -472,7 +472,7 @@ class _DepositOpeningPageState extends State<DepositOpeningPage> {
       keyboardType: TextInputType.number,
       inputFormatters: const [RupiahThousandsInputFormatter()],
       onChanged: (text) => value.setNominal(text.replaceAll(RegExp(r'[^0-9]'), '')),
-      decoration: _inputDecoration("Nominal", helperText: "Kelipatan Rp 1.000.000", prefixText: "Rp "),
+      decoration: _inputDecoration("Nominal", helperText: "Kelipatan Rp 500.000", prefixText: "Rp "),
     );
   }
 

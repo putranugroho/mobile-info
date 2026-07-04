@@ -455,8 +455,8 @@ class DepositOpeningNotifier extends ChangeNotifier {
 
     final nominal = nominalValue;
     if (nominal <= 0) return "Nominal wajib diisi.";
-    if (nominal < 1000000) return "Nominal minimal Rp 1.000.000.";
-    if (nominal % 1000000 != 0) return "Nominal harus kelipatan Rp 1.000.000.";
+    if (nominal < 500000) return "Nominal minimal Rp 500.000.";
+    if (nominal % 500000 != 0) return "Nominal harus kelipatan Rp 500.000.";
 
     if (selectedDebetNoRek == null) return "Pilih rekening debet dengan saldo lebih besar dari nominal deposito.";
 

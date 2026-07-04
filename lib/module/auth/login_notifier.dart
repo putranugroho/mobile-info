@@ -70,17 +70,14 @@ class LoginNotifier extends ChangeNotifier {
 
   // var deviceData = <String, dynamic>{};
 
-  String getDeviceId() {
-    if (kIsWeb) {
-      return "web-${Uri.base.host}";
-    }
-
-    return "mobile-${usersId.text.trim()}";
+  Future<String> getDeviceId() async {
+    return Pref().getOrCreateAppDeviceId(prefix: kIsWeb ? "web" : "mobile");
   }
 
   String getDeviceName() {
     if (kIsWeb) {
-      return "Flutter Web";
+      final host = Uri.base.host.trim();
+      return host.isNotEmpty ? "Flutter Web - $host" : "Flutter Web";
     }
 
     return "Mobile Device";
@@ -107,14 +104,17 @@ class LoginNotifier extends ChangeNotifier {
     DialogCustom().showLoading(context);
 
     try {
+      final deviceId = await getDeviceId();
+      final deviceName = getDeviceName();
+
       final value = await AuthRepository.login(
         token,
         NetworkURL.login(),
         usersId.text.trim(),
         password.text.trim(),
         fcmToken ?? '',
-        deviceId: getDeviceId(),
-        deviceName: getDeviceName(),
+        deviceId: deviceId,
+        deviceName: deviceName,
       );
 
       Navigator.pop(context);

@@ -80,7 +80,7 @@ class LoanDetailPage extends StatelessWidget {
                       _section(
                         title: "Rincian Angsuran",
                         children: value.tagihan.map((t) {
-                          final lunas = t.sisaTagihan == 0 && t.sisaDenda == 0;
+                          final lunas = t.sisaTagihan <= 0;
 
                           return Card(
                             elevation: 0,
@@ -337,7 +337,12 @@ void _showBantuanCS(BuildContext context, String noRek) {
                           subtitle: const Text("Chat dengan Customer Service"),
                           onTap: () {
                             Navigator.pop(context);
-                            Navigator.push(context, MaterialPageRoute(builder: (_) => ChatPage(noRekening: noRek, namaProduk: "Pinjaman")));
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => ChatPage(noRekening: noRek, namaProduk: "Pinjaman"),
+                              ),
+                            );
                           },
                         ),
                       ],

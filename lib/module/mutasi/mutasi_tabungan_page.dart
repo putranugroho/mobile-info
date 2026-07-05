@@ -14,6 +14,12 @@ class MutasiTabunganPage extends StatelessWidget {
 
   const MutasiTabunganPage({super.key, required this.noRekening, required this.namaProduk});
 
+  String _formatDate(DateTime date) {
+    final day = date.day.toString().padLeft(2, '0');
+    final month = date.month.toString().padLeft(2, '0');
+    return "$day-$month-${date.year}";
+  }
+
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
@@ -80,6 +86,12 @@ class _MutasiBodyState extends State<_MutasiBody> with SingleTickerProviderState
 
     notifier.clear();
     notifier.loadMutasi(noRek: widget.noRekening, periode: periode);
+  }
+
+  String _formatDate(DateTime date) {
+    final day = date.day.toString().padLeft(2, '0');
+    final month = date.month.toString().padLeft(2, '0');
+    return "$day-$month-${date.year}";
   }
 
   @override
@@ -308,7 +320,10 @@ class _MutasiBodyState extends State<_MutasiBody> with SingleTickerProviderState
         return ListView.builder(
           padding: const EdgeInsets.all(16),
           itemCount: value.data.length,
-          itemBuilder: (_, i) => _MutasiItem(item: value.data[i]),
+          itemBuilder: (_, i) {
+            final item = value.data[i];
+            return _MutasiItem(item: item, transactionLabel: value.transactionLabel(item));
+          },
         );
       },
     );
@@ -330,8 +345,15 @@ class _PeriodeBulan {
 /// ================= ITEM =================
 class _MutasiItem extends StatelessWidget {
   final MutasiTabunganModel item;
+  final String transactionLabel;
 
-  const _MutasiItem({required this.item});
+  const _MutasiItem({required this.item, required this.transactionLabel});
+
+  String _formatDate(DateTime date) {
+    final day = date.day.toString().padLeft(2, '0');
+    final month = date.month.toString().padLeft(2, '0');
+    return "$day-$month-${date.year}";
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -360,7 +382,7 @@ class _MutasiItem extends StatelessWidget {
               children: [
                 Text(item.keterangan, style: const TextStyle(fontWeight: FontWeight.bold)),
                 const SizedBox(height: 4),
-                Text("${item.date.day}-${item.date.month}-${item.date.year}", style: const TextStyle(fontSize: 12, color: Colors.grey)),
+                Text("${_formatDate(item.date)} • $transactionLabel", style: const TextStyle(fontSize: 12, color: Colors.grey)),
               ],
             ),
           ),

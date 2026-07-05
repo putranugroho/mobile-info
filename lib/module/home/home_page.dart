@@ -642,8 +642,8 @@ Widget _loanMenuButton({required IconData icon, required String title, required 
           Container(
             width: 42,
             height: 42,
-            decoration: BoxDecoration(color: Colors.green.withOpacity(0.15), borderRadius: BorderRadius.circular(10)),
-            child: Icon(icon, color: const Color.fromARGB(255, 0, 95, 0), size: 22),
+            decoration: BoxDecoration(color: const Color(0xffEAF3FF), borderRadius: BorderRadius.circular(10)),
+            child: Icon(icon, color: const Color(0xff1565C0), size: 22),
           ),
           const SizedBox(height: 10),
           Text(

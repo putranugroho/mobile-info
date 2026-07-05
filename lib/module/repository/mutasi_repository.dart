@@ -30,6 +30,39 @@ class MutasiRepository {
     throw Exception(json['message'] ?? 'Gagal mengambil mutasi tabungan');
   }
 
+  static Future<Map<String, String>> getTcodeMap() async {
+    final dio = Dio();
+    dio.options.headers['api-key'] = '123';
+    dio.options.headers['Content-Type'] = 'application/json';
+
+    final response = await dio.post(NetworkURL.tcode(), data: {"action": "list"});
+    final raw = response.data;
+    final Map<String, dynamic> json = raw is String ? jsonDecode(raw) : Map<String, dynamic>.from(raw);
+
+    if (response.statusCode == 200 && json['code'] == '000') {
+      final data = json['data'];
+      if (data is! List) return {};
+
+      final result = <String, String>{};
+      for (final item in data) {
+        if (item is! Map) continue;
+
+        final row = Map<String, dynamic>.from(item);
+        final code = (row['tcode'] ?? '').toString().trim();
+        final label = (row['keterangan'] ?? row['description'] ?? '').toString().trim();
+
+        // Untuk display riwayat mutasi, semua tcode dipakai, termasuk is_active=false.
+        if (code.isNotEmpty && label.isNotEmpty) {
+          result[code] = label;
+        }
+      }
+
+      return result;
+    }
+
+    throw Exception(json['message'] ?? 'Gagal mengambil daftar tcode');
+  }
+
   static Future<List<MutasiTabunganModel>> getMutasiTabungan({
     required String endpoint,
     required String token,

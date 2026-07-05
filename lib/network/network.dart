@@ -205,6 +205,10 @@ class NetworkURL {
     return "$url_medfo/inquiry/mutasi-tabungan";
   }
 
+  static String tcode() {
+    return "$url_go/tcode";
+  }
+
   static String inquiryDepositoData() {
     return "$url_medfo/inquiry/detail-deposito";
   }

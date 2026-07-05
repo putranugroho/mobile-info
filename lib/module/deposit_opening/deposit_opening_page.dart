@@ -5,6 +5,11 @@ import 'package:mobile_info/module/deposit_opening/deposit_opening_notifier.dart
 import 'package:mobile_info/utils/format_currency.dart';
 import 'package:provider/provider.dart';
 
+const Color kFeatureBlue = Color(0xff1565C0);
+const Color kFeatureBlueDark = Color(0xff0D47A1);
+const Color kFeatureBlueLight = Color(0xffEAF3FF);
+const Color kFeatureBlueBackground = Color(0xffF3F8FF);
+
 class RupiahThousandsInputFormatter extends TextInputFormatter {
   const RupiahThousandsInputFormatter();
 
@@ -42,10 +47,10 @@ class _DepositOpeningPageState extends State<DepositOpeningPage> {
     return ChangeNotifierProvider(
       create: (_) => DepositOpeningNotifier(),
       child: Scaffold(
-        backgroundColor: const Color.fromARGB(255, 255, 250, 250),
+        backgroundColor: kFeatureBlueBackground,
         appBar: AppBar(
           elevation: 0,
-          backgroundColor: const Color.fromARGB(255, 0, 95, 0),
+          backgroundColor: kFeatureBlue,
           foregroundColor: Colors.white,
           title: const Text("Permohonan Buka Deposito", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
         ),
@@ -78,7 +83,7 @@ class _DepositOpeningPageState extends State<DepositOpeningPage> {
       margin: const EdgeInsets.fromLTRB(16, 16, 16, 0),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: const Color.fromARGB(255, 0, 95, 0),
+        color: kFeatureBlue,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [BoxShadow(offset: const Offset(2, 2), blurRadius: 6, color: Colors.grey[300] ?? Colors.transparent)],
       ),
@@ -107,7 +112,7 @@ class _DepositOpeningPageState extends State<DepositOpeningPage> {
                 decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10)),
                 child: const Text(
                   "Buka Deposito",
-                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Color.fromARGB(255, 0, 95, 0)),
+                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: kFeatureBlue),
                 ),
               ),
             ),
@@ -139,7 +144,7 @@ class _DepositOpeningPageState extends State<DepositOpeningPage> {
                 child: Text(
                   tabs[index],
                   textAlign: TextAlign.center,
-                  style: TextStyle(fontSize: 12, fontWeight: active ? FontWeight.bold : FontWeight.normal, color: active ? const Color.fromARGB(255, 0, 95, 0) : Colors.grey.shade700),
+                  style: TextStyle(fontSize: 12, fontWeight: active ? FontWeight.bold : FontWeight.normal, color: active ? kFeatureBlue : Colors.grey.shade700),
                 ),
               ),
             ),
@@ -289,7 +294,7 @@ class _DepositOpeningPageState extends State<DepositOpeningPage> {
       case "5":
         return Colors.orange;
       case "2":
-        return Colors.green;
+        return kFeatureBlue;
       case "3":
         return Colors.red;
       default:
@@ -300,7 +305,7 @@ class _DepositOpeningPageState extends State<DepositOpeningPage> {
   Widget _formTab(BuildContext context, DepositOpeningNotifier value) {
     return RefreshIndicator(
       onRefresh: value.refreshAll,
-      color: const Color.fromARGB(255, 0, 95, 0),
+      color: kFeatureBlue,
       child: ListView(
         padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
         children: [
@@ -393,9 +398,9 @@ class _DepositOpeningPageState extends State<DepositOpeningPage> {
   Widget _infoCard(DepositOpeningNotifier value) {
     final isActive = value.setupActive;
     final isLoading = value.setupLoading || value.rateLoading;
-    final bgColor = isLoading ? Colors.blue.shade50 : isActive ? Colors.green.shade50 : Colors.orange.shade50;
-    final borderColor = isLoading ? Colors.blue.shade200 : isActive ? Colors.green.shade200 : Colors.orange.shade200;
-    final iconColor = isLoading ? Colors.blue.shade800 : isActive ? Colors.green.shade800 : Colors.orange.shade800;
+    final bgColor = isLoading ? Colors.blue.shade50 : isActive ? kFeatureBlueLight : Colors.orange.shade50;
+    final borderColor = isLoading ? Colors.blue.shade200 : isActive ? kFeatureBlue.withOpacity(0.30) : Colors.orange.shade200;
+    final iconColor = isLoading ? Colors.blue.shade800 : isActive ? kFeatureBlueDark : Colors.orange.shade800;
     final message = isLoading
         ? "Sedang mengecek layanan dan rate produk deposito."
         : value.setupMessage.isNotEmpty
@@ -564,7 +569,7 @@ class _DepositOpeningPageState extends State<DepositOpeningPage> {
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 12),
-        decoration: BoxDecoration(color: active ? const Color.fromARGB(255, 0, 95, 0) : Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: active ? const Color.fromARGB(255, 0, 95, 0) : Colors.grey.shade300)),
+        decoration: BoxDecoration(color: active ? kFeatureBlue : Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: active ? kFeatureBlue : Colors.grey.shade300)),
         child: Text(label, textAlign: TextAlign.center, style: TextStyle(color: active ? Colors.white : Colors.black87, fontWeight: FontWeight.bold)),
       ),
     );
@@ -573,11 +578,11 @@ class _DepositOpeningPageState extends State<DepositOpeningPage> {
   Widget _otpCard(DepositOpeningNotifier value) {
     return Container(
       padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(color: Colors.green.shade50, borderRadius: BorderRadius.circular(12), border: Border.all(color: Colors.green.shade200)),
+      decoration: BoxDecoration(color: kFeatureBlueLight, borderRadius: BorderRadius.circular(12), border: Border.all(color: kFeatureBlue.withOpacity(0.30))),
       child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
         const Text("Input OTP", style: TextStyle(fontWeight: FontWeight.bold)),
         const SizedBox(height: 6),
-        Text("Masukkan kode OTP yang dikirim ke nomor ${value.maskedPhone}.", style: TextStyle(fontSize: 12, color: Colors.green.shade900)),
+        Text("Masukkan kode OTP yang dikirim ke nomor ${value.maskedPhone}.", style: TextStyle(fontSize: 12, color: kFeatureBlueDark)),
         const SizedBox(height: 8),
         TextField(controller: value.otpController, keyboardType: TextInputType.number, maxLength: 6, inputFormatters: [FilteringTextInputFormatter.digitsOnly], decoration: _inputDecoration("OTP", counterText: "")),
       ]),
@@ -590,7 +595,7 @@ class _DepositOpeningPageState extends State<DepositOpeningPage> {
     return SizedBox(
       height: 48,
       child: ElevatedButton(
-        style: ElevatedButton.styleFrom(backgroundColor: const Color.fromARGB(255, 0, 95, 0), foregroundColor: Colors.white, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
+        style: ElevatedButton.styleFrom(backgroundColor: kFeatureBlue, foregroundColor: Colors.white, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
         onPressed: isBusy
             ? null
             : () async {
@@ -614,7 +619,7 @@ class _DepositOpeningPageState extends State<DepositOpeningPage> {
         content: Text("Sukses, permintaan pembukaan deposito berhasil didaftarkan. ${value.notificationMessage}"),
         actions: [
           ElevatedButton(
-            style: ElevatedButton.styleFrom(backgroundColor: const Color.fromARGB(255, 0, 95, 0), foregroundColor: Colors.white),
+            style: ElevatedButton.styleFrom(backgroundColor: kFeatureBlue, foregroundColor: Colors.white),
             onPressed: () async {
               Navigator.pop(dialogContext);
               value.resetAfterSuccess();
@@ -660,7 +665,7 @@ class _DepositOpeningPageState extends State<DepositOpeningPage> {
       contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
       border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
       enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide(color: Colors.grey.shade300)),
-      focusedBorder: const OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(10)), borderSide: BorderSide(color: Color.fromARGB(255, 0, 95, 0))),
+      focusedBorder: const OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(10)), borderSide: BorderSide(color: kFeatureBlue)),
     );
   }
 

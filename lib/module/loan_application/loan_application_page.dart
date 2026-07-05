@@ -3,6 +3,11 @@ import 'package:mobile_info/module/loan_application/loan_application_notifier.da
 import 'package:provider/provider.dart';
 import 'package:flutter/services.dart';
 
+const Color kFeatureBlue = Color(0xff1565C0);
+const Color kFeatureBlueDark = Color(0xff0D47A1);
+const Color kFeatureBlueLight = Color(0xffEAF3FF);
+const Color kFeatureBlueBackground = Color(0xffF3F8FF);
+
 class LoanApplicationPage extends StatefulWidget {
   const LoanApplicationPage({super.key});
 
@@ -18,10 +23,10 @@ class _LoanApplicationPageState extends State<LoanApplicationPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color.fromARGB(255, 255, 250, 250),
+      backgroundColor: kFeatureBlueBackground,
       appBar: AppBar(
         elevation: 0,
-        backgroundColor: const Color.fromARGB(255, 0, 95, 0),
+        backgroundColor: kFeatureBlue,
         foregroundColor: Colors.white,
         title: const Text("Permohonan Pinjaman", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
       ),
@@ -56,7 +61,7 @@ class _LoanApplicationPageState extends State<LoanApplicationPage> {
       margin: const EdgeInsets.fromLTRB(16, 16, 16, 0),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: const Color.fromARGB(255, 0, 95, 0),
+        color: kFeatureBlue,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [BoxShadow(offset: const Offset(2, 2), blurRadius: 6, color: Colors.grey[300] ?? Colors.transparent)],
       ),
@@ -109,7 +114,7 @@ class _LoanApplicationPageState extends State<LoanApplicationPage> {
                 style: TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.bold,
-                  color: isSubmittingLoan ? Colors.grey.shade700 : const Color.fromARGB(255, 0, 95, 0),
+                  color: isSubmittingLoan ? Colors.grey.shade700 : kFeatureBlue,
                 ),
               ),
             ),
@@ -149,7 +154,7 @@ class _LoanApplicationPageState extends State<LoanApplicationPage> {
                   style: TextStyle(
                     fontSize: 12,
                     fontWeight: active ? FontWeight.bold : FontWeight.normal,
-                    color: active ? const Color.fromARGB(255, 0, 95, 0) : Colors.grey.shade700,
+                    color: active ? kFeatureBlue : Colors.grey.shade700,
                   ),
                 ),
               ),
@@ -271,7 +276,7 @@ class _LoanApplicationPageState extends State<LoanApplicationPage> {
       case "1":
         return Colors.blue;
       case "2":
-        return Colors.green;
+        return kFeatureBlue;
       case "3":
         return Colors.red;
       default:
@@ -321,9 +326,9 @@ class _LoanApplicationPageState extends State<LoanApplicationPage> {
                 margin: const EdgeInsets.only(bottom: 14),
                 padding: const EdgeInsets.all(14),
                 decoration: BoxDecoration(
-                  color: Colors.green.withOpacity(0.08),
+                  color: kFeatureBlue.withOpacity(0.08),
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: Colors.green.withOpacity(0.25)),
+                  border: Border.all(color: kFeatureBlue.withOpacity(0.25)),
                 ),
                 child: Text(
                   "Jangka waktu tersedia ${value.jkWaktuMin} - ${value.jkWaktuMaks} bulan. Suku bunga ${value.sukuBunga}%.",
@@ -355,8 +360,8 @@ class _LoanApplicationPageState extends State<LoanApplicationPage> {
               ElevatedButton(
                 onPressed: value.calculating ? null : value.hitungSimulasi,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.yellow,
-                  foregroundColor: Colors.black,
+                  backgroundColor: kFeatureBlue,
+                  foregroundColor: Colors.white,
                   elevation: 0,
                   padding: const EdgeInsets.symmetric(vertical: 14),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
@@ -446,17 +451,17 @@ class LoanApplicationFormPage extends StatelessWidget {
       builder: (context, value, child) {
         if (value.loadingSetup) {
           return const Scaffold(
-            backgroundColor: Color.fromARGB(255, 255, 250, 250),
+            backgroundColor: kFeatureBlueBackground,
             body: Center(child: CircularProgressIndicator()),
           );
         }
 
         if (!value.setupAvailable) {
           return Scaffold(
-            backgroundColor: const Color.fromARGB(255, 255, 250, 250),
+            backgroundColor: kFeatureBlueBackground,
             appBar: AppBar(
               elevation: 0,
-              backgroundColor: const Color.fromARGB(255, 0, 95, 0),
+              backgroundColor: kFeatureBlue,
               foregroundColor: Colors.white,
               title: const Text("Ajukan Pinjaman", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
             ),
@@ -496,10 +501,10 @@ class LoanApplicationFormPage extends StatelessWidget {
         }
 
         return Scaffold(
-          backgroundColor: const Color.fromARGB(255, 255, 250, 250),
+          backgroundColor: kFeatureBlueBackground,
           appBar: AppBar(
             elevation: 0,
-            backgroundColor: const Color.fromARGB(255, 0, 95, 0),
+            backgroundColor: kFeatureBlue,
             foregroundColor: Colors.white,
             title: const Text("Ajukan Pinjaman", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
           ),
@@ -515,9 +520,9 @@ class LoanApplicationFormPage extends StatelessWidget {
                       margin: const EdgeInsets.only(bottom: 14),
                       padding: const EdgeInsets.all(14),
                       decoration: BoxDecoration(
-                        color: Colors.green.withOpacity(0.08),
+                        color: kFeatureBlue.withOpacity(0.08),
                         borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: Colors.green.withOpacity(0.25)),
+                        border: Border.all(color: kFeatureBlue.withOpacity(0.25)),
                       ),
                       child: Text(
                         value.hideRateAndCicilan
@@ -623,7 +628,7 @@ class LoanApplicationFormPage extends StatelessWidget {
                     ElevatedButton(
                       onPressed: value.submitting ? null : value.submitApplication,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color.fromARGB(255, 0, 95, 0),
+                        backgroundColor: kFeatureBlue,
                         foregroundColor: Colors.white,
                         padding: const EdgeInsets.symmetric(vertical: 14),
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
@@ -679,6 +684,8 @@ Widget _formInput(
         fillColor: readOnly ? Colors.grey.shade100 : Colors.white,
         contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+        enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide(color: Colors.grey.shade300)),
+        focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: const BorderSide(color: kFeatureBlue)),
       ),
     ),
   );
@@ -698,12 +705,12 @@ Widget _formUploadBox(String label, {required String fileName, required VoidCall
       ),
       child: Row(
         children: [
-          const Icon(Icons.upload_file, color: Color.fromARGB(255, 0, 95, 0)),
+          const Icon(Icons.upload_file, color: kFeatureBlue),
           const SizedBox(width: 10),
           Expanded(child: Text(fileName.isNotEmpty ? fileName : label, overflow: TextOverflow.ellipsis)),
           const Text(
             "Pilih File",
-            style: TextStyle(color: Color.fromARGB(255, 0, 95, 0), fontWeight: FontWeight.bold),
+            style: TextStyle(color: kFeatureBlue, fontWeight: FontWeight.bold),
           ),
         ],
       ),

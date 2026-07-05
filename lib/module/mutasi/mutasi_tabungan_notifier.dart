@@ -7,6 +7,7 @@ import '../../pref/pref.dart';
 class MutasiTabunganNotifier extends ChangeNotifier {
   bool loading = false;
   List<MutasiTabunganModel> data = [];
+  Map<String, String> tcodeMap = {};
 
   String? userlogin;
   String? bprId;
@@ -29,6 +30,8 @@ class MutasiTabunganNotifier extends ChangeNotifier {
     notifyListeners();
 
     try {
+      await _loadTcodeMapIfNeeded();
+
       data = await MutasiRepository.getMutasiTabungan(
         endpoint: NetworkURL.inquiryMutasiTabungan(),
         token: token,
@@ -44,6 +47,29 @@ class MutasiTabunganNotifier extends ChangeNotifier {
 
     loading = false;
     notifyListeners();
+  }
+
+  Future<void> _loadTcodeMapIfNeeded() async {
+    if (tcodeMap.isNotEmpty) return;
+
+    try {
+      tcodeMap = await MutasiRepository.getTcodeMap();
+    } catch (e) {
+      // Mutasi tetap ditampilkan walaupun endpoint tcode gagal.
+      debugPrint("ERROR LOAD TCODE: $e");
+      tcodeMap = {};
+    }
+  }
+
+  String transactionLabel(MutasiTabunganModel item) {
+    final code = item.trxCode.trim();
+    final backendLabel = code.isNotEmpty ? tcodeMap[code]?.trim() ?? '' : '';
+
+    if (backendLabel.isNotEmpty) return backendLabel;
+    if (code.isNotEmpty) return code;
+    if (item.keterangan.trim().isNotEmpty) return item.keterangan.trim();
+
+    return '-';
   }
 
   void clear() {

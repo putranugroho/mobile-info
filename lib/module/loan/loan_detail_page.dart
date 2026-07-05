@@ -80,7 +80,7 @@ class LoanDetailPage extends StatelessWidget {
                       _section(
                         title: "Rincian Angsuran",
                         children: value.tagihan.map((t) {
-                          final lunas = t.sisaTagihan == 0 && t.sisaDenda == 0;
+                          final lunas = t.sisaTagihan <= 0;
 
                           return Card(
                             elevation: 0,

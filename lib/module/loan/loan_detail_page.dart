@@ -64,11 +64,11 @@ class LoanDetailPage extends StatelessWidget {
                         children: [
                           _item("No Rekening", m.noRek),
                           _item("Nama", m.nama),
-                          _item("Plafond Awal", "Rp ${FormatCurrency.oCcy.format(m.plafondAwal)}"),
-                          _item("Outstanding", "Rp ${FormatCurrency.oCcy.format(m.outstanding)}"),
-                          _item("Jumlah Tagihan", "${FormatCurrency.oCcy.format(m.tunggakan)}"),
-                          _item("Tenor", "${m.jangkaWaktu} ${m.jenisJangkaWaktu == 'B' ? 'Bulan' : ''}"),
-                          _item("Bunga", "${m.rate}%"),
+                          _item("Nilai Pinjaman", "Rp ${FormatCurrency.oCcy.format(m.plafondAwal)}"),
+                          _item("Sisa Pinjaman", "Rp ${FormatCurrency.oCcy.format(m.outstanding)}"),
+                          _item("Sisa Angsuran", _formatRemainingInstallment(m.tunggakan)),
+                          _item("Jangka Waktu", "${m.jangkaWaktu} ${m.jenisJangkaWaktu == 'B' ? 'Bulan' : ''}"),
+                          _item("Suku Bunga", "${_formatRate(m.rate)}%"),
                           _item("Tanggal Awal", formatTanggal(m.tglEfektif)),
                           _item("Tanggal Akhir", formatTanggal(m.tglJatuhTempo)),
                         ],
@@ -80,7 +80,7 @@ class LoanDetailPage extends StatelessWidget {
                       _section(
                         title: "Rincian Angsuran",
                         children: value.tagihan.map((t) {
-                          final lunas = t.sisaTagihan <= 0;
+                          final lunas = t.sisaTagihan == 0 && t.sisaDenda == 0;
 
                           return Card(
                             elevation: 0,
@@ -222,11 +222,12 @@ class LoanDetailPage extends StatelessWidget {
   Widget _item(String label, String value) {
     final bool isBayar = label.toLowerCase().contains("bayar");
 
-    final Color highlightColor = Colors.redAccent; // bisa diganti sesuai brand
+    final Color highlightColor = Colors.redAccent;
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 6),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Expanded(
             child: Text(
@@ -238,14 +239,32 @@ class LoanDetailPage extends StatelessWidget {
               ),
             ),
           ),
-          Text(
-            value,
-            style: TextStyle(fontWeight: FontWeight.w600, color: isBayar ? highlightColor : Colors.black87),
+          const SizedBox(width: 12),
+          Flexible(
+            child: Text(
+              value,
+              textAlign: TextAlign.right,
+              style: TextStyle(fontWeight: FontWeight.w600, color: isBayar ? highlightColor : Colors.black87),
+            ),
           ),
         ],
       ),
     );
   }
+}
+
+String _formatRemainingInstallment(double value) {
+  if (value == value.truncateToDouble()) {
+    return value.toInt().toString();
+  }
+  return value.toStringAsFixed(2);
+}
+
+String _formatRate(double value) {
+  if (value == value.truncateToDouble()) {
+    return value.toInt().toString();
+  }
+  return value.toStringAsFixed(2).replaceFirst(RegExp(r'0+$'), '').replaceFirst(RegExp(r'\.$'), '');
 }
 
 void _showBantuanCS(BuildContext context, String noRek) {

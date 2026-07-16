@@ -21,6 +21,10 @@ class NetworkURL {
     return "$url_medfo/mobile-info/aktivasi/check";
   }
 
+  static String requestOtpDeposito() {
+    return "$url_medfo/mobile-info/deposito/request-otp";
+  }
+
   static String verifyOtp() {
     return "$url_medfo/mobile-info/aktivasi/verify-otp";
   }

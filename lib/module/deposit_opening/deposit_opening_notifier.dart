@@ -263,23 +263,13 @@ class DepositOpeningNotifier extends ChangeNotifier {
     users = await Pref().getUsers();
     selectedInterestCode = interestOptions.first.code;
 
-    await Future.wait([
-      loadSetupPembukaanDeposito(),
-      loadRateProduk(),
-      loadTabungan(),
-      loadHistory(),
-    ]);
+    await Future.wait([loadSetupPembukaanDeposito(), loadRateProduk(), loadTabungan(), loadHistory()]);
 
     notifyListeners();
   }
 
   Future<void> refreshAll() async {
-    await Future.wait([
-      loadSetupPembukaanDeposito(),
-      loadRateProduk(),
-      loadTabungan(),
-      loadHistory(),
-    ]);
+    await Future.wait([loadSetupPembukaanDeposito(), loadRateProduk(), loadTabungan(), loadHistory()]);
   }
 
   Future<void> loadSetupPembukaanDeposito() async {
@@ -300,7 +290,9 @@ class DepositOpeningNotifier extends ChangeNotifier {
       }).toList();
 
       setupActive = activeSetup.isNotEmpty;
-      setupMessage = setupActive ? "Layanan permohonan buka deposito tersedia." : "Layanan permohonan buka deposito belum aktif. Silakan hubungi BPR.";
+      setupMessage = setupActive
+          ? "Layanan permohonan buka deposito tersedia."
+          : "Layanan permohonan buka deposito belum aktif. Silakan hubungi BPR.";
     } catch (e) {
       setupActive = false;
       setupMessage = "Gagal mengecek setup pembukaan deposito.";
@@ -320,10 +312,7 @@ class DepositOpeningNotifier extends ChangeNotifier {
       final currentUser = users ?? await Pref().getUsers();
       final rows = await DepositOpeningRepository.inquiryRateProduk(bprId: currentUser.bprId, userLogin: currentUser.username);
 
-      final parsed = rows
-          .map((item) => DepositProductOption.fromRateProduct(item))
-          .where((item) => item.tenorBulan > 0 && item.rate > 0)
-          .toList()
+      final parsed = rows.map((item) => DepositProductOption.fromRateProduct(item)).where((item) => item.tenorBulan > 0 && item.rate > 0).toList()
         ..sort((a, b) => a.tenorBulan.compareTo(b.tenorBulan));
 
       productOptions = parsed;
@@ -333,10 +322,7 @@ class DepositOpeningNotifier extends ChangeNotifier {
         rateMessage = "Produk deposito belum tersedia dari rate produk.";
       } else {
         final previousCode = selectedProduct?.kodeProduk;
-        selectedProduct = productOptions.firstWhere(
-          (item) => item.kodeProduk == previousCode,
-          orElse: () => productOptions.first,
-        );
+        selectedProduct = productOptions.firstWhere((item) => item.kodeProduk == previousCode, orElse: () => productOptions.first);
         rateMessage = "Rate deposito berhasil dimuat.";
       }
     } catch (e) {
@@ -450,7 +436,8 @@ class DepositOpeningNotifier extends ChangeNotifier {
   String? validateForm() {
     if (setupLoading || rateLoading || historyLoading) return "Data masih dimuat. Silakan tunggu.";
     if (!setupActive) return setupMessage.isNotEmpty ? setupMessage : "Layanan permohonan buka deposito belum aktif.";
-    if (hasOngoingApplication) return "Masih ada permohonan deposito yang belum selesai. Pengajuan baru bisa dibuat setelah status Selesai atau Dibatalkan.";
+    if (hasOngoingApplication)
+      return "Masih ada permohonan deposito yang belum selesai. Pengajuan baru bisa dibuat setelah status Selesai atau Dibatalkan.";
     if (productOptions.isEmpty || selectedProduct == null) return "Produk deposito belum tersedia dari rate produk.";
 
     final nominal = nominalValue;
@@ -497,9 +484,15 @@ class DepositOpeningNotifier extends ChangeNotifier {
 
     try {
       final currentUser = users ?? await Pref().getUsers();
-      final value = await AuthRepository.lupaSandiMedfo(token, NetworkURL.lupaSandiMedfo(), currentUser.nomorPonsel.trim(), currentUser.bprId);
+      final value = await AuthRepository.aktivasiMobileInfo(
+        token,
+        NetworkURL.requestOtpDeposito(),
+        currentUser.nomorPonsel.trim(),
+        currentUser.bprId,
+      );
       final body = value is Map<String, dynamic> ? value : {};
-      final success = body['value'] == 1 || '${body['code'] ?? ''}' == '000' || body['status'] == true || '${body['status'] ?? ''}'.toLowerCase() == 'success';
+      final success =
+          body['value'] == 1 || '${body['code'] ?? ''}' == '000' || body['status'] == true || '${body['status'] ?? ''}'.toLowerCase() == 'success';
 
       if (!success) {
         final message = '${body['message'] ?? 'Gagal mengirim OTP.'}';
@@ -553,7 +546,8 @@ class DepositOpeningNotifier extends ChangeNotifier {
       );
 
       final verifyBody = verifyValue is Map<String, dynamic> ? verifyValue : {};
-      final otpValid = (verifyBody['status'] == true || '${verifyBody['status'] ?? ''}'.toLowerCase() == 'success') && '${verifyBody['code'] ?? ''}' == '000';
+      final otpValid =
+          (verifyBody['status'] == true || '${verifyBody['status'] ?? ''}'.toLowerCase() == 'success') && '${verifyBody['code'] ?? ''}' == '000';
       if (!otpValid) {
         final message = '${verifyBody['message'] ?? 'OTP tidak valid.'}';
         errorMessage = message;

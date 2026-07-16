@@ -392,35 +392,12 @@ class _HomePageState extends State<HomePage> {
 }
 
 Widget _buildHeaderLeftLogo(HomeNotifier value) {
-  final isMedfo = value.users!.bprId == "609999";
-
-  if (isMedfo) {
-    return SizedBox(
-      width: 105,
-      height: 70,
-      child: Align(
-        alignment: Alignment.centerLeft,
-        child: Image.asset(ImageAssets.logomedfo, width: 105, height: 64, fit: BoxFit.contain),
-      ),
-    );
-  }
-
   return SizedBox(
     width: 105,
     height: 70,
-    child: Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Expanded(child: Image.asset(ImageAssets.perbarindo, fit: BoxFit.contain)),
-        const SizedBox(height: 2),
-        Text(
-          "${value.users!.perbarindo}",
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-          textAlign: TextAlign.center,
-          style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: titlePerbarindo),
-        ),
-      ],
+    child: Align(
+      alignment: Alignment.centerLeft,
+      child: Image.asset(ImageAssets.logomedfo, width: 105, height: 64, fit: BoxFit.contain),
     ),
   );
 }

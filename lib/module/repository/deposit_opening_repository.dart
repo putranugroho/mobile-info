@@ -165,12 +165,25 @@ class DepositOpeningRepository {
     if (res is! Map<String, dynamic>) throw Exception("Response history permohonan deposito tidak valid.");
     if ('${res['code'] ?? ''}' != '000') throw Exception(res['message'] ?? "Data history permohonan deposito tidak ditemukan.");
 
+    // Parsing defensif -- sama seperti _getAllPejabatUsername, karena
+    // bentuk `data` yang dikembalikan backend bisa beda-beda tergantung
+    // endpoint: list langsung, {data:[...]}, atau {items:[...]}.
+    // Sebelumnya di sini cuma mengenali {data:{data:[...]}} -- kalau
+    // bentuk aslinya beda, fungsi ini diam-diam pulang [] kosong, yang
+    // bikin kd_kantor gagal terbaca di alur notifikasi dan notif ke
+    // Pejabat dibatalkan tanpa pesan error yang jelas.
     final data = res['data'];
-    if (data is Map<String, dynamic>) {
-      final rows = data['data'];
-      if (rows is List) return rows.map((e) => Map<String, dynamic>.from(e)).toList();
+    List<dynamic> rows = [];
+    if (data is List) {
+      rows = data;
+    } else if (data is Map) {
+      if (data['data'] is List) {
+        rows = data['data'];
+      } else if (data['items'] is List) {
+        rows = data['items'];
+      }
     }
-    return [];
+    return rows.whereType<Map>().map((e) => Map<String, dynamic>.from(e)).toList();
   }
 
   static Future<Map<String, dynamic>> daftarPermohonanPembukaanDeposito({

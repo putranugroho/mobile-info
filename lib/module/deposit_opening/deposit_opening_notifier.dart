@@ -551,25 +551,32 @@ class DepositOpeningNotifier extends ChangeNotifier {
         return message;
       }
 
+      // kd_kantor nasabah pemohon -- diambil dari response verify-otp
+      // (field user.kd_kantor / data.user.kd_kantor), BUKAN dari riwayat
+      // pengajuan deposito. Sempat dicoba ambil dari
+      // inquiryHistoryPermohonanDeposito, tapi ternyata catatan pengajuan
+      // deposito itu sendiri TIDAK menyimpan kd_kantor sama sekali (sudah
+      // dicek dari response asli) -- makanya notif ke Pejabat selalu
+      // dibatalkan (kd_kantor kosong). verify-otp jauh lebih tepat karena
+      // datanya berasal dari profil nasabah, bukan dari catatan transaksi.
+      final verifyData = verifyBody['data'];
+      final verifyUser = (verifyData is Map ? verifyData['user'] : null) ?? verifyBody['user'];
+      final kdKantorPemohon = verifyUser is Map ? '${verifyUser['kd_kantor'] ?? ''}'.trim() : '';
+
       final submitResponse = await _submitPermohonan();
       final submitMessage = '${submitResponse['message'] ?? 'Sukses, permintaan pembukaan deposito.'}';
 
-
+      // ==================== NOTIFIKASI KE PEJABAT ====================
+      // PENTING: pengajuan deposito di atas SUDAH BERHASIL tersimpan pada
+      // titik ini. Apa pun yang terjadi di notifikasi di bawah (gagal
+      // ambil kd_kantor, Pejabat kosong, gagal kirim push, dll) TIDAK
+      // BOLEH membuat proses ini dianggap gagal -- sebelumnya notifyDepositStaff
+      // bisa throw Exception ("Staff PIC deposito belum tersedia") yang
+      // ketangkap oleh catch di bawah dan menampilkan "Gagal memproses
+      // permohonan deposito" ke nasabah, padahal depositonya SUDAH tercatat.
+      // Itu berisiko nasabah coba submit ulang dan jadi pengajuan dobel.
       String notificationMessageLocal = '';
       try {
-        String kdKantorPemohon = '';
-        try {
-          final history = await DepositOpeningRepository.inquiryHistoryPermohonanDeposito(
-            bprId: currentUser.bprId,
-            noCif: currentUser.noCif,
-          );
-          if (history.isNotEmpty) {
-            kdKantorPemohon = '${history.first['kd_kantor'] ?? ''}'.trim();
-          }
-        } catch (e) {
-          debugPrint('⚠️ Gagal ambil kd_kantor dari riwayat pengajuan: $e');
-        }
-
         final notifResult = await DepositOpeningRepository.notifyDepositStaff(
           bprId: currentUser.bprId,
           kdKantor: kdKantorPemohon,

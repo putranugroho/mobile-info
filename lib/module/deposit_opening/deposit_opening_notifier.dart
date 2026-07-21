@@ -484,12 +484,7 @@ class DepositOpeningNotifier extends ChangeNotifier {
 
     try {
       final currentUser = users ?? await Pref().getUsers();
-      final value = await AuthRepository.aktivasiMobileInfo(
-        token,
-        NetworkURL.requestOtpDeposito(),
-        currentUser.nomorPonsel.trim(),
-        currentUser.bprId,
-      );
+      final value = await DepositOpeningRepository.requestOtpDeposito(phoneNumber: currentUser.nomorPonsel.trim(), bprId: currentUser.bprId);
       final body = value is Map<String, dynamic> ? value : {};
       final success =
           body['value'] == 1 || '${body['code'] ?? ''}' == '000' || body['status'] == true || '${body['status'] ?? ''}'.toLowerCase() == 'success';

@@ -4,7 +4,6 @@ import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:mobile_info/network/network.dart';
 
-
 class DepositNotificationRecipientModel {
   final int id;
   final String cif;
@@ -12,13 +11,7 @@ class DepositNotificationRecipientModel {
   final String noHp;
   final String status;
 
-  const DepositNotificationRecipientModel({
-    required this.id,
-    required this.cif,
-    required this.nama,
-    required this.noHp,
-    required this.status,
-  });
+  const DepositNotificationRecipientModel({required this.id, required this.cif, required this.nama, required this.noHp, required this.status});
 
   factory DepositNotificationRecipientModel.fromJson(Map<String, dynamic> json) {
     return DepositNotificationRecipientModel(
@@ -36,11 +29,7 @@ class DepositNotificationResultModel {
   final int successCount;
   final int failedCount;
 
-  const DepositNotificationResultModel({
-    required this.totalRecipient,
-    required this.successCount,
-    required this.failedCount,
-  });
+  const DepositNotificationResultModel({required this.totalRecipient, required this.successCount, required this.failedCount});
 }
 
 class DepositOpeningRepository {
@@ -60,20 +49,42 @@ class DepositOpeningRepository {
     return dio;
   }
 
+  static Future<Map<String, dynamic>> requestOtpDeposito({required String phoneNumber, required String bprId}) async {
+    final body = {"phone_number": phoneNumber.trim(), "bpr_id": bprId.trim()};
+
+    if (kDebugMode) {
+      print("ENDPOINT REQUEST OTP DEPOSITO : ${NetworkURL.requestOtpDeposito()}");
+      print("REQUEST OTP DEPOSITO : $body");
+    }
+
+    final response = await _dio().post(NetworkURL.requestOtpDeposito(), data: body);
+
+    final res = _decode(response.data);
+
+    if (kDebugMode) {
+      print("RESPONSE REQUEST OTP DEPOSITO : $res");
+    }
+
+    if (res is! Map<String, dynamic>) {
+      throw Exception("Response request OTP deposito tidak valid.");
+    }
+
+    final code = '${res['code'] ?? ''}';
+    final status = '${res['status'] ?? ''}'.toLowerCase();
+
+    if (code != '000' && status != 'success' && res['status'] != true) {
+      throw Exception(res['message'] ?? "Gagal mengirim OTP deposito.");
+    }
+
+    return res;
+  }
+
   static Future<List<Map<String, dynamic>>> inquirySetupPembukaanDep({required String bprId}) async {
     final body = {
       "bpr_id": bprId,
       "user_login": "SYSTEM",
       "term": "web",
-      "filter": {
-        "status_pembukaan": "",
-        "product_by": "",
-        "jurnal": "",
-        "nosbb": "",
-        "namasbb": "",
-        "status": "",
-        "id": null,
-      },
+      "filter": {"status_pembukaan": "", "product_by": "", "jurnal": "", "nosbb": "", "namasbb": "", "status": "", "id": null},
       "sort": {"by": "id", "order": "DESC"},
       "pagination": {"page": 1, "limit": 100},
     };
@@ -103,11 +114,7 @@ class DepositOpeningRepository {
   }
 
   static Future<List<Map<String, dynamic>>> inquiryRateProduk({required String bprId, required String userLogin}) async {
-    final body = {
-      "bpr_id": bprId,
-      "userlogin": userLogin.trim().isNotEmpty ? userLogin.trim() : "SYSTEM",
-      "term": "WEB",
-    };
+    final body = {"bpr_id": bprId, "userlogin": userLogin.trim().isNotEmpty ? userLogin.trim() : "SYSTEM", "term": "WEB"};
 
     if (kDebugMode) {
       print("ENDPOINT RATE PRODUK : ${NetworkURL.rateproduk()}");
@@ -302,11 +309,7 @@ class DepositOpeningRepository {
   }
 
   static Future<List<DepositNotificationRecipientModel>> inquiryNotificationRecipients({required String bprId}) async {
-    final body = {
-      "bpr_id": bprId,
-      "user_login": "admin",
-      "term": "WEB",
-    };
+    final body = {"bpr_id": bprId, "user_login": "admin", "term": "WEB"};
 
     if (kDebugMode) {
       print("ENDPOINT INQUIRY NOTIFIKASI DEPOSITO : ${NetworkURL.inquiryNotifikasiPinjaman()}");
@@ -326,24 +329,11 @@ class DepositOpeningRepository {
     final data = res['data'];
     if (data is! List) return [];
 
-    return data
-        .map((e) => DepositNotificationRecipientModel.fromJson(Map<String, dynamic>.from(e)))
-        .where((e) => e.cif.trim().isNotEmpty)
-        .toList();
+    return data.map((e) => DepositNotificationRecipientModel.fromJson(Map<String, dynamic>.from(e))).where((e) => e.cif.trim().isNotEmpty).toList();
   }
 
-  static Future<bool> sendPushNotification({
-    required String title,
-    required String body,
-    required String bprId,
-    required String noCif,
-  }) async {
-    final payload = {
-      "title": title,
-      "bpr_id": bprId,
-      "body": body,
-      "no_cif": noCif,
-    };
+  static Future<bool> sendPushNotification({required String title, required String body, required String bprId, required String noCif}) async {
+    final payload = {"title": title, "bpr_id": bprId, "body": body, "no_cif": noCif};
 
     if (kDebugMode) {
       print("ENDPOINT PUSH NOTIFIKASI DEPOSITO : ${NetworkURL.pushNotifPinjaman()}");
@@ -381,21 +371,11 @@ class DepositOpeningRepository {
     int failedCount = 0;
 
     for (final username in pejabatUsernames) {
-      final success = await sendPushNotification(
-        title: title,
-        body: body,
-        bprId: bprId,
-        noCif: username,
-      );
+      final success = await sendPushNotification(title: title, body: body, bprId: bprId, noCif: username);
 
       success ? successCount++ : failedCount++;
     }
 
-    return DepositNotificationResultModel(
-      totalRecipient: pejabatUsernames.length,
-      successCount: successCount,
-      failedCount: failedCount,
-    );
+    return DepositNotificationResultModel(totalRecipient: pejabatUsernames.length, successCount: successCount, failedCount: failedCount);
   }
-
 }

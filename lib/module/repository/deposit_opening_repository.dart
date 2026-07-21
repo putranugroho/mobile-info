@@ -219,6 +219,88 @@ class DepositOpeningRepository {
     return res;
   }
 
+  /// Ambil semua username Pejabat aktif (role_user = '1') di bpr ini,
+  /// lewat inquiry data petugas -- SAMA PERSIS dengan cara CMS Medfo
+  /// menentukan siapa yang dinotifikasi untuk pembukaan deposito
+  /// (_getAllPejabatUsername di pembukaan_deposito_notifier.dart).
+  ///
+  /// RIWAYAT: sebelumnya penerima notif diambil lewat
+  /// inquiryNotificationRecipients() yang memanggil endpoint
+  /// /inquiry/notifikasi-pinjaman -- endpoint itu untuk fitur notifikasi
+  /// PINJAMAN, bukan daftar Pejabat, jadi kemungkinan besar penerimanya
+  /// tidak sinkron dengan siapa yang sebenarnya dinotifikasi CMS untuk
+  /// deposito. Sekarang query-nya diganti supaya sumbernya benar-benar
+  /// sama dengan CMS.
+  static Future<List<String>> _getAllPejabatUsername({required String bprId}) async {
+    final body = {
+      "bpr_id": bprId,
+      "filter": {
+        "username": "",
+        "nama": "",
+        "no_hp": "",
+        "kd_kantor": "",
+        "no_identitas": "",
+        "jabatan": "",
+        "role_user": "1",
+        "status": "",
+        "status_aktif": "",
+        "tgl_lahir_from": "",
+        "tgl_lahir_to": "",
+        "created_at_from": "",
+        "created_at_to": "",
+      },
+      "sort": {"by": "created_at", "type": "desc"},
+      "pagination": {"page": 1, "limit": 100},
+    };
+
+    if (kDebugMode) {
+      print("ENDPOINT INQUIRY DATA PETUGAS (Pejabat) : ${NetworkURL.inquiryDataPetugasMedfo()}");
+      print("REQUEST INQUIRY DATA PETUGAS (Pejabat) : $body");
+    }
+
+    try {
+      final response = await _dio().post(NetworkURL.inquiryDataPetugasMedfo(), data: body);
+      final res = _decode(response.data);
+
+      if (kDebugMode) {
+        print("RESPONSE INQUIRY DATA PETUGAS (Pejabat) : $res");
+      }
+
+      if (res is! Map<String, dynamic>) return [];
+      if ('${res['code'] ?? ''}' != '000') return [];
+
+      // Parsing defensif: bentuk `data` dari endpoint ini bisa berupa list
+      // langsung, {data:[...]}, atau {items:[...]} -- sama seperti
+      // web_service kita sendiri harus jaga-jaga soal ini juga.
+      final data = res['data'];
+      List<dynamic> rows = [];
+      if (data is List) {
+        rows = data;
+      } else if (data is Map) {
+        if (data['data'] is List) {
+          rows = data['data'];
+        } else if (data['items'] is List) {
+          rows = data['items'];
+        }
+      }
+
+      return rows
+          .whereType<Map>()
+          .map((e) => Map<String, dynamic>.from(e))
+          .where((e) {
+            final roleUser = '${e['role_user'] ?? ''}'.trim();
+            final status = '${e['status'] ?? e['status_aktif'] ?? ''}'.trim().toUpperCase();
+            return roleUser == '1' && status == 'A';
+          })
+          .map((e) => '${e['username'] ?? ''}'.trim())
+          .where((username) => username.isNotEmpty)
+          .toList();
+    } catch (e) {
+      if (kDebugMode) print("ERROR INQUIRY DATA PETUGAS (Pejabat) : $e");
+      return [];
+    }
+  }
+
   static Future<List<DepositNotificationRecipientModel>> inquiryNotificationRecipients({required String bprId}) async {
     final body = {
       "bpr_id": bprId,
@@ -278,34 +360,39 @@ class DepositOpeningRepository {
     return res is Map<String, dynamic> && (res['value'] == 1 || res['status'] == true || '${res['code'] ?? ''}' == '000');
   }
 
+  /// Kirim notif ke semua Pejabat aktif saat ada pengajuan pembukaan
+  /// deposito baru -- judul & isi pesan disamakan PERSIS dengan yang
+  /// dipakai CMS Medfo untuk status 0 (lihat _depositoStatusBody di
+  /// pembukaan_deposito_notifier.dart), supaya pesan yang diterima Pejabat
+  /// konsisten baik pengajuan datang dari CMS maupun dari mobile-info ini.
   static Future<DepositNotificationResultModel> notifyDepositStaff({
     required String bprId,
     required String nama,
     required int nominal,
     required int jangkaWaktu,
   }) async {
-    final recipients = await inquiryNotificationRecipients(bprId: bprId);
-    if (recipients.isEmpty) throw Exception("Staff PIC deposito belum tersedia.");
+    final pejabatUsernames = await _getAllPejabatUsername(bprId: bprId);
+    if (pejabatUsernames.isEmpty) throw Exception("Pejabat aktif belum tersedia.");
 
-    final title = "Permohonan Deposito Baru";
-    final body = "$nama mengajukan pembukaan deposito Rp $nominal dengan tenor $jangkaWaktu bulan.";
+    const title = "Pembukaan Deposito";
+    final body = "Ada pengajuan pembukaan deposito baru atas nama $nama, menunggu diproses.";
 
     int successCount = 0;
     int failedCount = 0;
 
-    for (final recipient in recipients) {
+    for (final username in pejabatUsernames) {
       final success = await sendPushNotification(
         title: title,
         body: body,
         bprId: bprId,
-        noCif: recipient.cif,
+        noCif: username,
       );
 
       success ? successCount++ : failedCount++;
     }
 
     return DepositNotificationResultModel(
-      totalRecipient: recipients.length,
+      totalRecipient: pejabatUsernames.length,
       successCount: successCount,
       failedCount: failedCount,
     );

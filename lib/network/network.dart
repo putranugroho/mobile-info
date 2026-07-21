@@ -277,6 +277,13 @@ class NetworkURL {
     return "$url_medfo/inquiry/pembukaan-dep";
   }
 
+  /// Dipakai untuk ambil daftar Pejabat aktif (role_user = '1') yang perlu
+  /// dinotifikasi saat ada pengajuan pembukaan deposito baru -- host & path
+  /// yang sama persis dengan yang dipakai CMS Medfo untuk keperluan serupa.
+  static String inquiryDataPetugasMedfo() {
+    return "$url_medfo/inquiry/data-petugas";
+  }
+
   static String daftarPembukaanDeposito() {
     return "$url_medfo/permohonan-pembukaan-deposito/daftar";
   }

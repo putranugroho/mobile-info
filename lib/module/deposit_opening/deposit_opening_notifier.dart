@@ -554,14 +554,38 @@ class DepositOpeningNotifier extends ChangeNotifier {
       final submitResponse = await _submitPermohonan();
       final submitMessage = '${submitResponse['message'] ?? 'Sukses, permintaan pembukaan deposito.'}';
 
-      final notifResult = await DepositOpeningRepository.notifyDepositStaff(
-        bprId: currentUser.bprId,
-        nama: currentUser.nama,
-        nominal: nominalValue,
-        jangkaWaktu: selectedProduct?.tenorBulan ?? 0,
-      );
 
-      notificationMessage = "Notifikasi terkirim ke ${notifResult.successCount}/${notifResult.totalRecipient} staff.";
+      String notificationMessageLocal = '';
+      try {
+        String kdKantorPemohon = '';
+        try {
+          final history = await DepositOpeningRepository.inquiryHistoryPermohonanDeposito(
+            bprId: currentUser.bprId,
+            noCif: currentUser.noCif,
+          );
+          if (history.isNotEmpty) {
+            kdKantorPemohon = '${history.first['kd_kantor'] ?? ''}'.trim();
+          }
+        } catch (e) {
+          debugPrint('⚠️ Gagal ambil kd_kantor dari riwayat pengajuan: $e');
+        }
+
+        final notifResult = await DepositOpeningRepository.notifyDepositStaff(
+          bprId: currentUser.bprId,
+          kdKantor: kdKantorPemohon,
+          nama: currentUser.nama,
+          nominal: nominalValue,
+          jangkaWaktu: selectedProduct?.tenorBulan ?? 0,
+        );
+        notificationMessageLocal =
+            "Notifikasi terkirim ke ${notifResult.successCount}/${notifResult.totalRecipient} staff.";
+      } catch (e) {
+        debugPrint('⚠️ Notifikasi ke Pejabat gagal (pengajuan deposito TETAP tersimpan): $e');
+        notificationMessageLocal =
+            'Pengajuan tersimpan, tetapi notifikasi ke Pejabat gagal dikirim.';
+      }
+
+      notificationMessage = notificationMessageLocal;
       final message = "$submitMessage $notificationMessage";
 
       requestSuccess = true;

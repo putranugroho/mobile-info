@@ -226,10 +226,11 @@ class DepositOpeningRepository {
     return res;
   }
 
-  /// Ambil semua username Pejabat aktif (role_user = '1') di bpr ini,
-  /// lewat inquiry data petugas -- SAMA PERSIS dengan cara CMS Medfo
-  /// menentukan siapa yang dinotifikasi untuk pembukaan deposito
-  /// (_getAllPejabatUsername di pembukaan_deposito_notifier.dart).
+  /// Ambil semua username Pejabat aktif (role_user = '1') DI KANTOR
+  /// TERTENTU (kd_kantor), lewat inquiry data petugas -- SAMA PERSIS
+  /// dengan cara CMS Medfo menentukan siapa yang dinotifikasi untuk
+  /// pembukaan deposito (_getAllPejabatUsername di
+  /// pembukaan_deposito_notifier.dart).
   ///
   /// RIWAYAT: sebelumnya penerima notif diambil lewat
   /// inquiryNotificationRecipients() yang memanggil endpoint
@@ -238,14 +239,31 @@ class DepositOpeningRepository {
   /// tidak sinkron dengan siapa yang sebenarnya dinotifikasi CMS untuk
   /// deposito. Sekarang query-nya diganti supaya sumbernya benar-benar
   /// sama dengan CMS.
-  static Future<List<String>> _getAllPejabatUsername({required String bprId}) async {
+  ///
+  /// PENTING: kd_kantor WAJIB diisi (sebelumnya '' -- menjangkau semua
+  /// kantor di bpr yang sama, bukan cuma kantor nasabah pemohon). Sekarang
+  /// difilter di request DAN di-double-check lagi di sisi client, supaya
+  /// notif deposito nasabah kantor 001 tidak nyasar ke Pejabat kantor 002
+  /// (atau BPR lain -- itu sudah otomatis aman karena bpr_id juga difilter).
+  static Future<List<String>> _getAllPejabatUsername({
+    required String bprId,
+    required String kdKantor,
+  }) async {
+    final normalizedKantor = kdKantor.trim();
+    if (normalizedKantor.isEmpty) {
+      if (kDebugMode) {
+        print("⚠️ _getAllPejabatUsername dipanggil tanpa kd_kantor -- dibatalkan supaya tidak notif ke semua kantor.");
+      }
+      return [];
+    }
+
     final body = {
       "bpr_id": bprId,
       "filter": {
         "username": "",
         "nama": "",
         "no_hp": "",
-        "kd_kantor": "",
+        "kd_kantor": normalizedKantor,
         "no_identitas": "",
         "jabatan": "",
         "role_user": "1",
@@ -297,7 +315,8 @@ class DepositOpeningRepository {
           .where((e) {
             final roleUser = '${e['role_user'] ?? ''}'.trim();
             final status = '${e['status'] ?? e['status_aktif'] ?? ''}'.trim().toUpperCase();
-            return roleUser == '1' && status == 'A';
+            final kantorRow = '${e['kd_kantor'] ?? ''}'.trim();
+            return roleUser == '1' && status == 'A' && kantorRow == normalizedKantor;
           })
           .map((e) => '${e['username'] ?? ''}'.trim())
           .where((username) => username.isNotEmpty)
@@ -357,12 +376,13 @@ class DepositOpeningRepository {
   /// konsisten baik pengajuan datang dari CMS maupun dari mobile-info ini.
   static Future<DepositNotificationResultModel> notifyDepositStaff({
     required String bprId,
+    required String kdKantor,
     required String nama,
     required int nominal,
     required int jangkaWaktu,
   }) async {
-    final pejabatUsernames = await _getAllPejabatUsername(bprId: bprId);
-    if (pejabatUsernames.isEmpty) throw Exception("Pejabat aktif belum tersedia.");
+    final pejabatUsernames = await _getAllPejabatUsername(bprId: bprId, kdKantor: kdKantor);
+    if (pejabatUsernames.isEmpty) throw Exception("Pejabat aktif di kantor ini belum tersedia.");
 
     const title = "Pembukaan Deposito";
     final body = "Ada pengajuan pembukaan deposito baru atas nama $nama, menunggu diproses.";

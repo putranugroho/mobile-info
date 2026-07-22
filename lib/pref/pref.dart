@@ -8,6 +8,7 @@ class Pref {
   static String noCif = "no_cif";
   static String usersId = "users_id";
   static String bprId = "bpr_id";
+  static String kdKantor = "kd_kantor";
   static String nama = "nama";
   static String tglLahir = "tgl_lahir";
   static String noIdentitas = "no_identitas";
@@ -66,6 +67,7 @@ class Pref {
     pref.setString(Pref.noCif, users.noCif);
     pref.setString(Pref.usersId, users.usersId);
     pref.setString(Pref.bprId, users.bprId);
+    pref.setString(Pref.kdKantor, users.kdKantor);
     pref.setString(Pref.nama, users.nama);
     pref.setString(Pref.tglLahir, users.tglLahir);
     pref.setString(Pref.perbarindo, users.perbarindo);
@@ -87,6 +89,7 @@ class Pref {
       noCif: pref.getString('no_cif') ?? '',
       usersId: pref.getString('users_id') ?? '',
       bprId: pref.getString('bpr_id') ?? '',
+      kdKantor: pref.getString(Pref.kdKantor) ?? '',
       nama: pref.getString('nama') ?? '',
       tglLahir: pref.getString('tgl_lahir') ?? '',
       noIdentitas: pref.getString('no_identitas') ?? '',
@@ -105,7 +108,13 @@ class Pref {
     return users;
   }
 
-  Future<void> updateLoginSession({String? sessionToken, String? loginDeviceId, String? loginDeviceName, String? loginExpiredAt}) async {
+  Future<void> updateLoginSession({
+    String? sessionToken,
+    String? loginDeviceId,
+    String? loginDeviceName,
+    String? loginExpiredAt,
+    String? kdKantor,
+  }) async {
     final pref = await SharedPreferences.getInstance();
 
     if (sessionToken != null) {
@@ -120,6 +129,18 @@ class Pref {
     if (loginExpiredAt != null) {
       await pref.setString(Pref.loginExpiredAt, loginExpiredAt);
     }
+    final normalizedKantor = kdKantor?.trim() ?? '';
+    if (normalizedKantor.isNotEmpty) {
+      await pref.setString(Pref.kdKantor, normalizedKantor);
+    }
+  }
+
+  Future<void> mergeSessionProfileFromMap(Map<String, dynamic> data) async {
+    final kantor = '${data['kd_kantor'] ?? data['kdKantor'] ?? ''}'.trim();
+    await updateLoginSession(
+      loginExpiredAt: '${data['login_expired_at'] ?? ''}'.trim().isEmpty ? null : '${data['login_expired_at']}',
+      kdKantor: kantor.isEmpty ? null : kantor,
+    );
   }
 
   remove() async {
@@ -128,6 +149,7 @@ class Pref {
     pref.remove(Pref.noCif);
     pref.remove(Pref.usersId);
     pref.remove(Pref.bprId);
+    pref.remove(Pref.kdKantor);
     pref.remove(Pref.nama);
     pref.remove(Pref.tglLahir);
     pref.remove(Pref.noIdentitas);

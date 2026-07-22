@@ -718,13 +718,24 @@ class LoanApplicationNotifier extends ChangeNotifier {
 
       if (bprId.isEmpty) throw Exception("BPR ID tidak ditemukan.");
 
+      final kdKantor = users.kdKantor.trim();
+      if (kdKantor.isEmpty) {
+        throw Exception(
+          "Kode kantor tidak ditemukan di session login. Silakan logout lalu login kembali.",
+        );
+      }
+
       if (noCifController.text.trim().isEmpty) {
         throw Exception("No CIF tidak ditemukan.");
       }
 
       final form = buildFormModel();
 
-      final submitResult = await LoanApplicationRepository.submitLoanApplication(bprId: bprId, form: form);
+      final submitResult = await LoanApplicationRepository.submitLoanApplication(
+        bprId: bprId,
+        form: form,
+        kdKantor: kdKantor,
+      );
 
       if (LoanApplicationRepository.debugDryRunSubmit) {
         if (!context.mounted) return;
@@ -739,13 +750,42 @@ class LoanApplicationNotifier extends ChangeNotifier {
         return;
       }
 
-      final notifResult = await LoanApplicationRepository.notifyLoanStaff(bprId: bprId, form: form);
+      // ==================== NOTIFIKASI KE PEJABAT ====================
+      // PENTING: pengajuan pinjaman di atas SUDAH BERHASIL tersimpan pada
+      // titik ini. Apa pun yang terjadi di notifikasi di bawah TIDAK BOLEH
+      // membuat proses ini dianggap gagal -- sebelumnya notifyLoanStaff bisa
+      // throw Exception yang ketangkap catch di bawah dan menampilkan
+      // "Gagal mengirim permohonan" padahal permohonannya SUDAH tercatat.
+      // Sama seperti perbaikan yang sudah diterapkan di alur deposito.
+      //
+      // kd_kantor sekarang diambil dari users.kdKantor (field baru di
+      // UsersModel, dipetakan dari respons LOGIN). Ini dugaan berdasarkan
+      // pola: verify-otp (dipakai di alur deposito) TERBUKTI mengembalikan
+      // kd_kantor dengan struktur yang sama, dan login memakai backend yang
+      // sama juga. BELUM diverifikasi lewat log response login yang
+      // sesungguhnya -- kalau ternyata kd_kantor kosong terus, cek log
+      // "RESPONSE DATA LOGIN" (sudah ada print bawaan di AuthRepository.login)
+      // untuk lihat apa field aslinya, lalu sesuaikan mapping di
+      // UsersModel.fromJson. Selama masih kosong, notif otomatis tetap
+      // broadcast ke semua Pejabat se-BPR (fallback aman, bukan error).
+      String notificationMessage = '';
+      try {
+        final notifResult = await LoanApplicationRepository.notifyLoanStaff(
+          bprId: bprId,
+          kdKantor: kdKantor,
+          form: form,
+        );
+        notificationMessage = "Notifikasi terkirim ke ${notifResult.successCount}/${notifResult.totalRecipient} staff.";
+      } catch (e) {
+        debugPrint('⚠️ Notifikasi ke Pejabat gagal (pengajuan pinjaman TETAP tersimpan): $e');
+        notificationMessage = 'Pengajuan tersimpan, tetapi notifikasi ke Pejabat gagal dikirim.';
+      }
 
       if (!context.mounted) return;
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text("Permohonan berhasil dikirim. Notifikasi terkirim ke ${notifResult.successCount}/${notifResult.totalRecipient} staff."),
+          content: Text("Permohonan berhasil dikirim. $notificationMessage"),
         ),
       );
 

@@ -561,9 +561,34 @@ class DepositOpeningNotifier extends ChangeNotifier {
       // datanya berasal dari profil nasabah, bukan dari catatan transaksi.
       final verifyData = verifyBody['data'];
       final verifyUser = (verifyData is Map ? verifyData['user'] : null) ?? verifyBody['user'];
-      final kdKantorPemohon = verifyUser is Map ? '${verifyUser['kd_kantor'] ?? ''}'.trim() : '';
+      final kdKantorFromVerify = verifyUser is Map ? '${verifyUser['kd_kantor'] ?? ''}'.trim() : '';
 
-      final submitResponse = await _submitPermohonan();
+      // Fallback ke kd_kantor yang tersimpan di profil user (Pref) kalau
+      // response verify-otp tidak membawa kd_kantor. Nilai ini dipakai untuk
+      // DUA hal: (1) ikut dikirim saat insert permohonan, dan (2) menentukan
+      // Pejabat kantor mana yang dinotifikasi.
+      final kdKantorPemohon = kdKantorFromVerify.isNotEmpty ? kdKantorFromVerify : currentUser.kdKantor.trim();
+
+      // FAIL-CLOSED, sama seperti alur pengajuan pinjaman
+      // (loan_application_notifier.dart). Kalau kd_kantor tidak ketemu dari
+      // verify-otp MAUPUN dari session login, submit DIBATALKAN.
+      //
+      // Alasannya: permohonan yang tersimpan tanpa kd_kantor tidak punya
+      // identitas kantor, sehingga di CMS baris tersebut lolos dari filter
+      // kantor dan tampil ke SEMUA kantor -- nasabah kantor 001 bisa terlihat
+      // oleh petugas kantor 002. Lebih baik minta nasabah login ulang
+      // (session-nya memang tidak lengkap) daripada menyimpan data yang
+      // scope-nya tidak jelas.
+      if (kdKantorPemohon.isEmpty) {
+        const message = "Kode kantor tidak ditemukan di session login. Silakan logout lalu login kembali.";
+        debugPrint('❌ kd_kantor kosong (verify-otp & Pref sama-sama kosong) -- submit deposito dibatalkan.');
+        errorMessage = message;
+        loading = false;
+        notifyListeners();
+        return message;
+      }
+
+      final submitResponse = await _submitPermohonan(kdKantor: kdKantorPemohon);
       final submitMessage = '${submitResponse['message'] ?? 'Sukses, permintaan pembukaan deposito.'}';
 
       // ==================== NOTIFIKASI KE PEJABAT ====================
@@ -610,7 +635,7 @@ class DepositOpeningNotifier extends ChangeNotifier {
     }
   }
 
-  Future<Map<String, dynamic>> _submitPermohonan() async {
+  Future<Map<String, dynamic>> _submitPermohonan({String kdKantor = ''}) async {
     final currentUser = users ?? await Pref().getUsers();
     final interestOption = selectedInterestOption;
     final interestAccount = selectedInterestAccount;
@@ -622,6 +647,7 @@ class DepositOpeningNotifier extends ChangeNotifier {
     return await DepositOpeningRepository.daftarPermohonanPembukaanDeposito(
       bprId: currentUser.bprId,
       noCif: currentUser.noCif,
+      kdKantor: kdKantor.trim().isNotEmpty ? kdKantor.trim() : currentUser.kdKantor.trim(),
       jangkaWaktu: selectedProduct?.tenorBulan ?? 0,
       sukuBunga: selectedProduct?.rate ?? 0,
       nominal: nominalValue,

@@ -15,6 +15,7 @@ class UsersModel {
     required this.bprNama,
     required this.perbarindo,
     required this.createdAt,
+    this.kdKantor = '',
     this.sessionToken = '',
     this.loginDeviceId = '',
     this.loginDeviceName = '',
@@ -25,6 +26,7 @@ class UsersModel {
   final String noCif;
   final String usersId;
   final String bprId;
+  final String kdKantor;
   final String nama;
   final String tglLahir;
   final String noIdentitas;
@@ -43,12 +45,26 @@ class UsersModel {
   // Alias agar kode notifier bisa pakai currentUser.username
   String get username => usersId;
 
+  static Map<String, dynamic>? _mapFrom(dynamic value) {
+    if (value is Map<String, dynamic>) return value;
+    if (value is Map) return Map<String, dynamic>.from(value);
+    return null;
+  }
+
+  static String _readKdKantor(Iterable<Map<String, dynamic>?> maps) {
+    for (final map in maps) {
+      if (map == null) continue;
+      final kantor = '${map['kd_kantor'] ?? map['kdKantor'] ?? map['kantor'] ?? ''}'.trim();
+      if (kantor.isNotEmpty) return kantor;
+    }
+    return '';
+  }
+
   factory UsersModel.fromJson(Map<String, dynamic> json) {
-    final Map<String, dynamic> source = json['data'] is Map<String, dynamic>
-        ? Map<String, dynamic>.from(json['data'])
-        : json['user'] is Map<String, dynamic>
-        ? Map<String, dynamic>.from(json['user'])
-        : json;
+    final data = _mapFrom(json['data']);
+    final user = _mapFrom(json['user']);
+    final nestedUser = _mapFrom(data?['user']);
+    final source = data ?? user ?? json;
 
     int parseId(dynamic value) {
       if (value is int) return value;
@@ -60,6 +76,7 @@ class UsersModel {
       noCif: '${source['no_cif'] ?? source['nocif'] ?? ''}',
       usersId: '${source['users_id'] ?? source['username'] ?? source['userid'] ?? ''}',
       bprId: '${source['bpr_id'] ?? source['bprId'] ?? ''}',
+      kdKantor: _readKdKantor([data, user, nestedUser, json]),
       nama: '${source['nama'] ?? source['name'] ?? ''}',
       tglLahir: '${source['tgl_lahir'] ?? source['tanggal_lahir'] ?? ''}',
       noIdentitas: '${source['no_identitas'] ?? source['no_id'] ?? ''}',
@@ -81,6 +98,7 @@ class UsersModel {
     'users_id': usersId,
     'username': usersId,
     'bpr_id': bprId,
+    'kd_kantor': kdKantor,
     'nama': nama,
     'tgl_lahir': tglLahir,
     'no_identitas': noIdentitas,
@@ -101,6 +119,7 @@ class UsersModel {
     noCif: noCif,
     usersId: usersId,
     bprId: bprId,
+    kdKantor: kdKantor,
     nama: nama,
     tglLahir: tglLahir,
     noIdentitas: noIdentitas,
@@ -120,6 +139,7 @@ class UsersModel {
     String? noCif,
     String? usersId,
     String? bprId,
+    String? kdKantor,
     String? nama,
     String? tglLahir,
     String? noIdentitas,
@@ -137,6 +157,7 @@ class UsersModel {
     noCif: noCif ?? this.noCif,
     usersId: usersId ?? this.usersId,
     bprId: bprId ?? this.bprId,
+    kdKantor: kdKantor ?? this.kdKantor,
     nama: nama ?? this.nama,
     tglLahir: tglLahir ?? this.tglLahir,
     noIdentitas: noIdentitas ?? this.noIdentitas,
@@ -159,6 +180,7 @@ class UsersModel {
           noCif == other.noCif &&
           usersId == other.usersId &&
           bprId == other.bprId &&
+          kdKantor == other.kdKantor &&
           nama == other.nama &&
           tglLahir == other.tglLahir &&
           noIdentitas == other.noIdentitas &&
@@ -178,6 +200,7 @@ class UsersModel {
       noCif.hashCode ^
       usersId.hashCode ^
       bprId.hashCode ^
+      kdKantor.hashCode ^
       nama.hashCode ^
       tglLahir.hashCode ^
       noIdentitas.hashCode ^

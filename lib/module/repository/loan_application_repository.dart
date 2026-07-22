@@ -81,9 +81,18 @@ class LoanApplicationRepository {
     return LoanSimulationResultModel.fromJson(data);
   }
 
-  static Future<dynamic> submitLoanApplication({required String bprId, required LoanApplicationFormModel form}) async {
+  static Future<dynamic> submitLoanApplication({
+    required String bprId,
+    required LoanApplicationFormModel form,
+    required String kdKantor,
+  }) async {
     final dio = Dio();
     dio.options.headers['api-key'] = '123';
+
+    final normalizedKantor = kdKantor.trim();
+    if (normalizedKantor.isEmpty) {
+      throw Exception("Kode kantor wajib diisi (ambil dari session login nasabah).");
+    }
 
     final formData = FormData.fromMap({
       "bpr_id": bprId,
@@ -95,6 +104,7 @@ class LoanApplicationRepository {
       "nama": form.nama,
       "no_hp": form.noHp,
       "alamat": form.alamat,
+      "kd_kantor": normalizedKantor,
       "jaminan": form.jaminan,
       "nilai_pinjaman": form.nilaiPinjaman,
       "jk_waktu": form.jkWaktu,
@@ -199,6 +209,134 @@ class LoanApplicationRepository {
     print("=====================================================");
   }
 
+  /// Ambil semua username Pejabat aktif (role_user='1') di bpr yang sama --
+  /// SAMA PERSIS pola yang dipakai untuk notifikasi deposito
+  /// (_getAllPejabatUsername di deposit_opening_repository.dart), TAPI
+  /// filter kd_kantor di sini OPSIONAL (kosong = tidak difilter per kantor).
+  ///
+  /// RIWAYAT: sebelumnya penerima notif pinjaman diambil lewat
+  /// inquiryNotificationRecipients() yang memanggil /inquiry/notifikasi-pinjaman
+  /// dengan filter bpr_id SAJA -- dan filter bpr_id itu sendiri TIDAK
+  /// dihormati oleh endpoint tsb: pengajuan pinjaman nasabah bpr 609999
+  /// kantor 001 sempat mengirim notif ke 5 penerima lintas BPR & lintas
+  /// kantor (termasuk bpr 600931 yang BEDA BANK SAMA SEKALI). Endpoint
+  /// /inquiry/data-petugas terbukti lebih bisa diandalkan, jadi sumbernya
+  /// dipindah ke situ.
+  ///
+  /// kd_kantor SEMPAT dibuat wajib (fail-closed, tidak kirim sama sekali
+  /// kalau kosong) supaya tidak menjangkau kantor lain seperti bug di
+  /// atas -- tapi berdasarkan keputusan: sampai ada sumber kd_kantor
+  /// nasabah yang bisa diandalkan untuk alur pinjaman (modul ini tidak
+  /// lewat verifikasi OTP seperti deposito, jadi belum ada sumbernya),
+  /// untuk SEMENTARA filter kd_kantor dibuat opsional -- kalau kosong,
+  /// notif dikirim ke SEMUA Pejabat aktif se-BPR (bukan dibatalkan sama
+  /// sekali). bpr_id TETAP WAJIB & di-double-check di client, supaya
+  /// bug paling parah (notif nyasar lintas BPR/bank lain) tetap tertutup.
+  static Future<List<String>> _getAllPejabatUsername({
+    required String bprId,
+    String kdKantor = '',
+  }) async {
+    final normalizedKantor = kdKantor.trim();
+    final normalizedBprId = bprId.trim();
+    if (normalizedBprId.isEmpty) {
+      if (kDebugMode) print("⚠️ _getAllPejabatUsername (pinjaman) dipanggil tanpa bpr_id -- dibatalkan.");
+      return [];
+    }
+
+    final dio = Dio();
+    dio.options.headers['api-key'] = '123';
+
+    final body = {
+      "bpr_id": bprId,
+      "filter": {
+        "username": "",
+        "nama": "",
+        "no_hp": "",
+        "kd_kantor": normalizedKantor,
+        "no_identitas": "",
+        "jabatan": "",
+        "role_user": "1",
+        "status": "",
+        "status_aktif": "",
+        "tgl_lahir_from": "",
+        "tgl_lahir_to": "",
+        "created_at_from": "",
+        "created_at_to": "",
+      },
+      "sort": {"by": "created_at", "type": "desc"},
+      "pagination": {"page": 1, "limit": 100},
+    };
+
+    if (kDebugMode) {
+      print("ENDPOINT INQUIRY DATA PETUGAS (Pejabat pinjaman) : ${NetworkURL.inquiryDataPetugasMedfo()}");
+      print("REQUEST INQUIRY DATA PETUGAS (Pejabat pinjaman) : $body");
+      if (normalizedKantor.isEmpty) {
+        print("⚠️ kd_kantor kosong -- notif pinjaman untuk SEMENTARA broadcast ke semua Pejabat se-BPR (belum di-scope per kantor).");
+      }
+    }
+
+    try {
+      final response = await dio.post(NetworkURL.inquiryDataPetugasMedfo(), data: body);
+      final res = response.data is String ? jsonDecode(response.data) : response.data;
+
+      if (kDebugMode) {
+        print("RESPONSE INQUIRY DATA PETUGAS (Pejabat pinjaman) : $res");
+      }
+
+      if (res is! Map<String, dynamic>) return [];
+      if ('${res['code'] ?? ''}' != '000') return [];
+
+      // Parsing defensif -- sama seperti versi deposito, karena bentuk
+      // `data` bisa berupa list langsung, {data:[...]}, atau {items:[...]}.
+      final data = res['data'];
+      List<dynamic> rows = [];
+      if (data is List) {
+        rows = data;
+      } else if (data is Map) {
+        if (data['data'] is List) {
+          rows = data['data'];
+        } else if (data['items'] is List) {
+          rows = data['items'];
+        }
+      }
+
+      return rows
+          .whereType<Map>()
+          .map((e) => Map<String, dynamic>.from(e))
+          .where((e) {
+            final roleUser = '${e['role_user'] ?? ''}'.trim();
+            final status = '${e['status'] ?? e['status_aktif'] ?? ''}'.trim().toUpperCase();
+            final kantorRow = '${e['kd_kantor'] ?? ''}'.trim();
+            // CATATAN: item respons /inquiry/data-petugas TIDAK menyertakan
+            // bpr_id sama sekali per baris (sudah dikonfirmasi dari log
+            // asli), jadi tidak bisa di-double-check di sini seperti yang
+            // sempat dicoba sebelumnya -- itu ternyata bikin SEMUA baris
+            // ketolak diam-diam (bprRow selalu '', jadi tidak akan pernah
+            // sama dengan normalizedBprId). Filter bpr_id sepenuhnya
+            // diandalkan dari request (sudah terbukti benar lewat
+            // pemakaian yang sama di alur deposito). kd_kantor tetap
+            // dicek kalau memang diminta.
+            //
+            // deleted_at SENGAJA TIDAK dipakai sebagai filter (sempat
+            // dicoba, lalu dibatalkan): alurnya di backend ternyata
+            // dibuat -> dihapus (status A->C, deleted_at keisi) -> dibuat
+            // ulang (status C->A lagi, TAPI deleted_at dibiarkan tetap
+            // keisi, tidak ikut di-clear). Jadi deleted_at yang terisi
+            // bukan berarti petugasnya masih tidak aktif -- bisa saja
+            // cuma sisa riwayat dari penghapusan sebelumnya. status='A'
+            // satu-satunya sumber kebenaran yang bisa diandalkan di sini.
+            final kantorMatch = normalizedKantor.isEmpty || kantorRow == normalizedKantor;
+            return roleUser == '1' && status == 'A' && kantorMatch;
+          })
+          .map((e) => '${e['username'] ?? ''}'.trim())
+          .where((username) => username.isNotEmpty)
+          .toList();
+    } catch (e) {
+      if (kDebugMode) print("⚠️ Error inquiry data petugas (Pejabat pinjaman): $e");
+      return [];
+    }
+  }
+
   static Future<List<LoanNotificationRecipientModel>> inquiryNotificationRecipients({required String bprId}) async {
     final dio = Dio();
     dio.options.headers['api-key'] = '123';
@@ -226,9 +364,13 @@ class LoanApplicationRepository {
     return res is Map<String, dynamic> && res['value'] == 1;
   }
 
-  static Future<LoanNotificationResultModel> notifyLoanStaff({required String bprId, required LoanApplicationFormModel form}) async {
-    final recipients = await inquiryNotificationRecipients(bprId: bprId);
-    if (recipients.isEmpty) throw Exception("Staff PIC pinjaman belum tersedia.");
+  static Future<LoanNotificationResultModel> notifyLoanStaff({
+    required String bprId,
+    String kdKantor = '',
+    required LoanApplicationFormModel form,
+  }) async {
+    final pejabatUsernames = await _getAllPejabatUsername(bprId: bprId, kdKantor: kdKantor);
+    if (pejabatUsernames.isEmpty) throw Exception("Pejabat aktif belum tersedia.");
 
     final title = "Pengajuan Pinjaman Baru";
     final body = "${form.nama} mengajukan pinjaman Rp ${form.nilaiPinjaman} dengan tenor ${form.jkWaktu} bulan.";
@@ -236,13 +378,13 @@ class LoanApplicationRepository {
     int successCount = 0;
     int failedCount = 0;
 
-    for (final recipient in recipients) {
-      final success = await sendPushNotification(title: title, body: body, bprId: bprId, noCif: recipient.cif);
+    for (final username in pejabatUsernames) {
+      final success = await sendPushNotification(title: title, body: body, bprId: bprId, noCif: username);
 
       success ? successCount++ : failedCount++;
     }
 
-    return LoanNotificationResultModel(totalRecipient: recipients.length, successCount: successCount, failedCount: failedCount);
+    return LoanNotificationResultModel(totalRecipient: pejabatUsernames.length, successCount: successCount, failedCount: failedCount);
   }
 
   static Future<List<LoanApplicationStatusModel>> inquiryStatusPinjaman({required String bprId, required String nama, required String noHp}) async {

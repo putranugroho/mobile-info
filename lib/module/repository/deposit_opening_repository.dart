@@ -186,9 +186,19 @@ class DepositOpeningRepository {
     return rows.whereType<Map>().map((e) => Map<String, dynamic>.from(e)).toList();
   }
 
+  /// Daftarkan permohonan pembukaan deposito.
+  ///
+  /// [kdKantor] = kode kantor NASABAH pemohon. WAJIB ikut dikirim supaya
+  /// pengajuan yang tersimpan di backend punya identitas kantor sejak awal.
+  /// Sebelumnya field ini tidak dikirim sama sekali, akibatnya CMS Medfo
+  /// harus menebak kantor pemohon dengan cara memanggil inquiry nasabah
+  /// per-CIF satu per satu (lambat, dan gagal kalau CIF tidak ketemu) --
+  /// dan filter "permohonan hanya tampil di kantor si nasabah" jadi tidak
+  /// bisa diandalkan.
   static Future<Map<String, dynamic>> daftarPermohonanPembukaanDeposito({
     required String bprId,
     required String noCif,
+    required String kdKantor,
     required int jangkaWaktu,
     required double sukuBunga,
     required int nominal,
@@ -200,9 +210,18 @@ class DepositOpeningRepository {
     required String aro,
     required String userLogin,
   }) async {
+    // Guard lapis kedua -- sama persis dengan submitLoanApplication().
+    // Notifier sudah memblokir lebih dulu, ini jaring pengaman kalau nanti
+    // ada pemanggil baru yang lupa mengisi kd_kantor.
+    final normalizedKantor = kdKantor.trim();
+    if (normalizedKantor.isEmpty) {
+      throw Exception("Kode kantor wajib diisi (ambil dari session login nasabah).");
+    }
+
     final body = {
       "bpr_id": bprId,
       "no_cif": noCif,
+      "kd_kantor": normalizedKantor,
       "jangka_waktu": jangkaWaktu,
       "suku_bunga": sukuBunga,
       "nominal": nominal,

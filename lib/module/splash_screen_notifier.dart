@@ -68,8 +68,8 @@ class SplashScreenNotifier extends ChangeNotifier {
       }
 
       final data = body['data'];
-      if (data is Map<String, dynamic>) {
-        await Pref().updateLoginSession(loginExpiredAt: '${data['login_expired_at'] ?? user.loginExpiredAt}');
+      if (data is Map) {
+        await Pref().mergeSessionProfileFromMap(Map<String, dynamic>.from(data));
       }
 
       return _SplashSessionResult.valid;

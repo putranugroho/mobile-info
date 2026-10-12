@@ -17,6 +17,18 @@ class NetworkURL {
     return "$url/webServices/get_list_bpr.php";
   }
 
+  static String trxDigitalSetup() {
+    return "$url_medfo/mobile-info/trx-digital/setup";
+  }
+
+  static String trxDigitalCreate() {
+    return "$url_medfo/mobile-info/trx-digital/create";
+  }
+
+  static String trxDigitalHistory() {
+    return "$url_medfo/mobile-info/trx-digital/history";
+  }
+
   static String validasiKtp() {
     return "$url_medfo/mobile-info/aktivasi/check";
   }

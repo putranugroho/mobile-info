@@ -7,7 +7,7 @@ import 'package:mobile_info/models/banners_model.dart';
 import 'package:mobile_info/models/produk_model.dart';
 import 'package:mobile_info/module/home/home_notifier.dart';
 import 'package:mobile_info/module/loan/loan_detail_page.dart';
-import 'package:mobile_info/module/mutasi/mutasi_tabungan_page.dart';
+import 'package:mobile_info/module/trx_digital/trx_digital_pages.dart';
 import 'package:mobile_info/module/deposito/deposito_detail_page.dart';
 import 'package:mobile_info/module/deposit_opening/deposit_opening_page.dart';
 import 'package:mobile_info/module/loan_application/loan_application_page.dart';
@@ -443,14 +443,7 @@ Widget _produkTabungan(HomeNotifier value, BuildContext context) {
   return Column(
     children: value.listTabungan.map((tabungan) {
       return accountProductCard(
-        onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (_) => MutasiTabunganPage(noRekening: tabungan.noAcc, namaProduk: tabungan.namaProduk),
-            ),
-          );
-        },
+        onTap: () => showTabunganActionSheet(context, noRekening: tabungan.noAcc, namaProduk: tabungan.namaProduk),
         content: Row(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [

@@ -25,7 +25,7 @@ class CategoryBar extends StatelessWidget {
                 margin: const EdgeInsets.symmetric(vertical: 10),
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(20),
-                  color: isActive ? colorPrimary.withOpacity(0.1) : Colors.transparent,
+                  color: isActive ? colorPrimary.withValues(alpha: 0.1) : Colors.transparent,
                 ),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,

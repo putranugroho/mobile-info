@@ -146,7 +146,7 @@ class _LoanApplicationPageState extends State<LoanApplicationPage> {
                 decoration: BoxDecoration(
                   color: active ? Colors.white : Colors.transparent,
                   borderRadius: BorderRadius.circular(10),
-                  boxShadow: active ? [BoxShadow(color: Colors.black.withOpacity(0.06), blurRadius: 4, offset: const Offset(0, 2))] : [],
+                  boxShadow: active ? [BoxShadow(color: Colors.black.withValues(alpha: 0.06), blurRadius: 4, offset: const Offset(0, 2))] : [],
                 ),
                 child: Text(
                   tabs[index],
@@ -237,7 +237,7 @@ class _LoanApplicationPageState extends State<LoanApplicationPage> {
               ),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                decoration: BoxDecoration(color: statusColor.withOpacity(0.12), borderRadius: BorderRadius.circular(20)),
+                decoration: BoxDecoration(color: statusColor.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(20)),
                 child: Text(
                   status,
                   style: TextStyle(color: statusColor, fontSize: 11, fontWeight: FontWeight.bold),
@@ -326,9 +326,9 @@ class _LoanApplicationPageState extends State<LoanApplicationPage> {
                 margin: const EdgeInsets.only(bottom: 14),
                 padding: const EdgeInsets.all(14),
                 decoration: BoxDecoration(
-                  color: kFeatureBlue.withOpacity(0.08),
+                  color: kFeatureBlue.withValues(alpha: 0.08),
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: kFeatureBlue.withOpacity(0.25)),
+                  border: Border.all(color: kFeatureBlue.withValues(alpha: 0.25)),
                 ),
                 child: Text(
                   "Jangka waktu tersedia ${value.jkWaktuMin} - ${value.jkWaktuMaks} bulan. Suku bunga ${value.sukuBunga}%.",
@@ -343,7 +343,8 @@ class _LoanApplicationPageState extends State<LoanApplicationPage> {
                 onChanged: (_) => value.clearResult(),
               ),
               DropdownButtonFormField<int>(
-                value: value.selectedJkWaktu,
+                key: ValueKey(value.selectedJkWaktu),
+                initialValue: value.selectedJkWaktu,
                 items: value.jkWaktuOptions.map((bulan) => DropdownMenuItem<int>(value: bulan, child: Text("$bulan bulan"))).toList(),
                 onChanged: value.setJkWaktu,
                 decoration: InputDecoration(
@@ -520,9 +521,9 @@ class LoanApplicationFormPage extends StatelessWidget {
                       margin: const EdgeInsets.only(bottom: 14),
                       padding: const EdgeInsets.all(14),
                       decoration: BoxDecoration(
-                        color: kFeatureBlue.withOpacity(0.08),
+                        color: kFeatureBlue.withValues(alpha: 0.08),
                         borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: kFeatureBlue.withOpacity(0.25)),
+                        border: Border.all(color: kFeatureBlue.withValues(alpha: 0.25)),
                       ),
                       child: Text(
                         value.hideRateAndCicilan
@@ -549,7 +550,8 @@ class LoanApplicationFormPage extends StatelessWidget {
                     _formSectionTitle("Data Pinjaman"),
 
                     DropdownButtonFormField<String>(
-                      value: value.selectedJaminan,
+                      key: ValueKey(value.selectedJaminan),
+                      initialValue: value.selectedJaminan,
                       items: value.listJaminan.map((item) => DropdownMenuItem<String>(value: item.kdJaminan, child: Text(item.deskripsi))).toList(),
                       onChanged: value.setJaminan,
                       validator: (_) => value.requiredValidator(value.jaminanController.text, "Jaminan"),
@@ -573,7 +575,8 @@ class LoanApplicationFormPage extends StatelessWidget {
                     ),
 
                     DropdownButtonFormField<int>(
-                      value: value.selectedJkWaktu,
+                      key: ValueKey(value.selectedJkWaktu),
+                      initialValue: value.selectedJkWaktu,
                       items: value.jkWaktuOptions.map((bulan) => DropdownMenuItem<int>(value: bulan, child: Text("$bulan bulan"))).toList(),
                       onChanged: value.setJkWaktu,
                       validator: (_) => value.validateJangkaWaktu(value.jkWaktuController.text),

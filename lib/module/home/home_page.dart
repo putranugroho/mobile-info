@@ -609,12 +609,12 @@ Widget _loanMenuButton({required IconData icon, required String title, required 
         decoration: BoxDecoration(
           color: lightBlue,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: primaryBlue.withOpacity(0.18)),
+          border: Border.all(color: primaryBlue.withValues(alpha: 0.18)),
           boxShadow: [
             BoxShadow(
               offset: const Offset(0, 4),
               blurRadius: 10,
-              color: Colors.black.withOpacity(0.06),
+              color: Colors.black.withValues(alpha: 0.06),
             ),
           ],
         ),
@@ -625,7 +625,7 @@ Widget _loanMenuButton({required IconData icon, required String title, required 
               width: 44,
               height: 44,
               decoration: BoxDecoration(
-                color: primaryBlue.withOpacity(0.14),
+                color: primaryBlue.withValues(alpha: 0.14),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Icon(icon, color: primaryBlue, size: 22),
@@ -689,7 +689,7 @@ Widget _sukuBungaSection(List<Map<String, dynamic>> listtabungan, List<Map<Strin
     decoration: BoxDecoration(
       color: Colors.white,
       borderRadius: BorderRadius.circular(12),
-      boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 8, offset: const Offset(0, 4))],
+      boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 8, offset: const Offset(0, 4))],
     ),
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,

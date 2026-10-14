@@ -203,7 +203,7 @@ class LoanDetailPage extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
-        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 8, offset: const Offset(0, 4))],
+        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 8, offset: const Offset(0, 4))],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -312,7 +312,7 @@ void _showBantuanCS(BuildContext context, String noRek) {
 
                         ListTile(
                           leading: CircleAvatar(
-                            backgroundColor: colorPrimary.withOpacity(0.15),
+                            backgroundColor: colorPrimary.withValues(alpha: 0.15),
                             child: const Icon(Icons.support_agent, color: colorPrimary),
                           ),
                           title: const Text("Video Call"),
@@ -330,7 +330,7 @@ void _showBantuanCS(BuildContext context, String noRek) {
 
                         ListTile(
                           leading: CircleAvatar(
-                            backgroundColor: Colors.green.withOpacity(0.15),
+                            backgroundColor: Colors.green.withValues(alpha: 0.15),
                             child: const Icon(Icons.chat, color: Colors.green),
                           ),
                           title: const Text("Chat"),

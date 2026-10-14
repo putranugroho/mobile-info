@@ -1,9 +1,9 @@
 import 'dart:typed_data';
-import 'dart:html' as html;
 
 import 'package:flutter/material.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
+import 'package:printing/printing.dart';
 
 import '../../models/mutasi_tabungan_model.dart';
 import 'mutasi_pdf_content.dart';
@@ -34,12 +34,5 @@ Future<void> openOrDownloadPdf({
   final fileName =
       'Mutasi_${bulanIndonesia(firstDate.month)}_${downloadTime()}.pdf';
 
-  final blob = html.Blob([bytes], 'application/pdf');
-  final url = html.Url.createObjectUrlFromBlob(blob);
-
-  html.AnchorElement(href: url)
-    ..setAttribute('download', fileName)
-    ..click();
-
-  html.Url.revokeObjectUrl(url);
+  await Printing.sharePdf(bytes: bytes, filename: fileName);
 }

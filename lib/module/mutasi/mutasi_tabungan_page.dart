@@ -142,7 +142,7 @@ class _MutasiBodyState extends State<_MutasiBody> with SingleTickerProviderState
     return Container(
       padding: const EdgeInsets.fromLTRB(16, 48, 16, 12),
       decoration: BoxDecoration(
-        gradient: LinearGradient(colors: [const Color.fromARGB(255, 0, 95, 0), const Color.fromARGB(255, 0, 95, 0).withOpacity(0.7)]),
+        gradient: LinearGradient(colors: [const Color.fromARGB(255, 0, 95, 0), const Color.fromARGB(255, 0, 95, 0).withValues(alpha: 0.7)]),
       ),
       child: Column(
         children: [
@@ -160,7 +160,7 @@ class _MutasiBodyState extends State<_MutasiBody> with SingleTickerProviderState
                 borderRadius: BorderRadius.circular(24),
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                  decoration: BoxDecoration(color: Colors.white.withOpacity(0.9), borderRadius: BorderRadius.circular(24)),
+                  decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.9), borderRadius: BorderRadius.circular(24)),
                   child: Row(
                     children: const [
                       Icon(Icons.download, size: 18, color: Colors.black),
@@ -256,7 +256,7 @@ class _MutasiBodyState extends State<_MutasiBody> with SingleTickerProviderState
                           /// ===== VIDEO CALL =====
                           ListTile(
                             leading: CircleAvatar(
-                              backgroundColor: colorPrimary.withOpacity(0.15),
+                              backgroundColor: colorPrimary.withValues(alpha: 0.15),
                               child: const Icon(Icons.support_agent, color: colorPrimary),
                             ),
                             title: const Text("Video Call"),
@@ -275,7 +275,7 @@ class _MutasiBodyState extends State<_MutasiBody> with SingleTickerProviderState
                           /// ===== CHAT =====
                           ListTile(
                             leading: CircleAvatar(
-                              backgroundColor: Colors.green.withOpacity(0.15),
+                              backgroundColor: Colors.green.withValues(alpha: 0.15),
                               child: const Icon(Icons.chat, color: Colors.green),
                             ),
                             title: const Text("Chat"),
@@ -365,14 +365,14 @@ class _MutasiItem extends StatelessWidget {
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(12),
         color: Colors.white,
-        boxShadow: [BoxShadow(blurRadius: 6, color: Colors.grey.withOpacity(0.15))],
+        boxShadow: [BoxShadow(blurRadius: 6, color: Colors.grey.withValues(alpha: 0.15))],
       ),
       child: Row(
         children: [
           Container(
             width: 40,
             height: 40,
-            decoration: BoxDecoration(shape: BoxShape.circle, color: isCredit ? Colors.green.withOpacity(0.15) : Colors.red.withOpacity(0.15)),
+            decoration: BoxDecoration(shape: BoxShape.circle, color: isCredit ? Colors.green.withValues(alpha: 0.15) : Colors.red.withValues(alpha: 0.15)),
             child: Icon(isCredit ? Icons.arrow_downward : Icons.arrow_upward, color: isCredit ? Colors.green : Colors.red),
           ),
           const SizedBox(width: 12),

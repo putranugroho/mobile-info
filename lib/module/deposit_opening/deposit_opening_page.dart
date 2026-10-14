@@ -139,7 +139,7 @@ class _DepositOpeningPageState extends State<DepositOpeningPage> {
                 decoration: BoxDecoration(
                   color: active ? Colors.white : Colors.transparent,
                   borderRadius: BorderRadius.circular(10),
-                  boxShadow: active ? [BoxShadow(color: Colors.black.withOpacity(0.06), blurRadius: 4, offset: const Offset(0, 2))] : [],
+                  boxShadow: active ? [BoxShadow(color: Colors.black.withValues(alpha: 0.06), blurRadius: 4, offset: const Offset(0, 2))] : [],
                 ),
                 child: Text(
                   tabs[index],
@@ -214,7 +214,7 @@ class _DepositOpeningPageState extends State<DepositOpeningPage> {
               Expanded(child: Text(title, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold))),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                decoration: BoxDecoration(color: statusColor.withOpacity(0.12), borderRadius: BorderRadius.circular(20)),
+                decoration: BoxDecoration(color: statusColor.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(20)),
                 child: Text(status, style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: statusColor)),
               ),
             ],
@@ -399,7 +399,7 @@ class _DepositOpeningPageState extends State<DepositOpeningPage> {
     final isActive = value.setupActive;
     final isLoading = value.setupLoading || value.rateLoading;
     final bgColor = isLoading ? Colors.blue.shade50 : isActive ? kFeatureBlueLight : Colors.orange.shade50;
-    final borderColor = isLoading ? Colors.blue.shade200 : isActive ? kFeatureBlue.withOpacity(0.30) : Colors.orange.shade200;
+    final borderColor = isLoading ? Colors.blue.shade200 : isActive ? kFeatureBlue.withValues(alpha: 0.30) : Colors.orange.shade200;
     final iconColor = isLoading ? Colors.blue.shade800 : isActive ? kFeatureBlueDark : Colors.orange.shade800;
     final message = isLoading
         ? "Sedang mengecek layanan dan rate produk deposito."
@@ -461,7 +461,8 @@ class _DepositOpeningPageState extends State<DepositOpeningPage> {
     if (value.productOptions.isEmpty) return _emptyAccountBox(value.rateMessage.isNotEmpty ? value.rateMessage : "Produk deposito belum tersedia.");
 
     return DropdownButtonFormField<DepositProductOption>(
-      value: value.selectedProduct,
+      key: ValueKey(value.selectedProduct),
+      initialValue: value.selectedProduct,
       isExpanded: true,
       decoration: _inputDecoration("Jangka Waktu"),
       items: value.productOptions.map((item) {
@@ -487,7 +488,8 @@ class _DepositOpeningPageState extends State<DepositOpeningPage> {
     if (accounts.isEmpty) return _emptyAccountBox("Tidak ada rekening tabungan dengan saldo lebih besar dari nominal deposito.");
 
     return DropdownButtonFormField<String>(
-      value: currentValue,
+      key: ValueKey(currentValue),
+      initialValue: currentValue,
       isExpanded: true,
       itemHeight: 64,
       menuMaxHeight: 320,
@@ -500,7 +502,8 @@ class _DepositOpeningPageState extends State<DepositOpeningPage> {
 
   Widget _interestDropdown(DepositOpeningNotifier value) {
     return DropdownButtonFormField<String>(
-      value: value.selectedInterestCode,
+      key: ValueKey(value.selectedInterestCode),
+      initialValue: value.selectedInterestCode,
       isExpanded: true,
       decoration: _inputDecoration("Bayar Bunga"),
       items: value.interestOptions.map((item) => DropdownMenuItem<String>(value: item.code, child: Text(item.label))).toList(),
@@ -514,7 +517,8 @@ class _DepositOpeningPageState extends State<DepositOpeningPage> {
     if (accounts.isEmpty) return _emptyAccountBox("Rekening tujuan bunga belum tersedia.");
 
     return DropdownButtonFormField<String>(
-      value: currentValue,
+      key: ValueKey(currentValue),
+      initialValue: currentValue,
       isExpanded: true,
       itemHeight: 64,
       menuMaxHeight: 320,
@@ -578,7 +582,7 @@ class _DepositOpeningPageState extends State<DepositOpeningPage> {
   Widget _otpCard(DepositOpeningNotifier value) {
     return Container(
       padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(color: kFeatureBlueLight, borderRadius: BorderRadius.circular(12), border: Border.all(color: kFeatureBlue.withOpacity(0.30))),
+      decoration: BoxDecoration(color: kFeatureBlueLight, borderRadius: BorderRadius.circular(12), border: Border.all(color: kFeatureBlue.withValues(alpha: 0.30))),
       child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
         const Text("Input OTP", style: TextStyle(fontWeight: FontWeight.bold)),
         const SizedBox(height: 6),

@@ -81,6 +81,37 @@ flutter {
     source '../..'
 }
 
+// Gerbang kualitas: build (APK/AAB) GAGAL bila ada pemakaian API/library deprecated.
+// Aturannya ada di analysis_options.yaml (deprecated_member_use = error).
+// Pakai dart dari Flutter SDK langsung (bukan `flutter`) agar tidak deadlock dengan startup lock flutter.
+def flutterSdkDir = localProperties.getProperty('flutter.sdk') ?: System.getenv('FLUTTER_ROOT')
+tasks.register('failOnDeprecated', Exec) {
+    group = 'verification'
+    description = 'Gagalkan build jika ada pemakaian deprecated (analyzer error).'
+    doFirst {
+        if (flutterSdkDir == null || !file("${flutterSdkDir}/bin/cache/dart-sdk/bin/dart").exists()) {
+            throw new GradleException("Gerbang deprecated: Flutter SDK tidak ditemukan (flutter.sdk di android/local.properties atau FLUTTER_ROOT). Jalankan `flutter pub get` dulu.")
+        }
+    }
+    workingDir rootProject.projectDir.parentFile
+    commandLine "${flutterSdkDir}/bin/cache/dart-sdk/bin/dart", 'analyze', '--no-fatal-warnings', 'lib'
+}
+tasks.register('failOnBadPackages', Exec) {
+    group = 'verification'
+    description = 'Gagalkan build jika dependency langsung discontinued/retracted (tool/check_packages.dart).'
+    doFirst {
+        if (flutterSdkDir == null || !file("${flutterSdkDir}/bin/cache/dart-sdk/bin/dart").exists()) {
+            throw new GradleException("Gerbang paket: Flutter SDK tidak ditemukan (flutter.sdk di android/local.properties atau FLUTTER_ROOT).")
+        }
+    }
+    workingDir rootProject.projectDir.parentFile
+    commandLine "${flutterSdkDir}/bin/cache/dart-sdk/bin/dart", 'tool/check_packages.dart'
+}
+// Dipasang di preBuild DAN di assemble*/bundle* supaya melewati satu task (-x) tidak cukup.
+tasks.matching { it.name == 'preBuild' || it.name.startsWith('assemble') || it.name.startsWith('bundle') }.configureEach {
+    dependsOn 'failOnDeprecated', 'failOnBadPackages'
+}
+
 dependencies {
     implementation "androidx.core:core-ktx:1.12.0"
     coreLibraryDesugaring "com.android.tools:desugar_jdk_libs:2.0.4"

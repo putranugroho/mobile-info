@@ -460,15 +460,44 @@ class _DepositOpeningPageState extends State<DepositOpeningPage> {
     if (value.rateLoading) return const Center(child: Padding(padding: EdgeInsets.all(12), child: CircularProgressIndicator()));
     if (value.productOptions.isEmpty) return _emptyAccountBox(value.rateMessage.isNotEmpty ? value.rateMessage : "Produk deposito belum tersedia.");
 
-    return DropdownButtonFormField<DepositProductOption>(
-      key: ValueKey(value.selectedProduct),
+    final dropdown = DropdownButtonFormField<DepositProductOption>(
+      key: ValueKey('produk-${value.selectedJnsDep}-${value.selectedProduct?.kodeProduk}'),
       initialValue: value.selectedProduct,
       isExpanded: true,
       decoration: _inputDecoration("Jangka Waktu"),
-      items: value.productOptions.map((item) {
+      items: value.visibleProducts.map((item) {
         return DropdownMenuItem<DepositProductOption>(value: item, child: Text("${item.jangkaWaktu} - ${item.namaProduk}"));
       }).toList(),
       onChanged: value.setProduct,
+    );
+
+    if (!value.showJenisChooser) return dropdown;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SizedBox(
+          width: double.infinity,
+          child: SegmentedButton<int>(
+            showSelectedIcon: false,
+            segments: [
+              ButtonSegment<int>(value: 0, label: const Text("Deposito Manual"), enabled: value.hasManualProduct),
+              ButtonSegment<int>(value: 1, label: const Text("Deposito Digital"), enabled: value.hasDigitalProduct),
+            ],
+            selected: {value.selectedJnsDep},
+            onSelectionChanged: (selection) => value.setJenisDeposito(selection.first),
+          ),
+        ),
+        if (!value.hasDigitalProduct || !value.hasManualProduct) ...[
+          const SizedBox(height: 6),
+          Text(
+            value.hasDigitalProduct ? "Produk deposito manual belum tersedia." : "Produk deposito digital belum tersedia untuk BPR ini.",
+            style: const TextStyle(fontSize: 12, color: Colors.grey),
+          ),
+        ],
+        const SizedBox(height: 12),
+        dropdown,
+      ],
     );
   }
 
@@ -488,7 +517,7 @@ class _DepositOpeningPageState extends State<DepositOpeningPage> {
     if (accounts.isEmpty) return _emptyAccountBox("Tidak ada rekening tabungan dengan saldo lebih besar dari nominal deposito.");
 
     return DropdownButtonFormField<String>(
-      key: ValueKey(currentValue),
+      key: ValueKey('debet-$currentValue'),
       initialValue: currentValue,
       isExpanded: true,
       itemHeight: 64,
@@ -502,7 +531,7 @@ class _DepositOpeningPageState extends State<DepositOpeningPage> {
 
   Widget _interestDropdown(DepositOpeningNotifier value) {
     return DropdownButtonFormField<String>(
-      key: ValueKey(value.selectedInterestCode),
+      key: ValueKey('jenis-bunga-${value.selectedInterestCode}'),
       initialValue: value.selectedInterestCode,
       isExpanded: true,
       decoration: _inputDecoration("Bayar Bunga"),
@@ -517,7 +546,7 @@ class _DepositOpeningPageState extends State<DepositOpeningPage> {
     if (accounts.isEmpty) return _emptyAccountBox("Rekening tujuan bunga belum tersedia.");
 
     return DropdownButtonFormField<String>(
-      key: ValueKey(currentValue),
+      key: ValueKey('rek-bunga-$currentValue'),
       initialValue: currentValue,
       isExpanded: true,
       itemHeight: 64,

@@ -1,0 +1,6 @@
+name: build_gate
+description: Gerbang kualitas yang berjalan di SETIAP build Flutter (web, apk, ios) lewat asset transformer.
+publish_to: none
+version: 1.0.0
+environment:
+  sdk: ^3.0.0

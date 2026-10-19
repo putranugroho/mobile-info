@@ -25,6 +25,6 @@ Dua gerbang, dijalankan bersama oleh `tool/check_all.sh`:
 
 Di mana gerbang dipasang:
 - **Android (APK/AAB)**: `android/app/build.gradle` — task `failOnDeprecated` + `failOnBadPackages` terpasang di `preBuild` dan `assemble*`/`bundle*`, jadi `flutter build apk|appbundle` gagal di komputer mana pun.
-- **Web**: Flutter tidak punya hook pre-build. Pakai `tool/build_web.sh` (cek lalu `flutter build web`).
+- **Semua platform termasuk web**: `tool/gate` (paket `build_gate`) terdaftar sebagai *asset transformer* di `pubspec.yaml` (aset `assets/gate/gate.txt`). Flutter menjalankannya di setiap `flutter build web|apk|ios` dan `flutter run`; bila gerbang gagal, build gagal. Tidak perlu skrip khusus. Tambah ~5–10 detik per build (dart analyze + cek pub.dev).
 - **Git**: `git config core.hooksPath .githooks` (sekali per clone) menolak commit/push yang melanggar.
 - Untuk penguncian yang tidak bisa dilewati, jalankan `tool/check_all.sh` di CI dan wajibkan lulus sebelum merge.

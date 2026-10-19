@@ -343,7 +343,7 @@ class _LoanApplicationPageState extends State<LoanApplicationPage> {
                 onChanged: (_) => value.clearResult(),
               ),
               DropdownButtonFormField<int>(
-                key: ValueKey(value.selectedJkWaktu),
+                key: ValueKey('pinjaman-jkwaktu-${value.selectedJkWaktu}'),
                 initialValue: value.selectedJkWaktu,
                 items: value.jkWaktuOptions.map((bulan) => DropdownMenuItem<int>(value: bulan, child: Text("$bulan bulan"))).toList(),
                 onChanged: value.setJkWaktu,
@@ -550,7 +550,7 @@ class LoanApplicationFormPage extends StatelessWidget {
                     _formSectionTitle("Data Pinjaman"),
 
                     DropdownButtonFormField<String>(
-                      key: ValueKey(value.selectedJaminan),
+                      key: ValueKey('pinjaman-jaminan-${value.selectedJaminan}'),
                       initialValue: value.selectedJaminan,
                       items: value.listJaminan.map((item) => DropdownMenuItem<String>(value: item.kdJaminan, child: Text(item.deskripsi))).toList(),
                       onChanged: value.setJaminan,
@@ -575,7 +575,7 @@ class LoanApplicationFormPage extends StatelessWidget {
                     ),
 
                     DropdownButtonFormField<int>(
-                      key: ValueKey(value.selectedJkWaktu),
+                      key: ValueKey('pinjaman-jkwaktu2-${value.selectedJkWaktu}'),
                       initialValue: value.selectedJkWaktu,
                       items: value.jkWaktuOptions.map((bulan) => DropdownMenuItem<int>(value: bulan, child: Text("$bulan bulan"))).toList(),
                       onChanged: value.setJkWaktu,

@@ -113,6 +113,30 @@ class DepositOpeningRepository {
     return [];
   }
 
+  /// Produk deposito dengan bilyet digital aktif (status ON) untuk BPR ini.
+  /// Produk di daftar ini = deposito digital (jns_dep = 1); selain itu manual.
+  static Future<List<Map<String, dynamic>>> inquiryDepositoDigital({required String bprId}) async {
+    // Server web-service-medfo hanya mengizinkan header Content-Type/API-Key (CORS), jadi jangan pakai _dio()
+    // yang menambah x-username/x-password -- di Flutter Web request itu akan diblokir browser.
+    final dio = Dio();
+    dio.options.headers['api-key'] = '123';
+    dio.options.headers['Content-Type'] = 'application/json';
+    final response = await dio.post(NetworkURL.depositoDigital(), data: {"bpr_id": bprId});
+    final res = _decode(response.data);
+
+    if (kDebugMode) {
+      print("RESPONSE DEPOSITO DIGITAL : $res");
+    }
+
+    if (res is! Map<String, dynamic>) throw Exception("Response deposito digital tidak valid.");
+    if ('${res['code'] ?? ''}' != '000') return [];
+
+    final data = res['data'];
+    if (data is! List) return [];
+
+    return data.map((e) => Map<String, dynamic>.from(e)).where((e) => '${e['status'] ?? ''}'.toUpperCase() == 'ON').toList();
+  }
+
   static Future<List<Map<String, dynamic>>> inquiryRateProduk({required String bprId, required String userLogin}) async {
     final body = {"bpr_id": bprId, "userlogin": userLogin.trim().isNotEmpty ? userLogin.trim() : "SYSTEM", "term": "WEB"};
 
@@ -209,6 +233,7 @@ class DepositOpeningRepository {
     required String namaTabunganBunga,
     required String aro,
     required String userLogin,
+    int jnsDep = 0,
   }) async {
     // Guard lapis kedua -- sama persis dengan submitLoanApplication().
     // Notifier sudah memblokir lebih dulu, ini jaring pengaman kalau nanti
@@ -231,6 +256,7 @@ class DepositOpeningRepository {
       "no_tabungan_bunga": noTabunganBunga,
       "nama_tabungan_bunga": namaTabunganBunga,
       "aro": aro,
+      "jns_dep": jnsDep, // 0 = deposito manual, 1 = deposito digital
       "user_login": userLogin.trim().isNotEmpty ? userLogin.trim() : "SYSTEM",
       "term": "web",
     };

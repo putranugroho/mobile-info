@@ -30,12 +30,42 @@ class DepositProductOption {
   final int tenorBulan;
   final double rate;
 
+  /// Jenis deposito: 0/null = manual, 1 = digital (field `jns_dep` dari rate produk).
+  final int jnsDep;
+
+  bool get isDigital => jnsDep == 1;
+
+  DepositProductOption copyWith({int? jnsDep}) => DepositProductOption(
+    kodeProduk: kodeProduk,
+    namaProduk: namaProduk,
+    jangkaWaktu: jangkaWaktu,
+    tenorBulan: tenorBulan,
+    rate: rate,
+    jnsDep: jnsDep ?? this.jnsDep,
+  );
+
+  /// Produk digital dari daftar Bilyet Digital CMS (belum tentu punya rate di rate produk).
+  factory DepositProductOption.fromDigital(Map<String, dynamic> json) {
+    final jangka = int.tryParse('${json['jangka_waktu'] ?? 0}') ?? 0;
+    final harian = '${json['jenis_jangka_waktu'] ?? 'B'}'.toUpperCase() == 'H';
+    final nama = '${json['nama_produk'] ?? ''}'.trim();
+    return DepositProductOption(
+      kodeProduk: '${json['kode_produk'] ?? ''}'.trim(),
+      namaProduk: nama.isNotEmpty ? nama : 'Deposito Digital',
+      jangkaWaktu: harian ? '$jangka Bulan (Harian)' : '$jangka Bulan',
+      tenorBulan: jangka,
+      rate: 0,
+      jnsDep: 1,
+    );
+  }
+
   const DepositProductOption({
     required this.kodeProduk,
     required this.namaProduk,
     required this.jangkaWaktu,
     required this.tenorBulan,
     required this.rate,
+    this.jnsDep = 0,
   });
 
   factory DepositProductOption.fromRateProduct(Map<String, dynamic> json) {
@@ -50,7 +80,14 @@ class DepositProductOption {
       jangkaWaktu: '$tenor Bulan',
       tenorBulan: tenor,
       rate: rate,
+      jnsDep: _parseJnsDep(json['jns_dep']),
     );
+  }
+
+  /// null / '' / 0 -> manual (0); 1 -> digital (1).
+  static int _parseJnsDep(dynamic raw) {
+    if (raw == null) return 0;
+    return int.tryParse('$raw'.trim()) == 1 ? 1 : 0;
   }
 
   static int _parseTenor(Map<String, dynamic> json, String fallbackText) {
@@ -197,6 +234,18 @@ class DepositOpeningNotifier extends ChangeNotifier {
   List<DepositOpeningHistoryModel> historyList = [];
 
   DepositProductOption? selectedProduct;
+
+  /// Jenis deposito yang dipilih nasabah: 0 = manual, 1 = digital.
+  int selectedJnsDep = 0;
+
+  /// Produk sesuai jenis deposito yang dipilih.
+  List<DepositProductOption> get visibleProducts => productOptions.where((item) => item.jnsDep == selectedJnsDep).toList();
+
+  bool get hasManualProduct => productOptions.any((item) => item.jnsDep == 0);
+  bool get hasDigitalProduct => productOptions.any((item) => item.jnsDep == 1);
+
+  /// Pilihan jenis selalu ditampilkan; segmen tanpa produk dinonaktifkan di UI.
+  bool get showJenisChooser => productOptions.isNotEmpty;
   String? selectedDebetNoRek;
   String? selectedInterestCode;
   String? selectedInterestNoRek;
@@ -312,8 +361,26 @@ class DepositOpeningNotifier extends ChangeNotifier {
       final currentUser = users ?? await Pref().getUsers();
       final rows = await DepositOpeningRepository.inquiryRateProduk(bprId: currentUser.bprId, userLogin: currentUser.username);
 
-      final parsed = rows.map((item) => DepositProductOption.fromRateProduct(item)).where((item) => item.tenorBulan > 0 && item.rate > 0).toList()
-        ..sort((a, b) => a.tenorBulan.compareTo(b.tenorBulan));
+      // Deposito digital = produk dengan bilyet digital ON di CMS (Setup > Deposito Digital).
+      List<Map<String, dynamic>> digitalRows = [];
+      try {
+        digitalRows = await DepositOpeningRepository.inquiryDepositoDigital(bprId: currentUser.bprId);
+      } catch (e) {
+        debugPrint("ERROR DEPOSITO DIGITAL: $e"); // gagal -> semua produk dianggap manual
+      }
+      final digitalCodes = digitalRows.map((e) => '${e['kode_produk'] ?? ''}'.trim()).where((e) => e.isNotEmpty).toSet();
+
+      final fromRate = rows.map((item) => DepositProductOption.fromRateProduct(item)).where((item) => item.tenorBulan > 0 && item.rate > 0).map((item) {
+        // jns_dep dari rate produk bila ada; bila tidak, tentukan dari daftar bilyet digital.
+        return item.jnsDep == 1 || digitalCodes.contains(item.kodeProduk) ? item.copyWith(jnsDep: 1) : item;
+      }).toList();
+
+      final existingCodes = fromRate.map((e) => e.kodeProduk).toSet();
+      final digitalOnly = digitalRows
+          .map(DepositProductOption.fromDigital)
+          .where((item) => item.kodeProduk.isNotEmpty && item.tenorBulan > 0 && !existingCodes.contains(item.kodeProduk));
+
+      final parsed = [...fromRate, ...digitalOnly]..sort((a, b) => a.tenorBulan.compareTo(b.tenorBulan));
 
       productOptions = parsed;
 
@@ -321,8 +388,11 @@ class DepositOpeningNotifier extends ChangeNotifier {
         selectedProduct = null;
         rateMessage = "Produk deposito belum tersedia dari rate produk.";
       } else {
+        // Jenis yang dipilih tidak punya produk (mis. hanya ada digital) -> pindah ke jenis yang tersedia.
+        if (visibleProducts.isEmpty) selectedJnsDep = productOptions.first.jnsDep;
+        final visible = visibleProducts;
         final previousCode = selectedProduct?.kodeProduk;
-        selectedProduct = productOptions.firstWhere((item) => item.kodeProduk == previousCode, orElse: () => productOptions.first);
+        selectedProduct = visible.firstWhere((item) => item.kodeProduk == previousCode, orElse: () => visible.first);
         rateMessage = "Rate deposito berhasil dimuat.";
       }
     } catch (e) {
@@ -380,6 +450,15 @@ class DepositOpeningNotifier extends ChangeNotifier {
     }
 
     loading = false;
+    notifyListeners();
+  }
+
+  void setJenisDeposito(int jnsDep) {
+    if (selectedJnsDep == jnsDep) return;
+    selectedJnsDep = jnsDep;
+    final visible = visibleProducts;
+    selectedProduct = visible.isNotEmpty ? visible.first : null;
+    _resetOtpState();
     notifyListeners();
   }
 
@@ -657,6 +736,7 @@ class DepositOpeningNotifier extends ChangeNotifier {
       noTabunganBunga: noTabunganBunga,
       namaTabunganBunga: namaTabunganBunga,
       aro: rollOver ? "Y" : "N",
+      jnsDep: selectedProduct?.jnsDep ?? 0,
       userLogin: currentUser.username.isNotEmpty ? currentUser.username : "SYSTEM",
     );
   }
@@ -664,7 +744,8 @@ class DepositOpeningNotifier extends ChangeNotifier {
   void resetAfterSuccess() {
     nominalController.clear();
     otpController.clear();
-    selectedProduct = productOptions.isNotEmpty ? productOptions.first : null;
+    final visibleAfterReset = visibleProducts;
+    selectedProduct = visibleAfterReset.isNotEmpty ? visibleAfterReset.first : null;
     selectedDebetNoRek = eligibleDebetAccounts.isNotEmpty ? eligibleDebetAccounts.first.noAcc : null;
     selectedInterestCode = interestOptions.first.code;
     selectedInterestNoRek = listTabungan.isNotEmpty ? listTabungan.first.noAcc : null;

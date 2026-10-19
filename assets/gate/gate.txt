@@ -1,0 +1,1 @@
+gate lolos - file ini hanya penanda aset untuk build_gate

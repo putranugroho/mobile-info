@@ -3,6 +3,7 @@ const xusername = "core@2023";
 const xpassword = "corevalue@20231234";
 const url = "https://infoservices.medtrans.id";
 const url_medfo = "https://api-dev-medfo.medtrans.id";
+const url_web_service_medfo = "https://web-service-medfo.medtrans.id";
 const url_go = "https://api-dev-cms.medtrans.id";
 const url_biz = "https://ibprbiz.medtrans.id";
 const upload = "https://infoservices.medtrans.id/upload";
@@ -15,6 +16,11 @@ class NetworkURL {
 
   static String listBpr() {
     return "$url/webServices/get_list_bpr.php";
+  }
+
+  /// Daftar produk deposito yang bilyet digitalnya aktif (CMS > Setup > Deposito Digital).
+  static String depositoDigital() {
+    return "$url_web_service_medfo/inquiry/deposito-digital";
   }
 
   static String trxDigitalSetup() {

@@ -234,6 +234,7 @@ class DepositOpeningRepository {
     required String aro,
     required String userLogin,
     int jnsDep = 0,
+    String kodePrd = '',
   }) async {
     // Guard lapis kedua -- sama persis dengan submitLoanApplication().
     // Notifier sudah memblokir lebih dulu, ini jaring pengaman kalau nanti
@@ -257,6 +258,7 @@ class DepositOpeningRepository {
       "nama_tabungan_bunga": namaTabunganBunga,
       "aro": aro,
       "jns_dep": jnsDep, // 0 = deposito manual, 1 = deposito digital
+      "kode_prd": kodePrd, // kode produk dari daftar produk deposito
       "user_login": userLogin.trim().isNotEmpty ? userLogin.trim() : "SYSTEM",
       "term": "web",
     };

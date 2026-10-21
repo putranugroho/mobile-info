@@ -7,8 +7,8 @@ import 'package:mobile_info/models/banners_model.dart';
 import 'package:mobile_info/models/produk_model.dart';
 import 'package:mobile_info/module/home/home_notifier.dart';
 import 'package:mobile_info/module/loan/loan_detail_page.dart';
+import 'package:mobile_info/module/deposito/deposito_digital_pages.dart';
 import 'package:mobile_info/module/trx_digital/trx_digital_pages.dart';
-import 'package:mobile_info/module/deposito/deposito_detail_page.dart';
 import 'package:mobile_info/module/deposit_opening/deposit_opening_page.dart';
 import 'package:mobile_info/module/loan_application/loan_application_page.dart';
 
@@ -468,6 +468,23 @@ Widget _produkTabungan(HomeNotifier value, BuildContext context) {
   );
 }
 
+/// Penanda deposito digital pada kartu produk.
+class _DigitalBadge extends StatelessWidget {
+  const _DigitalBadge();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+      decoration: BoxDecoration(color: const Color(0xFFE3F2FD), borderRadius: BorderRadius.circular(10), border: Border.all(color: const Color(0xFF1565C0))),
+      child: const Text(
+        "Digital",
+        style: TextStyle(color: Color(0xFF1565C0), fontSize: 11, fontWeight: FontWeight.w700),
+      ),
+    );
+  }
+}
+
 Widget _produkDeposito(HomeNotifier value, BuildContext context) {
   if (value.loadingDeposito) {
     return const Padding(padding: EdgeInsets.all(16), child: CircularProgressIndicator());
@@ -480,13 +497,23 @@ Widget _produkDeposito(HomeNotifier value, BuildContext context) {
   return Column(
     children: value.listDeposito.map((deposito) {
       return accountProductCard(
-        onTap: () {
-          Navigator.push(context, MaterialPageRoute(builder: (_) => DepositoDetailPage(noRekening: deposito.noAcc)));
-        },
+        onTap: () => showDepositoActionSheet(
+          context,
+          deposito: deposito,
+          digitalInfo: value.digitalInfo(deposito.noAcc),
+          tabungan: value.listTabungan,
+        ),
         content: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(deposito.namaProduk, style: const TextStyle(fontWeight: FontWeight.bold)),
+            Row(
+              children: [
+                Flexible(
+                  child: Text(deposito.namaProduk, style: const TextStyle(fontWeight: FontWeight.bold)),
+                ),
+                if (value.isDepositoDigital(deposito.noAcc)) ...[const SizedBox(width: 8), const _DigitalBadge()],
+              ],
+            ),
             const SizedBox(height: 4),
             Text(deposito.noAcc, style: const TextStyle(fontSize: 12, color: Colors.grey)),
             const SizedBox(height: 6),

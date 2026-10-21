@@ -2,7 +2,9 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:mobile_info/models/index.dart';
+import 'package:mobile_info/models/deposito_digital_model.dart';
 import 'package:mobile_info/models/deposito_model.dart';
+import 'package:mobile_info/module/repository/deposito_digital_repository.dart';
 import 'package:mobile_info/models/tabungan_model.dart';
 import 'package:mobile_info/models/kredit_model.dart';
 import 'package:mobile_info/module/repository/auth_repository.dart';
@@ -140,6 +142,13 @@ class HomeNotifier extends ChangeNotifier {
   List<DepositoModel> listDeposito = [];
   bool loadingDeposito = false;
 
+  /// Deposito digital nasabah, key = nomor rekening deposito. Dicocokkan dengan master-data
+  /// (listDeposito): nomor ada di sini = digital, tidak ada = non digital.
+  Map<String, DepositoDigitalInfo> depositoDigital = {};
+
+  bool isDepositoDigital(String noAcc) => depositoDigital.containsKey(noAcc.trim());
+  DepositoDigitalInfo? digitalInfo(String noAcc) => depositoDigital[noAcc.trim()];
+
   Future loadDeposito() async {
     loadingDeposito = true;
     notifyListeners();
@@ -156,6 +165,13 @@ class HomeNotifier extends ChangeNotifier {
       );
     } catch (e) {
       debugPrint("ERROR DEPOSITO: $e");
+    }
+
+    try {
+      depositoDigital = await DepositoDigitalRepository.getDigitalNasabah(bprId: users!.bprId, noCif: users!.noCif);
+    } catch (e) {
+      depositoDigital = {}; // gagal -> semua dianggap non digital
+      debugPrint("ERROR DEPOSITO DIGITAL: $e");
     }
 
     loadingDeposito = false;

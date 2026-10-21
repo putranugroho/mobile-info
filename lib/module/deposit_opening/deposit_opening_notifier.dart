@@ -272,6 +272,17 @@ class DepositOpeningNotifier extends ChangeNotifier {
 
   bool get bayarBungaKeTabungan => selectedInterestCode == "TAB";
 
+  /// Deposito digital: bunga WAJIB dibayar ke tabungan dan tidak boleh diganti.
+  bool get bungaTerkunci => selectedProduct?.isDigital == true;
+
+  void _applyInterestLock() {
+    if (!bungaTerkunci) return;
+    selectedInterestCode = "TAB";
+    if (selectedInterestNoRek == null && listTabungan.isNotEmpty) {
+      selectedInterestNoRek = listTabungan.first.noAcc;
+    }
+  }
+
   String get maskedPhone {
     final phone = otpPhoneNumber.isNotEmpty ? otpPhoneNumber : (users?.nomorPonsel ?? '');
     if (phone.length <= 4) return phone;
@@ -393,6 +404,7 @@ class DepositOpeningNotifier extends ChangeNotifier {
         final visible = visibleProducts;
         final previousCode = selectedProduct?.kodeProduk;
         selectedProduct = visible.firstWhere((item) => item.kodeProduk == previousCode, orElse: () => visible.first);
+        _applyInterestLock();
         rateMessage = "Rate deposito berhasil dimuat.";
       }
     } catch (e) {
@@ -458,12 +470,14 @@ class DepositOpeningNotifier extends ChangeNotifier {
     selectedJnsDep = jnsDep;
     final visible = visibleProducts;
     selectedProduct = visible.isNotEmpty ? visible.first : null;
+    _applyInterestLock();
     _resetOtpState();
     notifyListeners();
   }
 
   void setProduct(DepositProductOption? value) {
     selectedProduct = value;
+    _applyInterestLock();
     _resetOtpState();
     notifyListeners();
   }
@@ -484,6 +498,7 @@ class DepositOpeningNotifier extends ChangeNotifier {
   }
 
   void setInterestCode(String? value) {
+    if (bungaTerkunci) return; // deposito digital: bayar bunga selalu ke tabungan
     selectedInterestCode = value;
     _resetOtpState();
     if (bayarBungaKeTabungan && selectedInterestNoRek == null && listTabungan.isNotEmpty) {
@@ -737,6 +752,7 @@ class DepositOpeningNotifier extends ChangeNotifier {
       namaTabunganBunga: namaTabunganBunga,
       aro: rollOver ? "Y" : "N",
       jnsDep: selectedProduct?.jnsDep ?? 0,
+      kodePrd: selectedProduct?.kodeProduk ?? '',
       userLogin: currentUser.username.isNotEmpty ? currentUser.username : "SYSTEM",
     );
   }

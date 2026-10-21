@@ -534,9 +534,9 @@ class _DepositOpeningPageState extends State<DepositOpeningPage> {
       key: ValueKey('jenis-bunga-${value.selectedInterestCode}'),
       initialValue: value.selectedInterestCode,
       isExpanded: true,
-      decoration: _inputDecoration("Bayar Bunga"),
+      decoration: _inputDecoration("Bayar Bunga", helperText: value.bungaTerkunci ? "Deposito digital: bunga otomatis dibayar ke tabungan." : null),
       items: value.interestOptions.map((item) => DropdownMenuItem<String>(value: item.code, child: Text(item.label))).toList(),
-      onChanged: value.setInterestCode,
+      onChanged: value.bungaTerkunci ? null : value.setInterestCode,
     );
   }
 

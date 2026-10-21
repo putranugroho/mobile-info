@@ -23,6 +23,19 @@ class NetworkURL {
     return "$url_web_service_medfo/inquiry/deposito-digital";
   }
 
+  /// Deposito digital milik nasabah (dibandingkan dengan master-data: ada = digital, tidak ada = non digital).
+  static String depositoDigitalNasabah() {
+    return "$url_web_service_medfo/inquiry/deposito-digital-nasabah";
+  }
+
+  static String penutupanDepositoDigital() {
+    return "$url_web_service_medfo/penutupan-deposito-digital/daftar";
+  }
+
+  static String formatBilyet() {
+    return "$url_web_service_medfo/inquiry/format-bilyet";
+  }
+
   static String trxDigitalSetup() {
     return "$url_medfo/mobile-info/trx-digital/setup";
   }

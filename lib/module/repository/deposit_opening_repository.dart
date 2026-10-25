@@ -32,6 +32,16 @@ class DepositNotificationResultModel {
   const DepositNotificationResultModel({required this.totalRecipient, required this.successCount, required this.failedCount});
 }
 
+/// Biaya materai pembukaan deposito: dikenakan bila nominal >= [minNominal].
+class BiayaMaterai {
+  final double biaya;
+  final double minNominal;
+
+  const BiayaMaterai({required this.biaya, required this.minNominal});
+
+  bool berlakuUntuk(num nominal) => biaya > 0 && nominal >= minNominal;
+}
+
 class DepositOpeningRepository {
   static dynamic _decode(dynamic data) {
     if (data is String) {
@@ -135,6 +145,26 @@ class DepositOpeningRepository {
     if (data is! List) return [];
 
     return data.map((e) => Map<String, dynamic>.from(e)).where((e) => '${e['status'] ?? ''}'.toUpperCase() == 'ON').toList();
+  }
+
+  /// Biaya materai pembukaan deposito. [digital] true -> "D", false -> "K" (konvensional/manual). Null bila tidak tersedia.
+  static Future<BiayaMaterai?> inquiryBiayaMaterai({required String bprId, required String userLogin, required bool digital}) async {
+    // Server web-service-medfo hanya mengizinkan header Content-Type/API-Key (CORS) -- jangan pakai _dio().
+    final dio = Dio();
+    dio.options.headers['api-key'] = '123';
+    dio.options.headers['Content-Type'] = 'application/json';
+    final response = await dio.post(
+      NetworkURL.biayaMaterai(),
+      data: {"bpr_id": bprId, "user_login": userLogin.trim().isNotEmpty ? userLogin.trim() : "SYSTEM", "jns_dep": digital ? "D" : "K"},
+      options: Options(validateStatus: (_) => true),
+    );
+    final res = _decode(response.data);
+    if (res is! Map || '${res['code']}' != '000' || res['data'] is! Map) return null;
+    final biaya = double.tryParse('${res['data']['biaya_materai']}');
+    if (biaya == null) return null;
+    // min_nominal_materai = batas nominal deposito yang dikenai materai (parameter dari server); kosong -> selalu berlaku.
+    final min = double.tryParse('${res['data']['min_nominal_materai'] ?? 0}') ?? 0;
+    return BiayaMaterai(biaya: biaya, minNominal: min);
   }
 
   static Future<List<Map<String, dynamic>>> inquiryRateProduk({required String bprId, required String userLogin}) async {

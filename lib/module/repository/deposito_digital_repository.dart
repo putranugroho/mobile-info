@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:typed_data';
 
 import 'package:dio/dio.dart';
 import 'package:mobile_info/models/deposito_digital_model.dart';
@@ -33,12 +34,19 @@ class DepositoDigitalRepository {
     return map;
   }
 
-  static Future<BilyetFormat> getFormatBilyet({required String bprId}) async {
-    final res = _decode((await _dio().post(NetworkURL.formatBilyet(), data: {"bpr_id": bprId})).data);
-    if ('${res['code']}' != '000' || res['data'] is! Map) {
-      throw Exception(res['message'] ?? 'Format bilyet belum tersedia.');
+  /// PDF bilyet digital dari server (sudah memuat format BPR, e-meterai, dan QR).
+  static Future<Uint8List> getBilyetPdf({required String bprId, required String noDeposito, required String noBilyet}) async {
+    final response = await _dio().post(
+      NetworkURL.bilyetDigital(),
+      data: {"bpr_id": bprId, "no_deposito": noDeposito, "no_bilyet": noBilyet},
+      options: Options(validateStatus: (_) => true),
+    );
+    final res = _decode(response.data);
+    final data = res['data'];
+    if ('${res['code']}' != '000' || data is! Map || '${data['file'] ?? ''}'.isEmpty) {
+      throw Exception(res['message'] ?? 'Bilyet digital belum tersedia.');
     }
-    return BilyetFormat.fromJson(Map<String, dynamic>.from(res['data']));
+    return base64Decode('${data['file']}');
   }
 
   /// Permohonan penutupan deposito digital. Melempar Exception(message) bila ditolak.

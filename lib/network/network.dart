@@ -32,8 +32,14 @@ class NetworkURL {
     return "$url_web_service_medfo/penutupan-deposito-digital/daftar";
   }
 
-  static String formatBilyet() {
-    return "$url_web_service_medfo/inquiry/format-bilyet";
+  /// Biaya materai pembukaan deposito: jns_dep "D" = digital, "K" = konvensional/manual.
+  static String biayaMaterai() {
+    return "$url_web_service_medfo/inquiry/biaya-materai";
+  }
+
+  /// PDF bilyet digital (base64) dibuat server: bpr_id, no_deposito, no_bilyet.
+  static String bilyetDigital() {
+    return "$url_medfo/inquiry/bilyet-digital";
   }
 
   static String trxDigitalSetup() {

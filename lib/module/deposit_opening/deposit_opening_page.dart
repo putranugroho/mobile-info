@@ -435,6 +435,10 @@ class _DepositOpeningPageState extends State<DepositOpeningPage> {
           _readonlyField(label: "Suku Bunga", value: value.selectedRate > 0 ? "${value.selectedRate.toStringAsFixed(2)} %" : "-"),
           const SizedBox(height: 12),
           _nominalField(value),
+          if (value.selectedBiayaMaterai != null) ...[
+            const SizedBox(height: 12),
+            _readonlyField(label: "Biaya Materai", value: "Rp ${FormatCurrency.oCcy.format(value.selectedBiayaMaterai!.biaya)}"),
+          ],
           const SizedBox(height: 12),
           value.loading ? const Center(child: Padding(padding: EdgeInsets.all(12), child: CircularProgressIndicator())) : _debetDropdown(value),
           const SizedBox(height: 12),

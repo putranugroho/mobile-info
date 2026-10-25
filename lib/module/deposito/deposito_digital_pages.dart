@@ -1,4 +1,3 @@
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'package:intl/intl.dart';
@@ -6,16 +5,14 @@ import 'package:mobile_info/models/deposito_detail_model.dart';
 import 'package:mobile_info/models/deposito_digital_model.dart';
 import 'package:mobile_info/models/deposito_model.dart';
 import 'package:mobile_info/models/tabungan_model.dart';
-import 'package:mobile_info/module/deposito/bilyet_pdf.dart';
 import 'package:mobile_info/module/deposito/deposito_detail_page.dart';
+import 'package:mobile_info/module/deposito/bilyet_viewer.dart';
 import 'package:mobile_info/module/repository/deposito_digital_repository.dart';
 import 'package:mobile_info/module/repository/deposito_repository.dart';
 import 'package:mobile_info/pref/pref.dart';
 import 'package:mobile_info/utils/colors.dart';
 import 'package:mobile_info/utils/format_currency.dart';
-import 'package:mobile_info/utils/terbilang.dart';
 import 'package:printing/printing.dart';
-import 'package:qr_flutter/qr_flutter.dart';
 
 const _biru = Color(0xFF1565C0);
 
@@ -329,6 +326,7 @@ class _PenutupanDepositoPageState extends State<PenutupanDepositoPage> {
 
 // ============================ CETAK BILYET ============================
 
+/// Bilyet digital: PDF dibuat server (endpoint inquiry/bilyet-digital), aplikasi hanya menampilkan, mengunduh, dan mencetaknya.
 class CetakBilyetPage extends StatefulWidget {
   final DepositoModel deposito;
   final DepositoDigitalInfo digitalInfo;
@@ -339,8 +337,10 @@ class CetakBilyetPage extends StatefulWidget {
 }
 
 class _CetakBilyetPageState extends State<CetakBilyetPage> {
-  late Future<_BilyetData> _future;
+  late Future<Uint8List> _future;
   bool _busy = false;
+
+  String get _fileName => 'Bilyet_${widget.digitalInfo.noBilyet}.pdf';
 
   @override
   void initState() {
@@ -348,56 +348,10 @@ class _CetakBilyetPageState extends State<CetakBilyetPage> {
     _future = _load();
   }
 
-  Future<_BilyetData> _load() async {
+  Future<Uint8List> _load() async {
     final users = await Pref().getUsers();
-    final results = await Future.wait([
-      DepositoRepository.getDetailDeposito(noRek: widget.deposito.noAcc, userlogin: users.usersId, bprId: users.bprId),
-      DepositoDigitalRepository.getFormatBilyet(bprId: users.bprId),
-    ]);
-    final detail = results[0] as DepositoDetailModel;
-    final format = results[1] as BilyetFormat;
-
-    Uint8List? logo;
-    final logoUrl = users.bprLogo.trim();
-    if (logoUrl.startsWith('http')) {
-      try {
-        final r = await Dio().get<List<int>>(
-          logoUrl,
-          options: Options(responseType: ResponseType.bytes, receiveTimeout: const Duration(seconds: 6), sendTimeout: const Duration(seconds: 6)),
-        );
-        logo = Uint8List.fromList(r.data ?? []);
-      } catch (_) {
-        logo = null; // logo gagal diunduh (mis. CORS di web) -> bilyet tetap tampil tanpa logo
-      }
-    }
-
-    final noBilyet = widget.digitalInfo.noBilyet.isNotEmpty ? widget.digitalInfo.noBilyet : detail.noBilyet;
-    final values = <String, String>{
-      'nomor_bilyet': noBilyet,
-      'nomor_deposito': detail.noRek,
-      'nama_nasabah': detail.nama,
-      'nomor_cif': detail.nocif,
-      'nominal_deposito': 'Rp ${FormatCurrency.oCcy.format(detail.nominal)}',
-      'terbilang': terbilangRupiah(detail.nominal),
-      'rate_bunga': '${detail.rate.toStringAsFixed(2)} % p.a.',
-      'tanggal_valuta': _fmtTanggal(detail.tglEff),
-      'tanggal_jatuh_tempo': _fmtTanggal(detail.tglJatuhTempo),
-      'nama_produk': widget.deposito.namaProduk,
-      'nama_kantor': users.bprNama,
-    };
-
-    return _BilyetData(
-      format: format,
-      values: values,
-      noBilyet: noBilyet,
-      qrData: '$noBilyet|${detail.noRek}|${users.bprId}',
-      penandatangan: users.bprNama,
-      logo: logo,
-    );
+    return DepositoDigitalRepository.getBilyetPdf(bprId: users.bprId, noDeposito: widget.deposito.noAcc, noBilyet: widget.digitalInfo.noBilyet);
   }
-
-  /// PDF dibuat hanya saat dibutuhkan (cetak/unduh), supaya pratinjau tidak bergantung pada PDF.js di browser.
-  Future<Uint8List> _pdf(_BilyetData d) => buildBilyetPdf(format: d.format, values: d.values, qrData: d.qrData, penandatangan: d.penandatangan, logoBytes: d.logo);
 
   Future<void> _run(Future<void> Function() action) async {
     if (_busy) return;
@@ -405,8 +359,8 @@ class _CetakBilyetPageState extends State<CetakBilyetPage> {
     try {
       await action();
     } catch (e) {
-      debugPrint('ERROR BILYET PDF: $e');
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Gagal membuat PDF bilyet. Silakan coba lagi.')));
+      debugPrint('ERROR BILYET: $e');
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Gagal memproses PDF bilyet. Silakan coba lagi.')));
     } finally {
       if (mounted) setState(() => _busy = false);
     }
@@ -417,7 +371,7 @@ class _CetakBilyetPageState extends State<CetakBilyetPage> {
     return Scaffold(
       backgroundColor: colorBackground,
       appBar: AppBar(title: const Text('Bilyet Digital'), backgroundColor: _biru, foregroundColor: Colors.white),
-      body: FutureBuilder<_BilyetData>(
+      body: FutureBuilder<Uint8List>(
         future: _future,
         builder: (context, snap) {
           if (snap.connectionState != ConnectionState.done) return const Center(child: CircularProgressIndicator());
@@ -426,134 +380,40 @@ class _CetakBilyetPageState extends State<CetakBilyetPage> {
             return Center(
               child: Padding(
                 padding: const EdgeInsets.all(24),
-                child: Text(snap.error.toString().replaceFirst('Exception: ', ''), textAlign: TextAlign.center),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(snap.error.toString().replaceFirst('Exception: ', ''), textAlign: TextAlign.center),
+                    const SizedBox(height: 12),
+                    OutlinedButton(onPressed: () => setState(() => _future = _load()), child: const Text('Coba lagi')),
+                  ],
+                ),
               ),
             );
           }
-          final d = snap.data!;
-          return ListView(
-            padding: const EdgeInsets.all(16),
+          final bytes = snap.data!;
+          return Column(
             children: [
-              Card(
-                clipBehavior: Clip.antiAlias,
-                child: Padding(
-                  padding: const EdgeInsets.all(8),
-                  child: BilyetPreview(format: d.format, values: d.values, qrData: d.qrData, penandatangan: d.penandatangan, logo: d.logo),
-                ),
+              Expanded(
+                child: Padding(padding: const EdgeInsets.all(12), child: buildBilyetViewer(bytes, _fileName)),
               ),
-              const SizedBox(height: 8),
-              Text('Bilyet ${d.noBilyet} • ${d.format.lebarMm.toStringAsFixed(0)} x ${d.format.tinggiMm.toStringAsFixed(0)} mm', textAlign: TextAlign.center, style: const TextStyle(color: Colors.grey, fontSize: 12)),
-              const SizedBox(height: 16),
-              Row(
-                children: [
-                  Expanded(
-                    child: OutlinedButton.icon(
-                      onPressed: _busy ? null : () => _run(() async => Printing.sharePdf(bytes: await _pdf(d), filename: 'Bilyet_${d.noBilyet}.pdf')),
-                      icon: const Icon(Icons.download),
+              SafeArea(
+                top: false,
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 4, 16, 12),
+                  child: SizedBox(
+                    width: double.infinity,
+                    height: 48,
+                    child: ElevatedButton.icon(
+                      style: ElevatedButton.styleFrom(backgroundColor: _biru, foregroundColor: Colors.white),
+                      onPressed: _busy ? null : () => _run(() => Printing.sharePdf(bytes: bytes, filename: _fileName)),
+                      icon: _busy ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white)) : const Icon(Icons.download),
                       label: const Text('Unduh PDF'),
                     ),
                   ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: ElevatedButton.icon(
-                      style: ElevatedButton.styleFrom(backgroundColor: _biru, foregroundColor: Colors.white),
-                      onPressed: _busy
-                          ? null
-                          : () => _run(() async {
-                              final bytes = await _pdf(d);
-                              await Printing.layoutPdf(name: 'Bilyet_${d.noBilyet}', format: bilyetPageFormat(d.format), onLayout: (_) async => bytes);
-                            }),
-                      icon: _busy ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white)) : const Icon(Icons.print),
-                      label: const Text('Cetak'),
-                    ),
-                  ),
-                ],
+                ),
               ),
             ],
-          );
-        },
-      ),
-    );
-  }
-}
-
-class _BilyetData {
-  final BilyetFormat format;
-  final Map<String, String> values;
-  final String noBilyet;
-  final String qrData;
-  final String penandatangan;
-  final Uint8List? logo;
-  const _BilyetData({required this.format, required this.values, required this.noBilyet, required this.qrData, required this.penandatangan, required this.logo});
-}
-
-/// Pratinjau bilyet yang digambar langsung oleh Flutter (tanpa PDF.js), dengan posisi field dalam mm sesuai format CMS.
-class BilyetPreview extends StatelessWidget {
-  final BilyetFormat format;
-  final Map<String, String> values;
-  final String qrData;
-  final String penandatangan;
-  final Uint8List? logo;
-
-  const BilyetPreview({super.key, required this.format, required this.values, required this.qrData, required this.penandatangan, this.logo});
-
-  @override
-  Widget build(BuildContext context) {
-    final bg = decodeBilyetDataUri(format.bgBilyet);
-
-    return AspectRatio(
-      aspectRatio: format.lebarMm / format.tinggiMm,
-      child: LayoutBuilder(
-        builder: (context, c) {
-          final mm = c.maxWidth / format.lebarMm; // piksel per mm
-          final fontPx = format.fontSize * 0.3528 * mm; // 1 pt = 0.3528 mm
-
-          double widthFor(double x) {
-            final next = x < 90 ? 90.0 : (x < 140 ? 140.0 : format.lebarMm);
-            return (next - x - 3).clamp(15.0, format.lebarMm).toDouble();
-          }
-
-          Widget fieldWidget(BilyetField f) {
-            switch (f.key) {
-              case 'logo':
-                return logo == null ? const SizedBox() : SizedBox(width: 16 * mm, height: 16 * mm, child: Image.memory(logo!, fit: BoxFit.contain, errorBuilder: (_, _, _) => const SizedBox()));
-              case 'qr_code':
-                return QrImageView(data: qrData, size: 18 * mm, padding: EdgeInsets.zero, backgroundColor: Colors.white);
-              case 'tanda_tangan':
-                return SizedBox(
-                  width: 40 * mm,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      SizedBox(height: 10 * mm),
-                      Container(height: 0.6, color: Colors.black87),
-                      Text(penandatangan, style: TextStyle(fontSize: fontPx * 0.7, color: Colors.black87)),
-                    ],
-                  ),
-                );
-              default:
-                return SizedBox(
-                  width: widthFor(f.x) * mm,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(f.label, style: TextStyle(fontSize: fontPx * 0.7, color: Colors.grey.shade700, height: 1.1)),
-                      Text(values[f.key] ?? '-', style: TextStyle(fontSize: fontPx, fontWeight: FontWeight.bold, color: Colors.black, height: 1.1)),
-                    ],
-                  ),
-                );
-            }
-          }
-
-          return Container(
-            color: Colors.white,
-            child: Stack(
-              clipBehavior: Clip.hardEdge,
-              children: [
-                if (bg != null) Positioned.fill(child: Opacity(opacity: (format.bgOpacity / 100).clamp(0.0, 1.0), child: Image.memory(bg, fit: BoxFit.fill, errorBuilder: (_, _, _) => const SizedBox()))),
-                for (final f in format.fields) Positioned(left: f.x * mm, top: f.y * mm, child: fieldWidget(f)),
-              ],
-            ),
           );
         },
       ),

@@ -44,7 +44,7 @@ class DepositProductOption {
     jnsDep: jnsDep ?? this.jnsDep,
   );
 
-  /// Produk digital dari daftar Bilyet Digital CMS (belum tentu punya rate di rate produk).
+  /// Produk digital dari daftar Bilyet Digital CMS (inquiry/deposito-digital), termasuk rate-nya.
   factory DepositProductOption.fromDigital(Map<String, dynamic> json) {
     final jangka = int.tryParse('${json['jangka_waktu'] ?? 0}') ?? 0;
     final harian = '${json['jenis_jangka_waktu'] ?? 'B'}'.toUpperCase() == 'H';
@@ -54,7 +54,7 @@ class DepositProductOption {
       namaProduk: nama.isNotEmpty ? nama : 'Deposito Digital',
       jangkaWaktu: harian ? '$jangka Bulan (Harian)' : '$jangka Bulan',
       tenorBulan: jangka,
-      rate: 0,
+      rate: _parseRate(json['rate']), // rate produk digital dari inquiry/deposito-digital
       jnsDep: 1,
     );
   }
@@ -238,6 +238,30 @@ class DepositOpeningNotifier extends ChangeNotifier {
   /// Jenis deposito yang dipilih nasabah: 0 = manual, 1 = digital.
   int selectedJnsDep = 0;
 
+  /// Biaya materai per jenis deposito (key: 0 = manual/"K", 1 = digital/"D"). Kosong bila belum/gagal dimuat.
+  Map<int, BiayaMaterai> biayaMaterai = {};
+
+  /// Biaya materai yang BERLAKU untuk nominal & jenis deposito terpilih: hanya bila nominal >= batas dari server.
+  /// Null bila tidak tersedia atau nominal belum mencapai batas.
+  BiayaMaterai? get selectedBiayaMaterai {
+    final info = biayaMaterai[selectedProduct?.jnsDep ?? selectedJnsDep];
+    return info != null && info.berlakuUntuk(nominalValue) ? info : null;
+  }
+
+  Future<void> _loadBiayaMaterai(String bprId, String userLogin) async {
+    Future<BiayaMaterai?> fetch(bool digital) async {
+      try {
+        return await DepositOpeningRepository.inquiryBiayaMaterai(bprId: bprId, userLogin: userLogin, digital: digital);
+      } catch (e) {
+        debugPrint("ERROR BIAYA MATERAI: $e");
+        return null;
+      }
+    }
+
+    final results = await Future.wait([fetch(false), fetch(true)]);
+    biayaMaterai = {if (results[0] != null) 0: results[0]!, if (results[1] != null) 1: results[1]!};
+  }
+
   /// Produk sesuai jenis deposito yang dipilih.
   List<DepositProductOption> get visibleProducts => productOptions.where((item) => item.jnsDep == selectedJnsDep).toList();
 
@@ -372,26 +396,24 @@ class DepositOpeningNotifier extends ChangeNotifier {
       final currentUser = users ?? await Pref().getUsers();
       final rows = await DepositOpeningRepository.inquiryRateProduk(bprId: currentUser.bprId, userLogin: currentUser.username);
 
-      // Deposito digital = produk dengan bilyet digital ON di CMS (Setup > Deposito Digital).
+      // Manual: dari rate produk (tidak berubah). Digital: dari inquiry/deposito-digital (bilyet digital ON), lengkap dengan rate-nya.
       List<Map<String, dynamic>> digitalRows = [];
       try {
         digitalRows = await DepositOpeningRepository.inquiryDepositoDigital(bprId: currentUser.bprId);
       } catch (e) {
-        debugPrint("ERROR DEPOSITO DIGITAL: $e"); // gagal -> semua produk dianggap manual
+        debugPrint("ERROR DEPOSITO DIGITAL: $e"); // gagal -> hanya produk manual yang tampil
       }
-      final digitalCodes = digitalRows.map((e) => '${e['kode_produk'] ?? ''}'.trim()).where((e) => e.isNotEmpty).toSet();
 
-      final fromRate = rows.map((item) => DepositProductOption.fromRateProduct(item)).where((item) => item.tenorBulan > 0 && item.rate > 0).map((item) {
-        // jns_dep dari rate produk bila ada; bila tidak, tentukan dari daftar bilyet digital.
-        return item.jnsDep == 1 || digitalCodes.contains(item.kodeProduk) ? item.copyWith(jnsDep: 1) : item;
-      }).toList();
+      await _loadBiayaMaterai(currentUser.bprId, currentUser.usersId);
 
-      final existingCodes = fromRate.map((e) => e.kodeProduk).toSet();
-      final digitalOnly = digitalRows
-          .map(DepositProductOption.fromDigital)
-          .where((item) => item.kodeProduk.isNotEmpty && item.tenorBulan > 0 && !existingCodes.contains(item.kodeProduk));
+      final manual = rows.map((item) => DepositProductOption.fromRateProduct(item)).where((item) => item.tenorBulan > 0 && item.rate > 0);
+      final digital = digitalRows.map(DepositProductOption.fromDigital).where((item) => item.kodeProduk.isNotEmpty && item.tenorBulan > 0 && item.rate > 0);
 
-      final parsed = [...fromRate, ...digitalOnly]..sort((a, b) => a.tenorBulan.compareTo(b.tenorBulan));
+      // Kode produk bisa sama di manual & digital (mis. 03/06/12); keduanya tetap terpisah lewat jnsDep.
+      final parsed = [...manual, ...digital]..sort((a, b) {
+        final byTenor = a.tenorBulan.compareTo(b.tenorBulan);
+        return byTenor != 0 ? byTenor : a.jnsDep.compareTo(b.jnsDep);
+      });
 
       productOptions = parsed;
 

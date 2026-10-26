@@ -444,12 +444,10 @@ class _DepositOpeningPageState extends State<DepositOpeningPage> {
           const SizedBox(height: 12),
           _readonlyField(label: "Nama Rek", value: value.namaRekening),
           const SizedBox(height: 12),
-          _interestDropdown(value),
+          if (!value.bungaTerkunci) ...[_interestDropdown(value)], // digital: terkunci Ke Tabungan -> disembunyikan
           if (value.bayarBungaKeTabungan) ...[
-            const SizedBox(height: 12),
-            _interestAccountDropdown(value),
-            const SizedBox(height: 12),
-            _readonlyField(label: "Nama", value: value.namaRekening),
+            if (!value.bungaTerkunci) const SizedBox(height: 12),
+            _rekeningTujuanBlock(value),
           ],
           const SizedBox(height: 12),
           _rollOverSelector(value),
@@ -544,21 +542,40 @@ class _DepositOpeningPageState extends State<DepositOpeningPage> {
     );
   }
 
-  Widget _interestAccountDropdown(DepositOpeningNotifier value) {
-    final accounts = value.listTabungan;
-    final currentValue = accounts.any((item) => item.noAcc == value.selectedInterestNoRek) ? value.selectedInterestNoRek : null;
-    if (accounts.isEmpty) return _emptyAccountBox("Rekening tujuan bunga belum tersedia.");
-
-    return DropdownButtonFormField<String>(
-      key: ValueKey('rek-bunga-$currentValue'),
-      initialValue: currentValue,
-      isExpanded: true,
-      itemHeight: 64,
-      menuMaxHeight: 320,
-      decoration: _inputDecoration("No Rek"),
-      selectedItemBuilder: (context) => accounts.map((item) => _accountSelectedItem(item)).toList(),
-      items: accounts.map((item) => _accountDropdownItem(item)).toList(),
-      onChanged: value.setInterestNoRek,
+  /// "Bayar Bunga Ke Rekening": default rekening sendiri, bisa diketik; rekening lain dicek lalu dikonfirmasi.
+  Widget _rekeningTujuanBlock(DepositOpeningNotifier value) {
+    final milikSendiri = value.rekTujuanMilikSendiri;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        TextField(
+          controller: value.rekLainController,
+          keyboardType: TextInputType.number,
+          inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+          onChanged: value.onRekLainChanged,
+          decoration: _inputDecoration(
+            "Bayar Bunga Ke Rekening",
+            helperText: value.bungaTerkunci
+                ? "Deposito digital: bunga otomatis dibayar ke rekening tabungan. ${milikSendiri ? 'Ketik nomor lain untuk mengganti.' : 'Tekan Cek Rekening untuk memastikan nomor benar.'}"
+                : (milikSendiri ? "Rekening tabungan Anda. Ketik nomor lain untuk mengganti." : "Rekening lain: tekan Cek Rekening untuk memastikan nomor benar."),
+            helperMaxLines: 3,
+          ),
+        ),
+        const SizedBox(height: 8),
+        SizedBox(
+          height: 44,
+          child: OutlinedButton.icon(
+            onPressed: value.rekLainLoading ? null : value.cekRekeningLain,
+            icon: value.rekLainLoading ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2)) : const Icon(Icons.search),
+            label: Text(value.rekLainLoading ? "Memeriksa..." : "Cek Rekening"),
+          ),
+        ),
+        if (value.rekLainError.isNotEmpty) ...[const SizedBox(height: 8), _errorCard(value.rekLainError)],
+        if (value.rekTujuanNama.isNotEmpty) ...[
+          const SizedBox(height: 12),
+          _readonlyField(label: "Nama Pemilik Rekening", value: value.rekTujuanNama),
+        ],
+      ],
     );
   }
 
@@ -691,10 +708,11 @@ class _DepositOpeningPageState extends State<DepositOpeningPage> {
     );
   }
 
-  InputDecoration _inputDecoration(String label, {String? helperText, String? prefixText, String? counterText}) {
+  InputDecoration _inputDecoration(String label, {String? helperText, int? helperMaxLines, String? prefixText, String? counterText}) {
     return InputDecoration(
       labelText: label,
       helperText: helperText,
+      helperMaxLines: helperMaxLines,
       prefixText: prefixText,
       counterText: counterText,
       filled: true,

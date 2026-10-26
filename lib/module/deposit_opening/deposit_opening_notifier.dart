@@ -273,6 +273,60 @@ class DepositOpeningNotifier extends ChangeNotifier {
   String? selectedDebetNoRek;
   String? selectedInterestCode;
   String? selectedInterestNoRek;
+
+  /// "Bayar Bunga Ke Rekening": terisi default rekening milik sendiri dan bisa diganti dengan mengetik.
+  /// Rekening milik sendiri langsung valid; rekening lain harus dicek (inquiry nama) lalu dikonfirmasi.
+  final rekLainController = TextEditingController();
+  bool rekLainLoading = false;
+  String rekLainNama = ''; // nama dari inquiry (untuk rekening lain)
+  String rekLainError = '';
+
+  String get rekTujuan => rekLainController.text.trim();
+  bool get rekTujuanMilikSendiri => rekTujuan.isNotEmpty && listTabungan.any((t) => t.noAcc == rekTujuan);
+  String get rekTujuanNama => rekTujuanMilikSendiri ? (users?.nama ?? '') : rekLainNama;
+
+  void _ensureRekTujuanDefault() {
+    if (rekLainController.text.trim().isEmpty && listTabungan.isNotEmpty) {
+      rekLainController.text = selectedInterestNoRek ?? listTabungan.first.noAcc;
+    }
+  }
+
+  void onRekLainChanged(String _) {
+    // Nomor berubah -> nama & konfirmasi sebelumnya tidak berlaku lagi.
+    rekLainNama = '';
+    rekLainError = '';
+    _resetOtpState();
+    notifyListeners();
+  }
+
+  Future<void> cekRekeningLain() async {
+    final noRek = rekTujuan;
+    if (noRek.isEmpty) {
+      rekLainError = 'Masukkan nomor rekening tujuan bunga.';
+      notifyListeners();
+      return;
+    }
+    rekLainLoading = true;
+    rekLainError = '';
+    rekLainNama = '';
+    notifyListeners();
+
+    try {
+      final currentUser = users ?? await Pref().getUsers();
+      rekLainNama = await DepositOpeningRepository.inquiryNamaRekening(bprId: currentUser.bprId, noRek: noRek, noHp: currentUser.nomorPonsel);
+    } catch (e) {
+      rekLainError = e.toString().replaceFirst('Exception: ', '');
+    }
+    rekLainLoading = false;
+    notifyListeners();
+  }
+
+  void _resetRekLain() {
+    rekLainController.clear();
+    rekLainNama = '';
+    rekLainError = '';
+    rekLainLoading = false;
+  }
   bool rollOver = true;
 
   bool get isBusy => loading || setupLoading || rateLoading || historyLoading;
@@ -478,6 +532,7 @@ class DepositOpeningNotifier extends ChangeNotifier {
       final eligible = eligibleDebetAccounts;
       if (selectedDebetNoRek == null && eligible.isNotEmpty) selectedDebetNoRek = eligible.first.noAcc;
       if (selectedInterestNoRek == null && listTabungan.isNotEmpty) selectedInterestNoRek = listTabungan.first.noAcc;
+      _ensureRekTujuanDefault();
     } catch (e) {
       errorMessage = "Gagal mengambil rekening tabungan.";
       debugPrint("ERROR LOAD TABUNGAN PEMBUKAAN DEPOSITO: $e");
@@ -568,7 +623,12 @@ class DepositOpeningNotifier extends ChangeNotifier {
     if (debet.saldo <= nominal) return "Saldo rekening debet harus lebih besar dari nominal deposito.";
 
     if (selectedInterestCode == null) return "Pilih metode bayar bunga.";
-    if (bayarBungaKeTabungan && selectedInterestNoRek == null) return "Pilih nomor rekening tujuan bunga.";
+    if (bayarBungaKeTabungan) {
+      if (rekTujuan.isEmpty) return "Masukkan nomor rekening tujuan bunga.";
+      if (!rekTujuanMilikSendiri) {
+        if (rekLainNama.isEmpty) return "Cek rekening tujuan bunga terlebih dahulu.";
+      }
+    }
 
     final currentUser = users;
     if (currentUser == null || currentUser.id == 0) return "Data user tidak valid. Silakan login ulang.";
@@ -754,11 +814,10 @@ class DepositOpeningNotifier extends ChangeNotifier {
   Future<Map<String, dynamic>> _submitPermohonan({String kdKantor = ''}) async {
     final currentUser = users ?? await Pref().getUsers();
     final interestOption = selectedInterestOption;
-    final interestAccount = selectedInterestAccount;
 
     final pencairanBunga = interestOption?.apiValue ?? "tabungan";
-    final noTabunganBunga = bayarBungaKeTabungan ? (selectedInterestNoRek ?? '') : '';
-    final namaTabunganBunga = bayarBungaKeTabungan && interestAccount != null ? currentUser.nama : '';
+    final noTabunganBunga = bayarBungaKeTabungan ? rekTujuan : '';
+    final namaTabunganBunga = bayarBungaKeTabungan ? rekTujuanNama : '';
 
     return await DepositOpeningRepository.daftarPermohonanPembukaanDeposito(
       bprId: currentUser.bprId,
@@ -787,6 +846,8 @@ class DepositOpeningNotifier extends ChangeNotifier {
     selectedDebetNoRek = eligibleDebetAccounts.isNotEmpty ? eligibleDebetAccounts.first.noAcc : null;
     selectedInterestCode = interestOptions.first.code;
     selectedInterestNoRek = listTabungan.isNotEmpty ? listTabungan.first.noAcc : null;
+    _resetRekLain();
+    _ensureRekTujuanDefault();
     rollOver = true;
     otpSent = false;
     requestSuccess = false;
@@ -800,6 +861,7 @@ class DepositOpeningNotifier extends ChangeNotifier {
   void dispose() {
     nominalController.dispose();
     otpController.dispose();
+    rekLainController.dispose();
     super.dispose();
   }
 }

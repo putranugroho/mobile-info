@@ -147,6 +147,31 @@ class DepositOpeningRepository {
     return data.map((e) => Map<String, dynamic>.from(e)).where((e) => '${e['status'] ?? ''}'.toUpperCase() == 'ON').toList();
   }
 
+  /// Inquiry nama pemilik rekening (satu BPR) lewat middleware, sama dengan alur transfer sesama.
+  /// Melempar Exception(message) bila rekening tidak ditemukan.
+  static Future<String> inquiryNamaRekening({required String bprId, required String noRek, required String noHp}) async {
+    final now = DateTime.now();
+    String two(int n) => n.toString().padLeft(2, '0');
+    final tglTrans = '${two(now.year % 100)}${two(now.month)}${two(now.day)}${two(now.hour)}${two(now.minute)}${two(now.second)}';
+    final invoice = now.millisecondsSinceEpoch.toString();
+
+    final dio = Dio();
+    dio.options.headers['x-username'] = xusername;
+    dio.options.headers['x-password'] = xpassword;
+    dio.options.connectTimeout = const Duration(seconds: 20);
+    dio.options.receiveTimeout = const Duration(seconds: 30);
+
+    final response = await dio.post(
+      NetworkURL.inqueryRek(),
+      data: FormData.fromMap({"token": token, "invoice": invoice, "no_hp": noHp, "bpr_id": bprId, "no_rek": noRek, "tgl_trans": tglTrans, "rrn": invoice}),
+      options: Options(validateStatus: (_) => true),
+    );
+    final res = _decode(response.data);
+    final nama = res is Map && res['data'] is Map ? '${res['data']['nama_rek'] ?? ''}'.trim() : '';
+    if (res is Map && '${res['code']}' == '000' && nama.isNotEmpty) return nama;
+    throw Exception(res is Map ? (res['message'] ?? 'Rekening tidak ditemukan.') : 'Rekening tidak ditemukan.');
+  }
+
   /// Biaya materai pembukaan deposito. [digital] true -> "D", false -> "K" (konvensional/manual). Null bila tidak tersedia.
   static Future<BiayaMaterai?> inquiryBiayaMaterai({required String bprId, required String userLogin, required bool digital}) async {
     // Server web-service-medfo hanya mengizinkan header Content-Type/API-Key (CORS) -- jangan pakai _dio().
